@@ -1,5 +1,5 @@
 (ns aoc2016.day01-test
-  (:require [aoc2016.day01 :refer [turn move north]]
+  (:require [aoc2016.day01 :refer [turn move north east west]]
             [clojure.test :refer [deftest is testing]]))
 
 (deftest turn-test-right
@@ -11,6 +11,6 @@
 
 (deftest move-test
   (testing "moving to the right"
-    (is (= '(100 0) (move north "R100"))))
+    (is (= (list east '(100 0)) (move north "R100"))))
   (testing "moving to the left"
-    (is (= '(-100 0) (move north "L100")))))
+    (is (= (list west '(-100 0)) (move north "L100")))))
