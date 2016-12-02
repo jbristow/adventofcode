@@ -25,7 +25,8 @@
   (reduce (fn [sum value] (keypad-move value sum)) 5 input))
 
 (defn answer-a [filename]
-  (apply str (map process-a (line-seq (BufferedReader. (FileReader. filename))))))
+  (clojure.string/join
+   (map process-a (line-seq (BufferedReader. (FileReader. filename))))))
 
 (def down-from {1 3, 2 6, 3 7, 4 8, 6 \A, 7 \B, 8 \C, \B \D})
 (def up-from {3 1, 6 2, 7 3, 8 4, \A 6, \B 7, \C 8, \D \B})
@@ -47,4 +48,5 @@
   (reduce (fn [sum value] (diamond-move value sum)) 5 input))
 
 (defn answer-b [filename]
-  (apply str (map process-b (line-seq (BufferedReader. (FileReader. filename))))))
+  (clojure.string/join 
+   (map process-b (line-seq (BufferedReader. (FileReader. filename))))))

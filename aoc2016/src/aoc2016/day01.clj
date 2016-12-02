@@ -23,7 +23,7 @@
 
 (defn move [current-direction input]
   (let [turn-direction (str (first input))
-        movement (Integer. (apply str (rest input)))
+        movement (Integer. (clojure.string/join (rest input)))
         new-direction (turn turn-direction current-direction)]
     (list new-direction (map #(* movement %) new-direction))))
 
@@ -39,7 +39,7 @@
 
 (defn move-b [current-direction current-location input]
   (let [turn-direction (str (first input))
-        movement (Integer. (apply str (rest input)))
+        movement (Integer. (clojure.string/join (rest input)))
         new-direction (turn turn-direction current-direction)
         steps (map #(map + current-location (map * new-direction (list % %))) (range 1 (inc movement)))]
     (list new-direction steps)))
