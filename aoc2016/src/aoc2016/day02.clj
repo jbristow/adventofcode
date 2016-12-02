@@ -30,8 +30,8 @@
 
 (def down-from {1 3, 2 6, 3 7, 4 8, 6 \A, 7 \B, 8 \C, \B \D})
 (def up-from {3 1, 6 2, 7 3, 8 4, \A 6, \B 7, \C 8, \D \B})
-(def left-from {3 2, 4 3, 6 5, 7 6, 8 7, 9 8, \B \A, \C \B})
-(def right-from {2 3, 3 4, 5 6, 6 7, 7 8, 8 9, \A \B, \B \C})
+(def left-of {3 2, 4 3, 6 5, 7 6, 8 7, 9 8, \B \A, \C \B})
+(def right-of {2 3, 3 4, 5 6, 6 7, 7 8, 8 9, \A \B, \B \C})
 
 (defn get-next-key [keymap number]
   (if (contains? keymap number) (get keymap number) number))
@@ -43,9 +43,9 @@
 (defmethod diamond-move \D [direction number]
   (get-next-key down-from number))
 (defmethod diamond-move \R [direction number]
-  (get-next-key right-from number))
+  (get-next-key right-of number))
 (defmethod diamond-move \L [direction number]
-  (get-next-key left-from number))
+  (get-next-key left-of number))
 
 (defn process-b [input]
   (reduce (fn [sum value] (diamond-move value sum)) 5 input))
