@@ -1,14 +1,6 @@
 # aoc2016
 
-A Clojure library designed to ... well, that part is up to you.
+A clojure solution for the [Advent of Code 2016](http://adventofcode.com/2016)!
 
-## Usage
+Consider reading my files to be spoilers for both the content of the questions and the answers.
 
-FIXME
-
-## License
-
-Copyright © 2016 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
