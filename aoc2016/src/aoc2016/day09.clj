@@ -1,4 +1,5 @@
 (ns aoc2016.day09
+  (:require [clojure.string :as str])
   (:import (java.io BufferedReader FileReader)))
 
 (defn process [input]
@@ -6,12 +7,12 @@
          output '()]
     (cond
       (nil? h)
-      (clojure.string/join (reverse output))
+      (str/join (reverse output))
 
       (= h \()
       (let [data (map #(Integer. %)
-                      (clojure.string/split
-                       (apply str (take-while (partial not= \)) r))
+                      (str/split
+                       (str/join (take-while (partial not= \)) r))
                        #"x"))
             after-paren (rest (drop-while (partial not= \)) r))
             expanded (flatten (repeat (second data)
@@ -31,8 +32,8 @@
 
       (= h \()
       (let [data (map #(Integer. %)
-                      (clojure.string/split
-                       (apply str (take-while (partial not= \)) r))
+                      (str/split
+                       (str/join (take-while (partial not= \)) r))
                        #"x"))
             after-paren (rest (drop-while (partial not= \)) r))
             expanded (apply + (repeat (second data)
@@ -46,7 +47,7 @@
 
 (defn answer []
   (count
-   (clojure.string/replace
+   (str/replace
     (first (map process
                 (line-seq (BufferedReader.
                            (FileReader. "resources/day09.txt")))))
