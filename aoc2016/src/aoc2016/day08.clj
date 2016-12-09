@@ -77,7 +77,6 @@
 (defn answer [solver]
   (count (filter true? (vals (solver puzzle-input (screen 50 6))))))
 
-(defn printout []
-  (let [ans (solver-1 puzzle-input (screen 50 6))]
-    (doseq [y (range 6)]
-      (println (map #(if (get ans (keyword (str % "-" y))) "#" ".")  (range 50))))))
+(defn printout [ans]
+  (doseq [y (range 6)]
+    (println (map #(if (get ans (keyword (str % "-" y))) "#" ".")  (range 50)))))
