@@ -8,7 +8,7 @@
 (defn parse-line [input]
   (let [split-line (clojure.string/split input #" ")]
     (cond (= "bot" (first split-line))
-          {:which :default
+          {:which :queue
            :bot-n (str "bot" (get split-line 1))
            :low (str (get split-line 5)
                      (get split-line 6))
@@ -23,35 +23,25 @@
 (defmulti give (fn [instruction bots] (:which instruction)))
 
 (defmethod give :direct [{bot-n :bot-n value :value :as instruction} bots]
-  (let [{q :queue :as curr-bot} (get bots bot-n)
-        v (sort (conj (:values curr-bot) value))]
-    (cond (nil? curr-bot)
-          (merge bots {bot-n (create-bot q v)})
-
-          (= 2 (count v))
-          (give {:which :direct :value (first v) :bot-n (:low q)}
-                (give {:which :direct :value (second v) :bot-n (:high q)}
-                      (merge bots {bot-n (create-bot nil v)})))
-          :else
-          (merge bots {bot-n (create-bot q v)}))))
-
-(defmethod give :default [{bot-n :bot-n :as instruction} bots]
-  (let [{v :values :as curr-bot} (get bots bot-n)
-        q instruction]
-    (cond
-      (nil? bot-n)
-      {}
-
-      (nil? curr-bot)
-      (merge bots {bot-n (create-bot instruction '())})
-
-      (= 2 (count v))
-      (give {:which :direct :value (first v) :bot-n (:low q)}
-            (give {:which :direct :value (second v) :bot-n (:high q)}
+  (let [{{:keys [low high] :as q} :queue :as curr-bot} (get bots bot-n)
+        [low-value high-value :as v] (sort (conj (:values curr-bot) value))]
+    (if (= 2 (count v))
+      (give {:which :direct :value low-value :bot-n low}
+            (give {:which :direct :value high-value :bot-n high}
                   (merge bots {bot-n (create-bot nil v)})))
 
-      :else
-      (merge bots {bot-n (create-bot instruction v)}))))
+      (merge bots {bot-n (create-bot q v)}))))
+
+(defmethod give :queue [{:keys [bot-n low high] :as q} bots]
+  (let [{[low-value high-value :as v] :values :as curr-bot} (get bots bot-n)]
+    (if (= 2 (count v))
+      (give {:which :direct :value low-value :bot-n low}
+            (give {:which :direct :value high-value :bot-n high}
+                  (merge bots {bot-n (create-bot nil v)})))
+
+      (merge bots {bot-n (create-bot q v)}))))
+
+(defmethod give :default [_ _] {})
 
 (def sample ["value 5 goes to bot 2"
              "bot 2 gives low to bot 1 and high to bot 0"
