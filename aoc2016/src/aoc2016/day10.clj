@@ -20,26 +20,24 @@
            :value (Integer. (get split-line 1))
            :bot-n (str "bot" (get split-line 5))})))
 
+(defn update-bots [bot-n {:keys [low high] :as q} [low-value high-value :as v] bots]
+  (if (= 2 (count v))
+    (give {:which :direct :value low-value :bot-n low}
+          (give {:which :direct :value high-value :bot-n high}
+                (merge bots {bot-n (create-bot nil v)})))
+
+    (merge bots {bot-n (create-bot q v)})))
+
 (defmulti give (fn [instruction bots] (:which instruction)))
 
 (defmethod give :direct [{bot-n :bot-n value :value :as instruction} bots]
   (let [{{:keys [low high] :as q} :queue :as curr-bot} (get bots bot-n)
         [low-value high-value :as v] (sort (conj (:values curr-bot) value))]
-    (if (= 2 (count v))
-      (give {:which :direct :value low-value :bot-n low}
-            (give {:which :direct :value high-value :bot-n high}
-                  (merge bots {bot-n (create-bot nil v)})))
-
-      (merge bots {bot-n (create-bot q v)}))))
+    (update-bots bot-n q v bots)))
 
 (defmethod give :queue [{:keys [bot-n low high] :as q} bots]
-  (let [{[low-value high-value :as v] :values :as curr-bot} (get bots bot-n)]
-    (if (= 2 (count v))
-      (give {:which :direct :value low-value :bot-n low}
-            (give {:which :direct :value high-value :bot-n high}
-                  (merge bots {bot-n (create-bot nil v)})))
-
-      (merge bots {bot-n (create-bot q v)}))))
+  (let [{v :values :as curr-bot} (get bots bot-n)]
+    (update-bots bot-n q v bots)))
 
 (defmethod give :default [_ _] {})
 
