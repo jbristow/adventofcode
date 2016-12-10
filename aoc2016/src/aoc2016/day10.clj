@@ -3,8 +3,6 @@
 
 (defn create-bot [q v] {:queue q :values v})
 
-(defn process [q bots output] nil)
-
 (defn parse-line [input]
   (let [split-line (clojure.string/split input #" ")]
     (cond (= "bot" (first split-line))
@@ -20,6 +18,8 @@
            :value (Integer. (get split-line 1))
            :bot-n (str "bot" (get split-line 5))})))
 
+(defmulti give (fn [instruction bots] (:which instruction)))
+
 (defn update-bots [bot-n {:keys [low high] :as q} [low-value high-value :as v] bots]
   (if (= 2 (count v))
     (give {:which :direct :value low-value :bot-n low}
@@ -27,8 +27,6 @@
                 (merge bots {bot-n (create-bot nil v)})))
 
     (merge bots {bot-n (create-bot q v)})))
-
-(defmulti give (fn [instruction bots] (:which instruction)))
 
 (defmethod give :direct [{:keys [bot-n value] :as instruction} bots]
   (let [{q :queue curr-values :values} (get bots bot-n)
