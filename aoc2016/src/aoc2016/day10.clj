@@ -30,13 +30,13 @@
 
 (defmulti give (fn [instruction bots] (:which instruction)))
 
-(defmethod give :direct [{bot-n :bot-n value :value :as instruction} bots]
-  (let [{{:keys [low high] :as q} :queue :as curr-bot} (get bots bot-n)
-        [low-value high-value :as v] (sort (conj (:values curr-bot) value))]
+(defmethod give :direct [{:keys [bot-n value] :as instruction} bots]
+  (let [{q :queue curr-values :values} (get bots bot-n)
+        [low-value high-value :as v] (sort (conj curr-values value))]
     (update-bots bot-n q v bots)))
 
-(defmethod give :queue [{:keys [bot-n low high] :as q} bots]
-  (let [{v :values :as curr-bot} (get bots bot-n)]
+(defmethod give :queue [{:keys [bot-n] :as q} bots]
+  (let [{v :values} (get bots bot-n)]
     (update-bots bot-n q v bots)))
 
 (defmethod give :default [_ _] {})
