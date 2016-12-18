@@ -1,6 +1,7 @@
 (ns aoc2016.day13
-  (:require [clojure.set :as s]
-            [clojure.zip :as z]))
+  (:require [aoc2016.util :as util]
+            [clojure.zip :as z]
+            [clojure.set :as s]))
 
 (def favorite-number 1364)
 
@@ -45,24 +46,11 @@
 
 (def z (z/zipper branch? children (fn [_ c] c) [[1 1] '()]))
 
-(defn- zip-children [loc]
-  (when-let [child (z/down loc)]
-    (take-while (complement nil?) (iterate z/right child))))
-
-(defn breadth-first [loc]
-  ((fn bfs [queue]
-     (lazy-seq
-      (when (seq queue)
-        (let [new-loc  (peek queue)
-              children (zip-children new-loc)]
-          (cons new-loc (bfs (into (pop queue) children)))))))
-   (conj clojure.lang.PersistentQueue/EMPTY loc)))
-
 (defn answer
   "Fewest number of steps to get to 31,39"
   [final-node]
   (count (second (z/node (first (filter #(= final-node (first (z/node %)))
-                                        (breadth-first z)))))))
+                                        (util/breadth-first z)))))))
 
 (defn answer-b
   "Number of distinct steps that can be reached in 50 steps"

@@ -1,13 +1,5 @@
 (ns aoc2016.day14
-  (:import (java.security MessageDigest)))
-
-(defn md5 [s]
-  (let [algorithm (MessageDigest/getInstance "MD5")
-        size (* 2 (.getDigestLength algorithm))
-        raw (.digest algorithm (.getBytes s))
-        sig (.toString (BigInteger. 1 raw) 16)
-        padding (clojure.string/join (repeat (- size (count sig)) "0"))]
-    (str padding sig)))
+  (:require [aoc2016.util :as util]))
 
 (def salt "cuanljph")
 
@@ -20,14 +12,14 @@
 (defn find-keys
   []
   (map (fn [s]
-         (let [m (md5 s)]
+         (let [m (util/md5 s)]
            (list s
                  m
                  (Integer. (clojure.string/replace s salt ""))
                  (first-triplet m)))) key-candidates))
 
 (defn multi-md5 [n s]
-  (nth (iterate md5 s) n))
+  (nth (iterate util/md5 s) n))
 
 (defn find-keys-b
   []
