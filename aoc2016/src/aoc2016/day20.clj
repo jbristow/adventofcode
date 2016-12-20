@@ -12,7 +12,7 @@
                              lines))]
     (loop [[x1 y1 :as a] (first ranges)
            [x2 y2 :as b] (second ranges)
-           r (drop 2 ranges)
+           r (nthrest ranges 2)
            nr '()]
       (cond (nil? b)
             (reverse (conj nr a))
