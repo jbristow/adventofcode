@@ -6,12 +6,12 @@
 (defn safe? [i]
   (= i \.))
 
-(defn trapped? [s]
+(defn trapped? [[l _ r]]
   (or
-   (= s "^^.")
-   (= s ".^^")
-   (= s "^..")
-   (= s "..^")))
+   (and (= \^ l)
+        (= \. r))
+   (and (= \. l)
+        (= \^ r))))
 
 (defn next-row [row]
   (clojure.string/join

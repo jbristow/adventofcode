@@ -1,7 +1,7 @@
 (ns aoc2016.day13
   (:require [aoc2016.util :as util]
-            [clojure.zip :as z]
-            [clojure.set :as s]))
+            [clojure.set :as s]
+            [clojure.zip :as zip]))
 
 (def favorite-number 1364)
 
@@ -44,13 +44,13 @@
        (apply list (s/difference (set (open-neighbors x y))
                                  (set seen)))))
 
-(def z (z/zipper branch? children (fn [_ c] c) [[1 1] '()]))
+(def z (zip/zipper branch? children (fn [_ c] c) [[1 1] '()]))
 
 (defn answer
   "Fewest number of steps to get to 31,39"
   [final-node]
-  (count (second (z/node (first (filter #(= final-node (first (z/node %)))
-                                        (util/breadth-first z)))))))
+  (count (second (zip/node (first (filter #(= final-node (first (zip/node %)))
+                                          (util/breadth-first z)))))))
 
 (defn answer-b
   "Number of distinct steps that can be reached in 50 steps"
@@ -58,5 +58,5 @@
   (loop [steps 0
          seen [z]]
     (if (= max-steps steps)
-      (count (distinct (map #(first (z/node %)) seen)))
-      (recur (inc steps) (distinct (concat seen (mapcat zip-children seen)))))))
+      (count (distinct (map #(first (zip/node %)) seen)))
+      (recur (inc steps) (distinct (concat seen (mapcat children seen)))))))

@@ -24,3 +24,19 @@
               children (zip-children new-loc)]
           (cons new-loc (bfs (into (pop queue) children)))))))
    (conj clojure.lang.PersistentQueue/EMPTY loc)))
+
+(defn rotate
+  "Treat a list/vector as a circular data structure and rotate it by n
+   places:
+
+   (rotate 0  [1 2 3 4]) ;=> [1 2 3 4]
+   (rotate 2  [1 2 3 4]) ;=> [3 4 1 2]
+   (rotate -1 [1 2 3 4]) ;=> [4 1 2 3]
+
+   Note, coll should be countable."
+  [n coll]
+  (let [size   (count coll)
+        offset (mod n size)
+        s      (cycle coll)
+        s      (drop offset s)]
+    (vec (take size s))))

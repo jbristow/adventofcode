@@ -9,16 +9,12 @@
   (int (Math/ceil (/ (Math/log x) (Math/log 2)))))
 
 (defn fill [length seed]
-  (println length (order (/ length (count seed))))
-  (str/join
-   (take length
-         (nth
-          (iterate calculate seed)
-          (order (/ length (count seed)))))))
+  (take length (some #(when (<= length (count %)) %)
+                     (iterate calculate seed))))
 
 (defn checksum [s]
-  (println (count s))
   (if (odd? (count s))
+    (count s)
     (checksum (map #(if (= (first %) (second %)) 1 0) (partition 2 s)))))
 
 (defn answer [] (checksum (fill 272 "01000100010010111")))
