@@ -1,7 +1,10 @@
 (ns aoc2016.day14
   (:require [aoc2016.util :as util]))
 
-(def salt "cuanljph")
+(def salt
+  ;"cuanljph"
+
+  "qzyelonm")
 
 (defn first-triplet [i]
   (let [matches (re-find #"(.)\1\1" i)]
