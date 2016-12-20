@@ -6,11 +6,13 @@
 
 (defn clean-blacklist [lines]
   (let [ranges (sort-by first
-                        (map (fn [a] (map (fn [b] (Long/valueOf b))
-                                          (str/split a #"-"))) lines))]
+                        (map #(let [[x y] (str/split % #"-")]
+                                (list (Long/valueOf x)
+                                      (Long/valueOf y)))
+                             lines))]
     (loop [[x1 y1 :as a] (first ranges)
            [x2 y2 :as b] (second ranges)
-           r (rest (rest ranges))
+           r (drop 2 ranges)
            nr '()]
       (cond (nil? b)
             (reverse (conj nr a))
