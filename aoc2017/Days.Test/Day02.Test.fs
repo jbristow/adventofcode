@@ -1,9 +1,12 @@
-module Day02Test
+module ``Tests for Day 02``
 
 open System
 open NUnit.Framework
 open FsUnit
 open Day02
+
+type InitMsgUtils() =
+    inherit FSharpCustomMessageFormatter()
 
 let rowDiffTestData =
     [ TestCaseData([ 5; 1; 9; 5 ]).Returns(8)

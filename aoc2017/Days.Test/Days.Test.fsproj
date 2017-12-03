@@ -6,22 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="../resources/*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <ProjectReference Include="..\Days\Days.fsproj" />
     <PackageReference Include="FsUnit" Version="3.0.0" />
     <PackageReference Include="nunit" Version="3.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="../resources/*">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Compile Include="Day*Test.fs" />
+    <Compile Include="Day01.Test.fs" />
+    <Compile Include="Day02.Test.fs" />
+    <Compile Include="Day03.Test.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Days\Days.fsproj" />
-  </ItemGroup>
 
 </Project>
