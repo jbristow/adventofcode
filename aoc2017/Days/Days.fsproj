@@ -2,15 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>AOC2017</Title>
+    <Version>2017.12.25</Version>
+    <RepositoryUrl>https://github.com/jbristow/adventofcode</RepositoryUrl>
+    <Description>A collection of solutions to the advent of code for 2017. This
+      year, I'm challenging myself to write in F# using dotnet core. The static
+      typing and compile cycle is not as fast as clojure has been, but the
+      language is fun.</Description>
+    <Authors>Jon Bristow</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <Compile Include="Day01.fs" />
     <Compile Include="Day02.fs" />
     <Compile Include="Day03.fs" />
     <Compile Include="Day04.fs" />
     <Compile Include="Day05.fs" />
+    <Compile Include="Day06.fs" />
   </ItemGroup>
 
 </Project>

@@ -27,8 +27,8 @@ let rec findEvenDiv (acc : int) (row : int list) : int =
     let evendivs = xs |> List.filter (isEvenlyDiv x)
 
     match evendivs with
-    | n :: [] when n < x -> acc + (x / n)
-    | n :: [] when n > x -> acc + (n / x)
+    | [n] when n < x -> acc + (x / n)
+    | [n] when n > x -> acc + (n / x)
     | _ -> findEvenDiv acc xs
 
 let corruptionChecksumPart2 (input : int list list) =

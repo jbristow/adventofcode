@@ -1,8 +1,8 @@
-module ``Tests for Day 05``
+module Tests.Day05
 
 open System
 open NUnit.Framework
-open FsUnit
+open Swensen.Unquote
 open Day05
 
 let zipmap x =

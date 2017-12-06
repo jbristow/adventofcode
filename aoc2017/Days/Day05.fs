@@ -1,13 +1,13 @@
 module Day05
 
-type trampolines = Map<int, int>
+type Trampolines = Map<int, int>
 
-let step i (tsMap : trampolines) =
+let step i (tsMap : Trampolines) =
     match tsMap |> Map.tryFind i with
     | Some x -> Some(i + x), tsMap |> Map.add i (x + 1)
     | _ -> None, tsMap
 
-let stepStranger i (tsMap : trampolines) =
+let stepStranger i (tsMap : Trampolines) =
     match tsMap |> Map.tryFind i with
     | Some x when x < 3 -> Some(i + x), tsMap |> Map.add i (x + 1)
     | Some x -> Some(i + x), tsMap |> Map.add i (x - 1)

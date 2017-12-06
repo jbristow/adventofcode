@@ -19,7 +19,7 @@ let spiralContaining (x : int) =
     |> List.skip 1
     |> List.map2 (fun c x -> List.replicate x c) cycle
     |> List.concat
-    |> List.scan (fun (acc : int) (c : int) -> acc + c) 0
+    |> List.scan (+) 0
     |> List.skip 1
     |> List.rev
     |> List.mapi (fun i x -> i, x)

@@ -1,12 +1,9 @@
-module ``Tests for Day 02``
+module Tests.Day02
 
 open System
 open NUnit.Framework
-open FsUnit
+open Swensen.Unquote
 open Day02
-
-type InitMsgUtils() =
-    inherit FSharpCustomMessageFormatter()
 
 let rowDiffTestData =
     [ TestCaseData([ 5; 1; 9; 5 ]).Returns(8)
@@ -14,7 +11,7 @@ let rowDiffTestData =
       TestCaseData([ 2; 4; 6; 8 ]).Returns(6) ]
 
 [<TestCaseSource("rowDiffTestData")>]
-let ``testing individual rows`` (row) = rowDiff 0 row
+let ``tests derived from day02-part01 examples`` (row) = rowDiff 0 row
 
 let smallSample =
     [ [ 5; 1; 9; 5 ]
@@ -22,19 +19,16 @@ let smallSample =
       [ 2; 4; 6; 8 ] ]
 
 [<Test>]
-let ``test small sample``() = corruptionChecksum smallSample |> should equal 18
+let ``test small sample``() = test <@ corruptionChecksum smallSample = 18 @>
 
 [<Test>]
-let ``test parsing``() =
-    parseString [| "5 1 9 5"; "7 5 3"; "2 4 6 8" |] |> should equal smallSample
+let ``input parsing``() =
+    test <@ (parseString [| "5 1 9 5"; "7 5 3"; "2 4 6 8" |]) = smallSample @>
 
 [<Test>]
-let ``Part 1: problem solver``() =
+let ``Answer for day02-part01``() =
     let data : string array = System.IO.File.ReadAllLines("day02.txt")
-    data
-    |> parseString
-    |> corruptionChecksum
-    |> should equal 34925
+    test <@ (data |> parseString |> corruptionChecksum) = 34925 @>
 
 let evenDivTestData =
     [ TestCaseData([ 5; 9; 2; 8 ]).Returns(4)
@@ -42,12 +36,9 @@ let evenDivTestData =
       TestCaseData([ 3; 8; 6; 5 ]).Returns(2) ]
 
 [<TestCaseSource("evenDivTestData")>]
-let FindEvenDiv(row) = findEvenDiv 0 row
+let ``tests derived from day02-part02 examples``(row) = findEvenDiv 0 row
 
 [<Test>]
-let ``Part 2: problem solver``() =
+let ``Answer for day02-part02``() =
     let data : string array = System.IO.File.ReadAllLines("day02.txt")
-    data
-    |> parseString
-    |> corruptionChecksumPart2
-    |> should equal 221
+    test <@ (data |> parseString |> corruptionChecksumPart2) = 221 @>

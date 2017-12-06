@@ -4,10 +4,10 @@ let allEq2 ((x, y) : char * char) : bool = x = y
 let fstAsInt (x, _) = int (string x)
 
 let antiCaptchaN (n:int) (input:string) =
-    Seq.zip input (input.Substring(n) + input.Substring(0,n))
+    (input.Substring(n) + input.Substring(0,n))
+    |> Seq.zip input
     |> Seq.filter allEq2
-    |> Seq.map fstAsInt
-    |> Seq.sum
+    |> Seq.sumBy fstAsInt
 
 let antiCaptcha (input:string) =
   let trimmed = input.Trim()
