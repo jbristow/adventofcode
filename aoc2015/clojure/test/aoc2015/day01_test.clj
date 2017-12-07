@@ -20,4 +20,6 @@
 (deftest answers-day01
   (let [data (slurp "../resources/day01.input")]
     (testing "part01"
-      (is (= 232 (converter data))))))
+      (is (= 232 (converter data))))
+    (testing "part02"
+      (is (= 1783 (whereami data))))))

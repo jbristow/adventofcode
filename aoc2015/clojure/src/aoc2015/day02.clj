@@ -1,23 +1,35 @@
-(ns aoc2015.day02)
+(ns aoc2015.day02
+  (:require [clojure.string :as str]))
 
-(def data
-  (map
-   (fn [row] (map #(Integer. %) (clojure.string/split row #"x")))
-   (clojure.string/split (slurp "resources/day02.input") #"\n")))
+(defn parse-line
+  "Converts AAxBBxCC into an integer triplet."
+  [line]
+  (take 3 (map #(Integer/valueOf %) (str/split line #"x"))))
 
-(defn paper [l w h]
-  (let [a (* 2 l w)
-        b (* 2 w h)
-        c (* 2 h l)
-        d (/ (min a b c) 2)]
-    (+ a b c d)))
+(defn parse-data [lines]
+  (map parse-line lines))
 
-(defn ribbon [l w h]
-  (let  [a (+ l l w w)
-         b (+ w w h h)
-         c (+ h h l l)] 
-    (+ (* l w h) (min a b c))))
+(defn paper [edges]
+  (let [faces (->> edges
+                   cycle
+                   (partition 2 1)
+                   (take 3)
+                   (map (partial apply * 2)))]
+    (apply + (/ (apply min faces) 2) faces)))
 
-(defn answer-1 [] (reduce + 0 (map (fn [[a b c]] (paper a b c)) data)))
+(defn ribbon [edges]
+  (+ (apply * edges)
+     (->> edges
+          (mapcat #(repeat 2 %))
+          cycle
+          (partition 4 2)
+          (take 3)
+          (map (partial reduce + 0))
+          (apply min))))
 
-(defn answer-2 [] (reduce + 0 (map (fn [[a b c]] (ribbon a b c)) data)))
+(defn totaler [f input]
+  (reduce + 0 (map f (parse-data input))))
+
+(defmulti total (fn [which input] which))
+(defmethod total :paper [_ input] (totaler paper input))
+(defmethod total :ribbon [_ input] (totaler ribbon input))
