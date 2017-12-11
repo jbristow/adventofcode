@@ -2,13 +2,6 @@ module Day11
 
 type Point = int * int * int
 
-let N : Point = (0, 1, -1)
-let NW : Point = (-1, 1, 0)
-let SW : Point = (-1, 0, 1)
-let S : Point = (0, -1, 1)
-let SE : Point = (1, -1, 0)
-let NE : Point = (1, 0, -1)
-
 let distance ((ax, ay, az) : Point)  : Point -> int =
     let distanceSubFn ((bx, by, bz) : Point) : int =
       List.max [ bx - ax
@@ -21,12 +14,12 @@ let addPoints ((ax, ay, az) : Point) ((bx, by, bz) : Point) : Point =
 
 let strToPoint =
     function
-    | "n" -> N
-    | "nw" -> NW
-    | "sw" -> SW
-    | "s" -> S
-    | "se" -> SE
-    | "ne" -> NE
+    | "n" -> (0, 1, -1)
+    | "nw" -> (-1, 1, 0)
+    | "sw" -> (-1, 0, 1)
+    | "s" -> (0, -1, 1)
+    | "se" -> (1, -1, 0)
+    | "ne" -> (1, 0, -1)
     | x -> failwith (sprintf "Bad movement. `%s`" x)
 
 let inputToPoints (input : string) : Point list =
