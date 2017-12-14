@@ -12,6 +12,11 @@
     <Authors>Jon Bristow</Authors>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>portable</DebugType>
+    <Optimize>true</Optimize>
+    <GenerateTailCalls>true</GenerateTailCalls>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Day01.fs" />
     <Compile Include="Day02.fs" />
@@ -26,6 +31,7 @@
     <Compile Include="Day11.fs" />
     <Compile Include="Day12.fs" />
     <Compile Include="Day13.fs" />
+    <Compile Include="Day14.fs" />
   </ItemGroup>
 
 </Project>
