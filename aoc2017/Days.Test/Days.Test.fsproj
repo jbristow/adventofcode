@@ -26,6 +26,7 @@
     <Compile Include="Day12.fs" />
     <Compile Include="Day13.fs" />
     <Compile Include="Day14.fs" />
+    <Compile Include="Day15.fs" />
     <Compile Include="Program.fs" />
     <ProjectReference Include="..\Days\Days.fsproj" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
