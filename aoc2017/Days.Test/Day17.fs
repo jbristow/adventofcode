@@ -19,15 +19,15 @@ let samplePart1 curr x buff = spin 3 (curr, x, buff)
 
 [<Test>]
 let samplePart1Full() =
-    let curr, _, buffer = bufferedSpinner 3 |> Seq.item 2016
+    let curr, _, buffer = bufferedSpinner 3 |> Seq.item 2017
     buffer.[curr + 1] =! 638
 
 [<Test>]
 let answerPart1() =
-    let curr, _, buffer = bufferedSpinner 356 |> Seq.item 2016
+    let curr, _, buffer = bufferedSpinner 356 |> Seq.item 2017
     buffer.[curr + 1] =! 808
 
 [<Test>]
 let answerPart2() =
-    let _, _, a = unbufferedSpinner 356 |> Seq.item 49999999
+    let _, _, a = unbufferedSpinner 356 |> Seq.item 50000000
     a =! 47465686
