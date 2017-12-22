@@ -47,4 +47,4 @@ let testAnswerPart2() =
 
   let c = data |> Part2.simulate 10000000
   printfn "%A" c
-  c.Infected =! 5587
+  c.Infected =! 2512135
