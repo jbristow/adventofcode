@@ -11,6 +11,7 @@
     <GenerateTailCalls>true</GenerateTailCalls>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Days\Days.fsproj" />
     <None Include="../resources/*.txt" CopyToPublishDirectory="Always" CopyToOutputDirectory="Always" />
     <Compile Include="Day01.fs" />
     <Compile Include="Day02.fs" />
@@ -33,8 +34,8 @@
     <Compile Include="Day19.fs" />
     <Compile Include="Day20.fs" />
     <Compile Include="Day21.fs" />
+    <Compile Include="Day22.fs" />
     <Compile Include="Program.fs" />
-    <ProjectReference Include="..\Days\Days.fsproj" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <PackageReference Include="NUnit" Version="3.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
