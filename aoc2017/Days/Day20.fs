@@ -108,9 +108,7 @@ let demolitionDerby input =
                        |> Particle.AtTime t
                        |> Particle.GetPosition)
                 |> List.choose (fun a ->
-                       if (snd a
-                           |> List.length
-                           = 1) then Some(snd a)
+                       if (((snd a) |> List.length) = 1) then Some(snd a)
                        else None)
             loop trest (uncollided |> List.concat)
         | [] -> remaining

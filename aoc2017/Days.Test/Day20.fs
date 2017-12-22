@@ -19,7 +19,7 @@ let testParse3 (s) = parse3 s
 [<Test>]
 let testSimpleParticleParse() =
     "p=<-11104,1791,5208>, v=<-6,36,-84>, a=<19,-5,-4>"
-    |> Particle.ofString 0
+    |> Particle.OfString 0
     =! { Label = 0
          Position = (-11104, 1791, 5208)
          Velocity = (-6, 36, -84)
