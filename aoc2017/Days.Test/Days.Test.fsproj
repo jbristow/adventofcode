@@ -35,6 +35,8 @@
     <Compile Include="Day20.fs" />
     <Compile Include="Day21.fs" />
     <Compile Include="Day22.fs" />
+    <Compile Include="Day23.fs" />
+    <Compile Include="Day24.fs" />
     <Compile Include="Program.fs" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <PackageReference Include="NUnit" Version="3.9.0" />
