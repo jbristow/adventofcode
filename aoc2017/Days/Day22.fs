@@ -173,6 +173,15 @@ module Part2 =
         |> Seq.concat
         |> Map.ofSeq
 
+    let display g =
+      let minX = g |> Map.toList |> List.minBy (fst >> fst) |> (fst >> fst) |> (+) -3
+      let maxX = g |> Map.toList |> List.maxBy (fst >> fst) |> (fst >> fst) |> (+) 3
+      let minY = g |> Map.toList |> List.minBy (fst >> snd) |> (fst >> snd) |> (+) -3
+      let maxY = g |> Map.toList |> List.maxBy (fst >> snd) |> (fst >> snd) |> (+) 3
+
+      let dispg = [minY..maxY] |> List.map (fun y -> [minX..maxX] |> List.map (fun x -> State.toChar (g |> Map.tryFind (x,y))))
+      sprintf "(%d,%d)->(%d,%d)\n%s" minX minY maxX maxY (System.String.Join("\n",dispg |> List.map (fun row -> System.String.Join("", row))))
+
     let simulate maxn data =
         let grid = data |> parseInput
         let size = data |> Array.length
@@ -185,5 +194,6 @@ module Part2 =
                 runner nextG nextC (n + 1)
             | _ -> (g, c)
 
-        let _, finalC = runner grid carrier 0
+        let finalG, finalC = runner grid carrier 0
+        System.IO.File.WriteAllText("outputDay22.txt", display finalG)
         finalC

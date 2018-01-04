@@ -2,53 +2,55 @@ module Day18
 
 open System.Text.RegularExpressions
 
-let getRegisterValue register registers =
-    match registers |> Map.tryFind register with
-    | Some x -> x
-    | None -> 0I
+type Registers = Map<string, bigint>
 
-let getValue (s : string) (registers : Map<string, bigint>) =
-    match s with
-    | x when Regex.IsMatch(x, @"\d+") -> System.Numerics.BigInteger.Parse(x)
-    | r -> getRegisterValue r registers
-    | _ -> failwith (sprintf "Could not parse `%s`" s)
+module Registers =
+    let getValue register registers =
+        match registers |> Map.tryFind register with
+        | Some x -> x
+        | None -> 0I
 
-let (|SndC|_|) (line, registers) =
-    if (line |> Array.head) = "snd" then Some(registers |> getValue line.[1])
+    let parseArgument a rs =
+        match a with
+        | x when Regex.IsMatch(x, @"\d+") -> System.Numerics.BigInteger.Parse(x)
+        | r -> rs |> getValue r
+        | _ -> failwith (sprintf "Could not parse `%s`" a)
+
+module Instruction =
+    let mathF f =
+        fun regs (line : string array) ->
+            let a = line.[1]
+            let b = line.[2]
+            a,
+            f (regs |> Registers.parseArgument a)
+                (regs |> Registers.parseArgument b)
+
+    let argValF n =
+        fun regs (line : string array) ->
+            regs |> Registers.parseArgument line.[n]
+
+let instruction label registers line output =
+    if (line |> Array.head) = label then Some(output registers line)
     else None
 
-let (|SetC|_|) (line, registers) =
-    if (line |> Array.head) = "set" then
-        Some(line.[1], (registers |> getValue line.[2]))
-    else None
-
-let math f a b regs = a, f (regs |> getValue a) (regs |> getValue b)
-
-let (|AddC|_|) (line, registers) =
-    if (line |> Array.head) = "add" then
-        Some(math (+) line.[1] line.[2] registers)
-    else None
-
-let (|MulC|_|) (line, registers) =
-    if (line |> Array.head) = "mul" then
-        Some(math (*) line.[1] line.[2] registers)
-    else None
-
-let (|ModC|_|) (line, registers) =
-    if (line |> Array.head) = "mod" then
-        Some(math (%) line.[1] line.[2] registers)
-    else None
-
-let (|RcvC|_|) (line, registers) =
-    if (line |> Array.head) = "rcv" then Some(registers |> getValue line.[1])
-    else None
-
-let (|JgzC|_|) (line, registers) =
-    if (line |> Array.head) = "jgz" then
-        Some
-            (registers |> getValue line.[1],
-             int (registers |> getValue line.[2]))
-    else None
+let (|SndC|_|) (line, regs) =
+    (instruction "snd" regs line (Instruction.argValF 1))
+let (|SetC|_|) (line, regs) =
+    (instruction "set" regs line
+         (fun r l -> l.[1], (r |> Registers.parseArgument l.[2])))
+let (|AddC|_|) (line, regs) =
+    (instruction "add" regs line (Instruction.mathF (+)))
+let (|MulC|_|) (line, regs) =
+    (instruction "mul" regs line (Instruction.mathF (*)))
+let (|ModC|_|) (line, regs) =
+    (instruction "mod" regs line (Instruction.mathF (%)))
+let (|RcvC|_|) (line, regs) =
+    (instruction "rcv" regs line (Instruction.argValF 1))
+let (|JgzC|_|) (line, regs) =
+    (instruction "jgz" regs line
+         (fun r l ->
+         r |> Registers.parseArgument l.[1],
+         int (r |> Registers.parseArgument l.[2])))
 
 let processLine (registers : Map<string, bigint>) lineNum lastSound
     recoveredSounds line =
@@ -77,7 +79,7 @@ let runProgram (input : string array) =
     runProgram' Map.empty 0 -1I []
 
 type Program =
-    { LineNumber : bigint
+    { LineNumber : int
       InputBuffer : bigint list
       Registers : Map<string, bigint>
       WaitingForInput : bool
@@ -85,72 +87,78 @@ type Program =
       Finished : bool
       Id : int }
 
-let createProgram n =
-    { Finished = false
-      Id = n
-      InputBuffer = []
-      LineNumber = 0I
-      Registers = [ "p", bigint n ] |> Map.ofSeq
-      SentCount = 0
-      WaitingForInput = false }
+module Program =
+    let jump n p = { p with LineNumber = p.LineNumber + n }
+    let nextLine p = p |> jump 1
+    let incSentCount p = { p with SentCount = p.SentCount + 1 }
+    let updateRegister r v p = { p with Registers = p.Registers |> Map.add r v }
 
+    let registerMath f x y p =
+        p
+        |> updateRegister x
+               (f (p.Registers |> Registers.parseArgument x)
+                    (p.Registers |> Registers.parseArgument y))
+        |> nextLine
+
+    let init n =
+        { Finished = false
+          Id = n
+          InputBuffer = []
+          LineNumber = 0
+          Registers = [ "p", bigint n ] |> Map.ofSeq
+          SentCount = 0
+          WaitingForInput = false }
+
+
+        
 let (|SndPC|_|) (line : string array, p) =
     if (line |> Array.head) = "snd" then
         Some
-            ({ p with LineNumber = p.LineNumber + 1I
-                      SentCount = p.SentCount + 1 },
-             Some((p.Registers |> getValue line.[1])))
+            (p
+             |> Program.incSentCount
+             |> Program.nextLine,
+             Some((p.Registers |> Registers.parseArgument line.[1])))
     else None
-
-let programSetRegister p x xVal =
-    { p with LineNumber = p.LineNumber + 1I
-             Registers = p.Registers |> Map.add x xVal }
 
 let (|SetPC|_|) (line : string array, p) =
     if (line |> Array.head) = "set" then
-        Some(programSetRegister p line.[1] (p.Registers |> getValue line.[2]))
+        Some(p
+             |> Program.updateRegister line.[1]
+                    (p.Registers |> Registers.parseArgument line.[2])
+             |> Program.nextLine)
     else None
-
-let updateProgramWithMath p f x y =
-    { p with LineNumber = p.LineNumber + 1I
-             Registers =
-                 (p.Registers
-                  |> Map.add x
-                         (f (p.Registers |> getValue (x))
-                              (p.Registers |> getValue (y)))) }
 
 let (|AddPC|_|) (line : string array, p) =
     if (line |> Array.head) = "add" then
-        Some(updateProgramWithMath p (+) line.[1] line.[2])
+        Some(p |> Program.registerMath (+) line.[1] line.[2])
     else None
 
 let (|MulPC|_|) (line : string array, p) =
     if (line |> Array.head) = "mul" then
-        Some(updateProgramWithMath p (*) line.[1] line.[2])
+        Some(p |> Program.registerMath (*) line.[1] line.[2])
     else None
 
 let (|ModPC|_|) (line : string array, p) =
     if (line |> Array.head) = "mod" then
-        Some(updateProgramWithMath p (%) line.[1] line.[2])
+        Some(p |> Program.registerMath (%) line.[1] line.[2])
     else None
 
 let (|RcvPC|_|) (line : string array, p) =
     match (line |> Array.head) = "rcv", p.InputBuffer with
     | true, input :: restInputBuffer ->
-        Some
-            ({ programSetRegister p line.[1] input with WaitingForInput = false
-                                                        InputBuffer =
-                                                            restInputBuffer })
+        Some({ p with InputBuffer = restInputBuffer
+                      WaitingForInput = false }
+             |> Program.updateRegister line.[1] input
+             |> Program.nextLine)
     | true, [] -> Some({ p with WaitingForInput = true })
     | false, _ -> None
 
 let (|JgzPC|_|) (line : string array, p) =
     if (line |> Array.head) = "jgz" then
-        match (p.Registers |> getValue line.[1]) with
-        | v when (v > 0I) ->
-            let jump = (p.Registers |> getValue line.[2])
-            Some { p with LineNumber = p.LineNumber + jump }
-        | v -> Some { p with LineNumber = p.LineNumber + 1I }
+        let n = (int (p.Registers |> Registers.parseArgument line.[2]))
+        match (p.Registers |> Registers.parseArgument line.[1]) with
+        | v when (v > 0I) -> Some(p |> Program.jump n)
+        | v -> Some(p |> Program.nextLine)
     else None
 
 let processLine2 p (line : string array) : Program * bigint option =
@@ -163,13 +171,8 @@ let processLine2 p (line : string array) : Program * bigint option =
 
 let run2Programs (input : string array) =
     let lines = input |> Array.map (fun s -> s.Split([| ' ' |]))
-
-    let lineLen =
-        lines
-        |> Array.length
-        |> bigint
-
-    let inBounds lineN = lineN >= 0I && lineN < lineLen
+    let lineLen = lines |> Array.length
+    let inBounds lineN = lineN >= 0 && lineN < lineLen
 
     let runProgram p =
         if (p.Finished || (p.WaitingForInput && p.InputBuffer |> List.isEmpty)) then
@@ -200,4 +203,4 @@ let run2Programs (input : string array) =
            || (nextP1'.Finished && nextP2'.Finished) then (nextP1', nextP2')
         else run2Programs' nextP1' nextP2'
 
-    run2Programs' (createProgram 0) (createProgram 1)
+    run2Programs' (Program.init 0) (Program.init 1)

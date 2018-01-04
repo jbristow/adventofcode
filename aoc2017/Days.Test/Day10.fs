@@ -8,35 +8,24 @@ open Day10
 [<Test>]
 let ``Test range func``() = range 5 =! [ 0; 1; 2; 3; 4 ]
 
-[<Test>]
-let testRotate() = range 5
-                   |> rotate 2
-                   =! [ 2; 3; 4; 0; 1 ]
-
-[<Test>]
-let testUnrotate() = range 5
-                     |> unrotate 2
-                     =! [ 3; 4; 0; 1; 2 ]
-
-[<Test>]
-let testRotateUnrotateSymmetry() =
-    range 5
-    |> rotate 2
-    |> unrotate 2
-    =! range 5
-
 let sampleDay10Part01Data =
-    [ TestCaseData(0, 0, [ 0; 1; 2; 3; 4 ], 3).Returns(3, 1, [ 2; 1; 0; 3; 4 ])
-      TestCaseData(3, 1, [ 2; 1; 0; 3; 4 ], 4).Returns(3, 2, [ 4; 3; 0; 1; 2 ])
-      TestCaseData(3, 2, [ 4; 3; 0; 1; 2 ], 1).Returns(1, 3, [ 4; 3; 0; 1; 2 ])
-      TestCaseData(1, 3, [ 4; 3; 0; 1; 2 ], 5).Returns(4, 4, [ 3; 4; 2; 1; 0 ]) ]
+    [ TestCaseData(0, 0, [ 0; 1; 2; 3; 4 ], 3).Returns([ 0, 2; 1, 1; 2, 0; 3, 3; 4, 4 ] |> Map.ofList)
+      TestCaseData(3, 1, [ 2; 1; 0; 3; 4 ], 4).Returns([ 0, 4; 1, 3; 2, 0; 3, 1; 4, 2 ] |> Map.ofList)
+      TestCaseData(3, 2, [ 4; 3; 0; 1; 2 ], 1).Returns([ 0, 4; 1, 3; 2, 0; 3, 1; 4, 2 ] |> Map.ofList)
+      TestCaseData(1, 3, [ 4; 3; 0; 1; 2 ], 5).Returns([ 0, 3; 1, 4; 2, 2; 3, 1; 4, 0 ] |> Map.ofList) ]
 
 [<TestCaseSource("sampleDay10Part01Data")>]
 let sampleDay10Part01 (start, skip, col, length) =
-    mutate (start, skip, col) length
+    mutate (col
+            |> List.mapi (fun i x -> i, x)
+            |> Map.ofList) (start, skip, length, 5)
 
 [<Test>]
-let sampleDay10Part01All() = hashByInput 5 "3,4,1,5" =! [ 3; 4; 2; 1; 0 ]
+let sampleDay10Part01All() =
+    hashByInput 5 "3,4,1,5"
+    |> Map.toList
+    |> List.map snd
+    =! [ 3; 4; 2; 1; 0 ]
 
 [<TestCase("", ExpectedResult = "a2582a3a0e66e6e86e3812dcb672a272")>]
 [<TestCase("AoC 2017", ExpectedResult = "33efeb34ea91902bb2f59c9920caa6cd")>]
@@ -50,8 +39,7 @@ let testXorReduce() =
     =! 64
 
 [<Test>]
-let testStrToInt() =
-    strToInt "1,2,3" =! [ 49; 44; 50; 44; 51; 17; 31; 73; 47; 23 ]
+let testStrToInt() = strToInt "1,2,3" =! [ 49; 44; 50; 44; 51 ]
 
 [<TestFixture>]
 type AnswerDay10() =

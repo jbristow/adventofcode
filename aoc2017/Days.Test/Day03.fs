@@ -1,4 +1,4 @@
-module Test.Day03
+module Tests.Day03
 
 open System
 open NUnit.Framework
@@ -44,19 +44,21 @@ let spiral5x5 =
         (4, 4), 25 ] ]
 
 [<Test>]
-let ``spiral test placeholder``() = spiralContaining 3 =! spiral3x3
+let testSpiral3x3 () = spiralContaining 3 =! spiral3x3
 
 [<Test>]
-let ``spiral test placeholder even``() = spiralContaining 10 =! spiral5x5
+let biggerSpiral () = spiralContaining 10 =! spiral5x5
 
 [<TestCase(1, ExpectedResult = 0)>]
 [<TestCase(12, ExpectedResult = 3)>]
 [<TestCase(23, ExpectedResult = 2)>]
 [<TestCase(1024, ExpectedResult = 31)>]
-let ``tests derived from day03-part01 examples`` (input) = findDistance 1 input
+let samplePart1 (input) = findDistance 1 input
 
-[<Test>]
-let ``Answer for day03-part01``() = findDistance 1 289326 =! 419
+[<TestFixture>]
+module Answers =
+    [<Test>]
+    let part1 () = findDistance 1 289326 =! 419
 
-[<Test>]
-let ``Answer for day03-part02``() = findGtInMemory 50 289326 =! int64 295229
+    [<Test>]
+    let part2 () = findGtInMemory 50 289326 =! int64 295229
