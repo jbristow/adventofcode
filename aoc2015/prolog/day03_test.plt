@@ -1,4 +1,3 @@
-
 :-  open("../resources/day03.input", read, InStream),
     read_string(InStream, "\n", "", _, String), 
     nb_setval('FileInput', String).
