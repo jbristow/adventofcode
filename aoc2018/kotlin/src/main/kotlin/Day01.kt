@@ -1,8 +1,6 @@
 import java.io.File
 
 
-fun answer1(input: List<String>) = input.sumBy(String::parseN)
-
 private fun String.parseN() = let { (head, tail) ->
     when (head) {
         '+' -> 1
@@ -11,23 +9,32 @@ private fun String.parseN() = let { (head, tail) ->
     } * tail.toInt()
 }
 
+object Day01 {
+    fun answer1(input: List<String>) = input.sumBy(String::parseN)
 
-fun answer2(input: List<String>) =
-        generateSequence(input.scan(0) { acc, other -> acc + other.parseN() }.tail) {
-            it.map(556::plus)
-        }.findFirstDupe(emptySet())
+    fun answer2(input: List<String>): Int {
+        val ns = input.map(String::parseN).scan(Int::plus)
+        val ending = ns.last
+        return (sequenceOf(listOf(0)) + generateSequence(ns) {
+            it.map(ending::plus)
+        }).findFirstDupe(emptySet())
+    }
 
 
-fun Sequence<List<Int>>.findFirstDupe(seen: Set<Int>): Int = let { (head, tail) ->
-    val inter = head.intersect(seen)
-    when {
-        inter.isNotEmpty() -> head.find { it in inter }!!
-        else -> tail.findFirstDupe(seen + head)
+    tailrec fun Sequence<List<Int>>.findFirstDupe(seen: Set<Int>): Int {
+        val (head, tail) = this
+        val intersections = head intersect seen
+        return when {
+            intersections.isNotEmpty() -> head.find { it in intersections }!!
+            else -> tail.findFirstDupe(seen + head)
+        }
+    }
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val input = File("src/main/resources/day01.txt").readLines()
+        println("answer 1: ${this.answer1(input)}")
+        println("answer 2: ${this.answer2(input)}")
     }
 }
 
-fun main(args: Array<String>) {
-    val input = File("src/main/resources/day01.txt").readLines()
-    println("answer 1: ${answer1(input)}")
-    println("answer 2: ${answer2(input)}")
-}
