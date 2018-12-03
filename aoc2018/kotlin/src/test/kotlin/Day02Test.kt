@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import kotlin.test.assertEquals
 
@@ -31,5 +32,11 @@ internal class Day02Test {
     fun part2_answer() {
         val shuff = input.shuffled()
         assertEquals("srijafjzloguvlntqmphenbkd", Day02.answer2(shuff))
+    }
+
+    @ParameterizedTest
+    @MethodSource("inputProvider")
+    fun bencher(data: List<String>) {
+        assertEquals("abc", Day02.answer2(data))
     }
 }
