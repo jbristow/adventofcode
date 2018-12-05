@@ -21,6 +21,7 @@ repositories {
 dependencies {
     // Use the Kotlin JDK 8 standard library
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1")
 
     // Use the Kotlin test library
     testImplementation(kotlin("test"))
