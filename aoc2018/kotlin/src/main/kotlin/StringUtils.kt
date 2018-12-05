@@ -26,3 +26,5 @@ fun <B> String.cartesian(transform: (Char, Char) -> B): Sequence<B> {
         }
     }.flatten()
 }
+
+val String.init get() = dropLast(1)

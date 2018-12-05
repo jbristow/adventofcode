@@ -1,8 +1,9 @@
+<<<<<<< HEAD
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
 
-internal class Day03Test {
+internal class Day05Test {
     private val input = File("src/main/resources/day03.txt").readLines()
 
     @Test
@@ -28,5 +29,18 @@ internal class Day03Test {
     @Test
     fun part2_answer(){
         assertEquals("235",Day03.answer2(input))
+=======
+import org.junit.jupiter.api.Test
+import java.io.File
+import kotlin.test.assertEquals
+
+internal class Day05Test {
+
+   // private val input = File("src/main/resources/day03.txt").readLines()
+
+    @Test
+    fun part1_sample1() {
+        assertEquals("dabCBAcaDA", Day05.answer1("dabAcCaCBAcCcaDA"))
+>>>>>>> Day 5 - 2018
     }
 }

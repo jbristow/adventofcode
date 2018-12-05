@@ -29,3 +29,5 @@ fun <A, B : Any> List<A>.cartesianNotNull(transform: ((A, A) -> B?)): Sequence<B
         }
     }.flatten()
 }
+
+
