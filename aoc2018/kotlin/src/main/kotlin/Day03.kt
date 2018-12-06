@@ -1,14 +1,12 @@
+import utility.Point
+import utility.init
+import kotlinx.coroutines.runBlocking
 import java.io.File
-import java.io.PrintWriter
 import kotlin.math.max
 import kotlin.math.min
 
-typealias Point = Pair<Int, Int>
 
-val Point.x get() = first
-val Point.y get() = second
-
-private fun String.parseRect(): Rectangle {
+fun String.parseRect(): Rectangle {
     val result = Regex("""#(\d+) @ (\d+),(\d+): (\d+)x(\d+)""").find(this)
     val groups = result!!.groups
     return Rectangle(
@@ -22,7 +20,7 @@ private fun String.parseRect(): Rectangle {
 
 class Rectangle(val id: String, val tl: Point, val br: Point) {
     constructor(id: String, x: Int, y: Int, width: Int, height: Int) :
-            this(id, x to y, x + width to y + height)
+            this(id, Point(x, y), Point(x + width, y + height))
 }
 
 private fun Rectangle.overlaps(b: Rectangle) = when {
@@ -32,54 +30,41 @@ private fun Rectangle.overlaps(b: Rectangle) = when {
     else -> true
 }
 
+fun <T> Sequence<Set<T>>.unionAll() =
+    this.fold(emptySet<T>()) { a, b -> a.union(b) }
 
 object Day03 {
-    fun answer1(input: List<String>): Int {
-        val points = input
-            .cartesian { a, b -> a.parseRect() to b.parseRect() }
-            .filter { (a, b) -> a.overlaps(b) }
-            .map { (a, b) -> a.intersection(b) }
-            .reduce { set, other -> set.union(other) }
+    fun answer1(input: List<Rectangle>) =
+        input.init.asSequence()
+            .mapIndexed { i, a ->
+                input.drop(i + 1).asSequence().filter {
+                    a.overlaps(it)
+                }.map { b ->
+                    a.intersection(b)
+                }.unionAll()
+            }.unionAll()
+            .count()
 
 
-        val maxX = points.map { it.x }.max()!!
-        val maxY = points.map { it.y }.max()!!
-        PrintWriter(File("outputDay03-${System.currentTimeMillis()}.txt")).use { pw ->
-            pw.println((0..maxY).joinToString("\n") { y ->
-                (0..maxX).joinToString("") { x ->
-                    when {
-                        x to y in points -> "X"
-                        else -> " "
-                    }
-                }
-
-
-            })
-        }
-
-        return points.count()
-    }
-
-    fun answer2(input: List<String>) =
-        input.asSequence()
-            .map(String::parseRect)
-            .let { rects ->
-                rects.find { a -> rects.none(a::overlaps) }?.id
-            }
+    fun answer2(rects: List<Rectangle>) =
+        rects.find { a -> rects.none(a::overlaps) }?.id
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val input = File("src/main/resources/day03.txt").readLines()
-        println("answer 1: ${answer1(input)}")
-        println("answer 2: ${answer2(input)}")
+        runBlocking {
+            val input = File("src/main/resources/day03.txt").readLines()
+                .map(String::parseRect)
+
+            println("answer 1: ${answer1(input)}")
+            println("answer 2: ${answer2(input)}")
+        }
     }
-
-
 }
 
-
 fun Rectangle.intersection(b: Rectangle): Set<Point> =
-    (max(tl.x, b.tl.x) until min(br.x, b.br.x)).flatMap { x ->
-        (max(tl.y, b.tl.y) until min(br.y, b.br.y)).map { y -> x to y }
-    }.toSet()
+    (max(tl.x, b.tl.x) until min(br.x, b.br.x)).asSequence()
+        .map { x ->
+            (max(tl.y, b.tl.y) until min(br.y, b.br.y)).asSequence()
+                .map { y -> Point(x, y) }
+        }.flatten().toSet()
 

@@ -1,3 +1,5 @@
+package utility
+
 /**
  * scan is similar to fold, but returns a list of successive reduced values from the left:
  *   [1,2,3].scan(0) {a,i->a + i} ==> [0,1,3,6]

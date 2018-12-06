@@ -1,3 +1,7 @@
+import utility.cartesian
+import utility.different
+import utility.frequencies
+import utility.same
 import java.io.File
 
 fun <A, B> Map<A, B>.anyValue(test: (B) -> Boolean) = any { (_, v) -> test(v) }

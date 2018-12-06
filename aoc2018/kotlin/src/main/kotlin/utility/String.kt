@@ -1,3 +1,5 @@
+package utility
+
 val String.tail get() = drop(1)
 val String.head get() = first()
 

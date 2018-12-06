@@ -14,15 +14,15 @@ fun String.react() =
 
 
 object Day05 {
-fun answer1(input: String) = input.react().count()
+    fun answer1(input: String) = input.react().count()
 
-fun answer2(input: String) =
-    ('a'..'z').zip('A'..'Z')
-        .map { (lc, uc) ->
-            input.filterNot { it == lc || it == uc }
-                .react()
-                .count()
-        }.min()
+    fun answer2(input: String) =
+        ('a'..'z').zip('A'..'Z')
+            .map { (lc, uc) ->
+                input.filterNot { it == lc || it == uc }
+                    .react()
+                    .count()
+            }.min()
 
 
     @JvmStatic
