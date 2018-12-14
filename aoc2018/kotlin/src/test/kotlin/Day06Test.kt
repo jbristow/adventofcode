@@ -1,9 +1,10 @@
 import org.junit.jupiter.api.Test
+import utility.Point
 import java.io.File
+import kotlin.random.Random
 import kotlin.test.assertEquals
 
 internal class Day06Test {
-
     private val input =
         File("src/main/resources/day06.txt").readLines().map(String::parsePoint)
     private val data =
@@ -12,6 +13,17 @@ internal class Day06Test {
     @Test
     fun part1_sample() {
         assertEquals(17, Day06.answer1(data))
+    }
+
+    @Test
+    fun part1_sample2() {
+        val rand = Random
+        assertEquals(
+            17,
+            Day06.answer1(generateSequence {
+                Point(rand.nextInt(30), rand.nextInt(30))
+            }.distinct().take(25).toList())
+        )
     }
 
     @Test

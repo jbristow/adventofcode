@@ -1,6 +1,7 @@
 import utility.*
 import java.awt.image.BufferedImage
 import java.io.File
+import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -77,8 +78,14 @@ object Day06 {
 
         val topLeft = Point(minX, minY)
 
+        val rand = Random()
+        val colors = generateSequence {
+            (rand.nextInt(0x8) + 3) * 0x110000 +
+                    (rand.nextInt(0x8) + 3) * 0x1100 +
+                    (rand.nextInt(0x8) + 3) * 0x11
+        }.distinct().take(input.count()).toList()
         val color = input.mapIndexed { i, point ->
-            point to (i * ((0xEEEEEE - 0x666666) / input.count()))
+            point to colors[i]
         }.toMap()
 
         BufferedImage(

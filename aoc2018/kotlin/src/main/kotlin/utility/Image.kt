@@ -1,5 +1,6 @@
 package utility
 
+import java.awt.Color
 import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
@@ -11,6 +12,12 @@ fun BufferedImage.floodFill(rgb: Int): BufferedImage {
             setRGB(x, y, rgb)
         }
     }
+    return this
+}
+
+fun BufferedImage.floodFill(color: Color): BufferedImage {
+    graphics.color = color
+    graphics.fillRect(0, 0, width, height)
     return this
 }
 
@@ -53,3 +60,4 @@ fun BufferedImage.writePng(filename: String): BufferedImage {
     ImageIO.write(this, "png", File("$filename.png"))
     return this
 }
+

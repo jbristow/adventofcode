@@ -22,7 +22,13 @@ dependencies {
     // Use the Kotlin JDK 8 standard library
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1")
-
+    implementation("io.reactivex.rxjava2:rxkotlin:2.2.0")
+    implementation("org.apache.tinkerpop:gremlin-core:3.3.4")
+    implementation("org.apache.tinkerpop:gremlin-driver:3.3.4")
+    implementation("org.slf4j:slf4j-api:1.8.0-beta2")
+    implementation("org.slf4j:slf4j-simple:1.8.0-beta2")
+    implementation("io.github.microutils:kotlin-logging:1.6.22")
+    
     // Use the Kotlin test library
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
