@@ -1,21 +1,11 @@
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
-import kroo.net.GifSequenceWriter
 import utility.Point
-import utility.drawImage
 import utility.head
 import utility.tail
 import java.awt.Color
 import java.awt.Graphics
-import java.awt.Image
 import java.awt.image.BufferedImage
 import java.awt.image.BufferedImage.TYPE_INT_ARGB
 import java.io.File
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import javax.imageio.stream.FileImageOutputStream
 
 enum class Choice {
     LEFT {
@@ -80,12 +70,8 @@ fun Char.toDirection(): Direction? {
     return Direction.values().find { it.char == this }
 }
 
-fun String.toDirection(): Direction? {
-    require(this.count() == 1) { "Directions can only be parsed from single char strings" }
-    return first().toDirection()
-}
 
-private fun <E> Direction?.whenNotNull(function: (Direction) -> E): E? = when {
+fun <E> Direction?.whenNotNull(function: (Direction) -> E): E? = when {
     this != null -> function(this)
     else -> null
 }
@@ -113,17 +99,17 @@ data class Cart(
 
 }
 
-private fun Cart.nextPosition(direction: Direction, lastChoice: Choice?) =
+fun Cart.nextPosition(direction: Direction, lastChoice: Choice?) =
     Cart(direction.move(loc), direction, lastChoice, id)
 
-private fun Cart.nextPosition(direction: Direction) =
+fun Cart.nextPosition(direction: Direction) =
     Cart(direction.move(loc), direction, lastChoice, id)
 
 // '\'
-private fun Cart.turnBackCorner() = nextPosition(direction.turnBack())
+fun Cart.turnBackCorner() = nextPosition(direction.turnBack())
 
 // '/'
-private fun Cart.turnForwardCorner() = nextPosition(direction.turnForward())
+fun Cart.turnForwardCorner() = nextPosition(direction.turnForward())
 
 
 val Cart.x: Int get() = loc.x
@@ -142,143 +128,64 @@ fun Cart.move(tracks: List<String>) = when (tracks[y][x]) {
     else -> throw OffTheRailsException(loc)
 }
 
-private fun Cart.intersection() = when (lastChoice) {
+fun Cart.intersection() = when (lastChoice) {
     null, Choice.RIGHT -> Choice.LEFT.makeChoice(this)
     Choice.STRAIGHT -> Choice.RIGHT.makeChoice(this)
     Choice.LEFT -> Choice.STRAIGHT.makeChoice(this)
 }
 
+fun <E> List<E>.splitBy(predicate: (E) -> Boolean) =
+    groupBy(predicate).let {
+        (it[false] ?: emptyList()) to (it[true] ?: emptyList())
+    }
+
+
+fun List<String>.findCarts() =
+    mapIndexed { y, xl ->
+        xl.mapIndexedNotNull { x, c ->
+            c.toDirection().whenNotNull {
+                Cart(Point(x, y), it, null)
+            }
+        }
+    }.flatten()
+
 object Day13 {
 
 
-    private val timestamp: String =
-        LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
-            .replace(Regex("""\W"""), "")
+//    private val timestamp: String =
+//        LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+//            .replace(Regex("""\W"""), "")
 
     @JvmStatic
     fun main(args: Array<String>) {
-        runBlocking {
-            val input = File("src/main/resources/day13.txt").readLines()
-            val trackLayer = drawRails(input)
-            println("Answer 1: ${Day13.answer1(input, trackLayer)}");
-            println("Answer 2: ${Day13.answer2(input, trackLayer)}");
-        }
+        val input = File("src/main/resources/day13.txt").readLines()
+
+        println("Answer 1: ${Day13.answer1(input)}")
+        println("Answer 2: ${Day13.answer2(input)}")
     }
 
-    private suspend fun answer1(
-        input: List<String>,
-        trackLayer: BufferedImage
-    ) =
-
-        FileImageOutputStream(File("day13-output-$timestamp.gif")).use { output ->
-            GifSequenceWriter(output, TYPE_INT_ARGB, 10, false).use { writer ->
-                val channel = Channel<Image>()
-                val retVal = GlobalScope.async {
-                    val x = step(
-                        0,
-                        input.findCarts(),
-                        input,
-                        channel,
-                        trackLayer.width to trackLayer.height
-                    )
-                    channel.close()
-                    x
-                }
-                for (image in channel) {
-                    val bgl = BufferedImage(
-                        trackLayer.width,
-                        trackLayer.height,
-                        TYPE_INT_ARGB
-                    )
-                    bgl.graphics.color = Color(0x00, 0x00, 0x00, 0xff)
-                    bgl.graphics.drawRect(
-                        0,
-                        0,
-                        trackLayer.width,
-                        trackLayer.height
-                    )
-                    bgl.drawImage(trackLayer).drawImage(image)
-                    bgl.flush()
-                    writer.writeToSequence(bgl)
-                }
-
-                retVal.await()
-            }
-        }
+    private fun answer1(input: List<String>) =
+        step(0, input.findCarts(), input)
 
 
-    private suspend fun answer2(
-        input: List<String>,
-        trackLayer: BufferedImage
-    ) =
-        FileImageOutputStream(File("day13-output-part2-$timestamp.gif")).use { output ->
-            GifSequenceWriter(output, TYPE_INT_ARGB, 10, false).use { writer ->
-                val channel = Channel<Image>()
-                val retVal = GlobalScope.async {
-                    demolitionStep(
-                        0,
-                        input.findCarts(),
-                        input,
-                        channel,
-                        trackLayer.width to trackLayer.height
-                    ).let {
-                        channel.close()
-                        it
-                    }
-                }
-                for (image in channel) {
-                    val bgl = BufferedImage(
-                        trackLayer.width,
-                        trackLayer.height,
-                        TYPE_INT_ARGB
-                    )
-                    bgl.graphics.color = Color(0x00, 0x00, 0x00, 0xff)
-                    bgl.graphics.drawRect(
-                        0,
-                        0,
-                        trackLayer.width,
-                        trackLayer.height
-                    )
-                    bgl.drawImage(trackLayer).drawImage(image)
-                    bgl.flush()
-                    writer.writeToSequence(bgl)
-                }
-                retVal.await()
-            }
-        }
+    private fun answer2(input: List<String>) =
+        demolitionStep(0, input.findCarts(), input)
 
-    tailrec suspend fun demolitionStep(
+    private tailrec fun step(
         i: Int,
         carts: List<Cart>,
-        tracks: List<String>,
-        channel: Channel<Image>,
-        imgDim: Pair<Int, Int>
+        tracks: List<String>
     ): Point {
-        val (nextCarts, collisions) = moveCarts(
-            carts = carts.sorted(),
-            tracks = tracks
-        )
-        channel.send(
-            drawCarts(
-                imgDim.first,
-                imgDim.second,
-                nextCarts + collisions
-            )
-        )
+        val (nextCarts, collisions) =
+                moveCarts(carts = carts.sorted(), tracks = tracks)
+
         return when {
-            carts.count() == 1 -> carts.first().loc
-            else ->
-                demolitionStep(
-                    i + 1,
-                    carts,
-                    tracks,
-                    channel,
-                    imgDim
-                )
+            collisions.isEmpty() -> step(i + 1, nextCarts, tracks)
+            else -> collisions.first().loc
         }
     }
 
-    tailrec fun moveCarts(
+    private tailrec fun moveCarts(
         carts: List<Cart>,
         moved: List<Cart> = emptyList(),
         collided: List<Cart> = emptyList(),
@@ -304,30 +211,18 @@ object Day13 {
 
     }
 
-    tailrec suspend fun step(
+    private tailrec fun demolitionStep(
         i: Int,
         carts: List<Cart>,
-        tracks: List<String>,
-        channel: Channel<Image>,
-        imgDim: Pair<Int, Int>
+        tracks: List<String>
     ): Point {
-        val (nextCarts, collisions) =
-                moveCarts(carts = carts.sorted(), tracks = tracks)
-
-        channel.send(
-            drawCarts(imgDim.first, imgDim.second, nextCarts + collisions)
+        val (nextCarts, collisions) = moveCarts(
+            carts = carts.sorted(),
+            tracks = tracks
         )
         return when {
-            collisions.isEmpty() -> step(
-                i + 1,
-                nextCarts,
-                tracks,
-                channel,
-                imgDim
-            )
-            else -> {
-                collisions.first().loc
-            }
+            carts.count() == 1 -> carts.first().loc
+            else -> demolitionStep(i + 1, nextCarts, tracks)
         }
     }
 
@@ -486,19 +381,6 @@ object Day13 {
     }
 }
 
-private fun <E> List<E>.splitBy(predicate: (E) -> Boolean) =
-    groupBy(predicate).let {
-        (it[false] ?: emptyList()) to (it[true] ?: emptyList())
-    }
-
-private fun List<String>.findCarts() =
-    mapIndexed { y, xl ->
-        xl.mapIndexedNotNull { x, c ->
-            c.toDirection().whenNotNull {
-                Cart(Point(x, y), it, null)
-            }
-        }
-    }.flatten()
 
 
 

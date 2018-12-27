@@ -1,5 +1,4 @@
 import utility.Point
-import utility.init
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import kotlin.math.max
@@ -35,7 +34,7 @@ fun <T> Sequence<Set<T>>.unionAll() =
 
 object Day03 {
     fun answer1(input: List<Rectangle>) =
-        input.init.asSequence()
+        input.dropLast(1).asSequence()
             .mapIndexed { i, a ->
                 input.drop(i + 1).asSequence().filter {
                     a.overlaps(it)

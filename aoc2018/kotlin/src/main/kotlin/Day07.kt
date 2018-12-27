@@ -77,7 +77,7 @@ object Day07 {
 
 
 object US {
-    fun <A> start() = DefaultGraphTraversal<A, A>()
+    private fun <A> start() = DefaultGraphTraversal<A, A>()
 
     fun <A : Element, B> values(vararg propertyKeys: String) =
         start<A>().values<B>(*propertyKeys)!!
@@ -87,23 +87,21 @@ object US {
     fun <A> addV(vertexLabel: String) =
         start<A>().addV(vertexLabel)!!
 
-    fun outE(vararg edgeLabels: String) =
-        start<Vertex>().outE(*edgeLabels)
-
     fun inE(vararg edgeLabels: String) =
-        start<Vertex>().inE(*edgeLabels)
+        start<Vertex>().inE(*edgeLabels)!!
 
+    @Suppress("FunctionName")
     fun <A> V(vararg vertexIdsOrElements: Any) =
-        start<A>().V(*vertexIdsOrElements)
+        start<A>().V(*vertexIdsOrElements)!!
 
     fun <A : Element, B> properties(vararg propertyKeys: String) =
         start<A>().properties<B>(*propertyKeys)!!
 
     fun <A : Element> label() = start<A>().label()!!
-    fun <A : Property<*>, B> value() = start<A>().value<B>()
+    fun <A : Property<*>, B> value() = start<A>().value<B>()!!
 
     fun <A> not(notTraversal: Traversal<*, *>) =
-        start<A>().not(notTraversal)
+        start<A>().not(notTraversal)!!
 }
 
 private tailrec fun GraphTraversalSource.processSteps(chain: String): String {
@@ -180,4 +178,4 @@ fun <S, E> GraphTraversal<S, E>.upsertStep(
                 .property("name", name)
                 .property("timeLeft", name.toInt() - 'A'.toInt() + offset + 1)
                 .property("total", name.toInt() - 'A'.toInt() + offset + 1)
-        )
+        )!!

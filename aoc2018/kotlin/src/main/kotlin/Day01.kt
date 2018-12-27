@@ -24,7 +24,7 @@ object Day01 {
     }
 
 
-    tailrec fun Sequence<List<Int>>.findFirstDupe(seen: Set<Int>): Int {
+    private tailrec fun Sequence<List<Int>>.findFirstDupe(seen: Set<Int>): Int {
         val (head, tail) = this
         val intersections = head intersect seen
         return when {

@@ -70,7 +70,7 @@ object Day11 {
         return findBox(1, 300, Point(-1, -1), -6, -1, fillGrid(input))
     }
 
-    fun fillGrid(input: Int): List<List<Int>> {
+    private fun fillGrid(input: Int): List<List<Int>> {
         return (1..300).map { y ->
             (1..300).map { x ->
                 powerLevel(input, Point(x, y))

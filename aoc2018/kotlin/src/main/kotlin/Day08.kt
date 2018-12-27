@@ -1,4 +1,3 @@
-import utility.init
 import java.io.File
 import java.util.*
 
@@ -25,7 +24,7 @@ object Day08 {
             val currentMetadata = rest.take(current[1]).asSequence()
             currentMetadata to
                     if (ws.isNotEmpty()) {
-                        ws.init.flatten() + ws.last().let {
+                        ws.dropLast(1).flatten() + ws.last().let {
                             listOf(
                                 it[0] - 1,
                                 it[1]

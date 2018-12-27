@@ -32,6 +32,7 @@ internal class Day05Test {
     }
 
     companion object {
+        @Suppress("unused")
         @JvmStatic
         fun part1_sample_data() = Stream.of(
             arguments(0, "aA"),
@@ -39,6 +40,6 @@ internal class Day05Test {
             arguments(4, "abAB"),
             arguments(6, "aabAAB"),
             arguments(10, "dabAcCaCBAcCcaDA")
-        )
+        )!!
     }
 }

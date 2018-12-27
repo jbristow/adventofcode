@@ -16,6 +16,9 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
     mavenCentral()
+    flatDir {
+        dirs("/Users/jbristow/git/z3/build/")
+    }
 }
 
 dependencies {
@@ -28,7 +31,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.8.0-beta2")
     implementation("org.slf4j:slf4j-simple:1.8.0-beta2")
     implementation("io.github.microutils:kotlin-logging:1.6.22")
-    
+
     // Use the Kotlin test library
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
@@ -39,6 +42,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.3.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.2")
+    implementation("org.apache.httpcomponents:httpclient:4.5.6")
+
+    implementation(files("/Users/jbristow/git/z3/build/com.microsoft.z3.jar"))
 }
 
 tasks.withType<KotlinCompile> {

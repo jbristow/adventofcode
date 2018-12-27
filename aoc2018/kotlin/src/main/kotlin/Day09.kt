@@ -26,7 +26,7 @@ object Day09 {
         private val init: Node<E>
         var first = Node(initial)
         var last = first
-        var size = 0
+        private var size = 0
 
         init {
             first = Node(initial)
