@@ -1,3 +1,5 @@
+package utility
+
 /**
  * scan is similar to fold, but returns a list of successive reduced values from the left:
  *   [1,2,3].scan(0) {a,i->a + i} ==> [0,1,3,6]
@@ -5,13 +7,9 @@
  * Note that `seq.scan(x,operation).last()` is equal to seq.fold(x,operation)
  */
 fun <A, B> Sequence<A>.scan(initial: B, operation: (B, A) -> B) =
-        fold(sequenceOf(initial)) { scanSequence, curr ->
-            scanSequence + operation(scanSequence.last(), curr)
-        }
-
-fun <A> Sequence<A>.scan(operation: (A, A) -> A): Sequence<A> {
-    return tail.scan(head, operation)
-}
+    fold(sequenceOf(initial)) { scanSequence, curr ->
+        scanSequence + operation(scanSequence.last(), curr)
+    }
 
 val <T> Sequence<T>.head get() = first()
 val <T> Sequence<T>.tail get() = drop(1)

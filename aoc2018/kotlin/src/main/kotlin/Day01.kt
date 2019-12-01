@@ -1,5 +1,8 @@
+import utility.component1
+import utility.component2
+import utility.last
+import utility.scan
 import java.io.File
-
 
 private fun String.parseN() = let { (head, tail) ->
     when (head) {
@@ -21,7 +24,7 @@ object Day01 {
     }
 
 
-    tailrec fun Sequence<List<Int>>.findFirstDupe(seen: Set<Int>): Int {
+    private tailrec fun Sequence<List<Int>>.findFirstDupe(seen: Set<Int>): Int {
         val (head, tail) = this
         val intersections = head intersect seen
         return when {
