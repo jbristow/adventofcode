@@ -216,7 +216,7 @@ sealed class Instruction {
 
 object Day05 {
 
-    fun parseInstruction(
+    private fun parseInstruction(
         instruction: String,
         input: MutableList<Long>
     ): Either<String, Pair<Instruction, MutableList<Long>>> =
