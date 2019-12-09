@@ -14,13 +14,15 @@ val arrowVersion = "0.10.3"
 val jupiterVersion = "5.5.2"
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
+
     implementation("io.arrow-kt:arrow-core:$arrowVersion")
     implementation("io.arrow-kt:arrow-syntax:$arrowVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
     // Use the Kotlin test library
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.1")
 
     // Use the Kotlin JUnit integration
     testImplementation(kotlin("test-junit"))
