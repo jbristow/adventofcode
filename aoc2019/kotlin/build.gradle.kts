@@ -1,7 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.3.50"
+    kotlin("jvm") version "1.3.61"
+    kotlin("kapt") version "1.3.61"
 }
 
 version = "1.0-SNAPSHOT"
@@ -18,6 +19,8 @@ dependencies {
 
     implementation("io.arrow-kt:arrow-core:$arrowVersion")
     implementation("io.arrow-kt:arrow-syntax:$arrowVersion")
+    implementation("io.arrow-kt:arrow-optics:$arrowVersion")
+    kapt("io.arrow-kt:arrow-meta:$arrowVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
     // Use the Kotlin test library
     testImplementation(kotlin("test"))
