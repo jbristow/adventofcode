@@ -3,7 +3,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 sealed class Mode {
-    fun assignable(first: Long, code: Array<Long>, offset: Long): Int {
+    fun assignable(first: Long, offset: Long): Int {
         return when (this) {
             is Immediate -> throw Error("Cannot assign to immediate value")
             is Position -> first
@@ -33,8 +33,8 @@ data class CurrentState(
 
 operator fun CurrentState.plus(n: Int) = CurrentState(pointer.map { it + n }, inputs, output)
 
-fun Pair<Long, Mode>.index(code: Array<Long>, state: CurrentState): Int =
-    second.assignable(first, code, state.relativeBase)
+fun Pair<Long, Mode>.index(state: CurrentState): Int =
+    second.assignable(first, state.relativeBase)
 
 fun Pair<Long, Mode>.value(code: Array<Long>, state: CurrentState) =
     second.valueOf(first, code, state.relativeBase)
@@ -76,7 +76,7 @@ sealed class Instruction {
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
             ): Either<String, CurrentState> {
-                code[params[2].index(code, state)] = params[0].value(code, state) + params[1].value(code, state)
+                code[params[2].index(state)] = params[0].value(code, state) + params[1].value(code, state)
                 return (state + 4).right()
             }
         }
@@ -87,7 +87,7 @@ sealed class Instruction {
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
             ): Either<String, CurrentState> {
-                code[params[2].index(code, state)] = params[0].value(code, state) * params[1].value(code, state)
+                code[params[2].index(state)] = params[0].value(code, state) * params[1].value(code, state)
                 return (state + 4).right()
             }
         }
@@ -103,8 +103,8 @@ sealed class Instruction {
                 println(params)
                 println(params[0].value(code,state))
                 println(params[1].value(code,state))
-                println(params[2].index(code,state))
-                code[params[2].index(code, state)] = when {
+                println(params[2].index(state))
+                code[params[2].index(state)] = when {
                     params[0].value(code, state) < params[1].value(code, state) -> 1
                     else -> 0
                 }
@@ -118,7 +118,7 @@ sealed class Instruction {
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
             ): Either<String, CurrentState> {
-                code[params[2].index(code, state)] = when {
+                code[params[2].index(state)] = when {
                     params[0].value(code, state) == params[1].value(code, state) -> 1
                     else -> 0
                 }
@@ -165,7 +165,7 @@ sealed class Instruction {
         ) = inputOption.fold(
             { state },
             { input ->
-                code[params[0].index(code, state)] = input
+                code[params[0].index(state)] = input
                 CurrentState(state.pointer.map { it + 2 }, state.inputs, state.output)
             }).right()
     }

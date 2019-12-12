@@ -16,8 +16,8 @@ object Day04 {
     private fun hasAtLeastOneDigitAppearingExactlyTwice(it: Int) =
         it.toString()
             .groupBy { it }
-            .mapValues { (k, v) -> v.size }
-            .any { (k, v) -> v == 2 }
+            .mapValues { (_, v) -> v.size }
+            .any { (_, v) -> v == 2 }
 
     fun part1() =
         passwordRange.asSequence()
