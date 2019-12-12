@@ -3,6 +3,7 @@ import intcode.CurrentState
 import intcode.step
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.*
 
 object Day09 {
 
@@ -12,17 +13,17 @@ object Day09 {
     private val initialCode = fileData.splitToSequence(",")
         .mapIndexed { i, it -> i.toLong() to it.toLong() }.toMap()
 
-    fun part1(): Either<String, Long> {
+    fun part1(): Either<String, LinkedList<Long>> {
         return step(
             initialCode.toMutableMap(),
-            CurrentState(inputs = mutableListOf(1))
+            CurrentState(inputs = LinkedList(listOf(1L)))
         )
     }
 
     fun part2() =
         step(
             initialCode.toMutableMap(),
-            CurrentState(inputs = mutableListOf(2))
+            CurrentState(inputs = LinkedList(listOf(2L)))
         )
 }
 

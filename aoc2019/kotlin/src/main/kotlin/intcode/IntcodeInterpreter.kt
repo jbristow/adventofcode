@@ -1,6 +1,18 @@
 package intcode
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.flatMap
+import arrow.core.getOrElse
+import arrow.core.left
+import arrow.core.right
+import arrow.core.rightIfNotNull
+import arrow.core.some
+import arrow.core.toOption
+import arrow.optics.optics
+import java.util.*
 
 sealed class Mode {
     fun assignable(first: Long, offset: Long) =
@@ -22,12 +34,16 @@ sealed class Mode {
     object Relative : Mode()
 }
 
+@optics
 data class CurrentState(
     val pointer: Option<Long> = 0L.some(),
-    val inputs: MutableList<Long> = mutableListOf(),
-    val output: Option<Long> = Option.empty(),
-    val relativeBase: Long = 0
-)
+    val inputs: LinkedList<Long> = LinkedList(),
+    val output: LinkedList<Long> = LinkedList(),
+    val relativeBase: Long = 0,
+    val waitingForInput: Boolean = false
+) {
+    companion object
+}
 
 operator fun CurrentState.plus(n: Int) = copy(pointer = pointer.map { it + n })
 operator fun CurrentState.plus(n: Long) = copy(pointer = pointer.map { it + n })
@@ -158,18 +174,20 @@ sealed class Instruction {
         }
     }
 
-    class SetFromInput(private val inputOption: Option<Long>) : Instruction() {
+    class SetFromInput(private val inputs: LinkedList<Long>) : Instruction() {
         override val opcodes: Int = 1
         override fun execute(
             code: MutableMap<Long, Long>,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
-        ) = inputOption.fold(
-            { state },
-            { input ->
+        ) = when {
+            inputs.isEmpty() -> state.copy(waitingForInput = true)
+            else -> {
+                val input = inputs.pop()
                 code[params[0].index(state)] = input
-                state.copy(pointer = state.pointer.map { it + 2 })
-            }).right()
+                state.copy(pointer = state.pointer.map { it + 2 }, waitingForInput = false)
+            }
+        }.right()
     }
 
     class Output : Instruction() {
@@ -179,13 +197,14 @@ sealed class Instruction {
             params: List<Pair<Long, Mode>>,
             state: CurrentState
         ): Either<String, CurrentState> {
-            println("OUTPUT: ${params[0].value(code, state)}")
+//            println("OUTPUT: ${params[0].value(code, state)}")
             return state.copy(
                 pointer = state.pointer.map { it + 2 },
-                output = params[0].value(code, state).some()
+                output = state.output.apply { addLast(params[0].value(code, state)) }
             ).right()
         }
     }
+
 
     class ModifyRelativeBase : Instruction() {
         override val opcodes: Int = 1
@@ -209,24 +228,24 @@ sealed class Instruction {
             state: CurrentState
         ): Either<String, CurrentState> = state.copy(pointer = Option.empty()).right()
     }
-}
 
+}
 
 fun parseInstruction(
     instruction: Long,
-    input: MutableList<Long>
-): Either<String, Pair<Instruction, MutableList<Long>>> =
+    input: LinkedList<Long>
+): Either<String, Instruction> =
     when (instruction % 100) {
-        1L -> (Instruction.ThreeParameterInstruction.Add() to input).right()
-        2L -> (Instruction.ThreeParameterInstruction.Multiply() to input).right()
-        3L -> (Instruction.SetFromInput(input.firstOrNone()) to input.drop(1).toMutableList()).right()
-        4L -> (Instruction.Output() to input).right()
-        5L -> (Instruction.TwoParameterInstruction.JumpIfTrue() to input).right()
-        6L -> (Instruction.TwoParameterInstruction.JumpIfFalse() to input).right()
-        7L -> (Instruction.ThreeParameterInstruction.LessThan() to input).right()
-        8L -> (Instruction.ThreeParameterInstruction.Equal() to input).right()
-        9L -> (Instruction.ModifyRelativeBase() to input).right()
-        99L -> (Instruction.End to input).right()
+        1L -> Instruction.ThreeParameterInstruction.Add().right()
+        2L -> Instruction.ThreeParameterInstruction.Multiply().right()
+        3L -> Instruction.SetFromInput(input).right()
+        4L -> Instruction.Output().right()
+        5L -> Instruction.TwoParameterInstruction.JumpIfTrue().right()
+        6L -> Instruction.TwoParameterInstruction.JumpIfFalse().right()
+        7L -> Instruction.ThreeParameterInstruction.LessThan().right()
+        8L -> Instruction.ThreeParameterInstruction.Equal().right()
+        9L -> Instruction.ModifyRelativeBase().right()
+        99L -> Instruction.End.right()
         else -> "Problem parsing instruction $instruction".left()
     }
 
@@ -240,9 +259,9 @@ fun handleCodePoint(
             { "Program has stopped.".left() },
             { pointer ->
                 code[pointer].rightIfNotNull { "Code point $pointer undefined." }.flatMap { codeValue ->
-                    parseInstruction(codeValue, state.inputs).flatMap { (instr, inp) ->
+                    parseInstruction(codeValue, state.inputs).flatMap { instr ->
                         instr.findInputs(code, state).flatMap { params ->
-                            instr.execute(code, params, state.copy(pointer = pointer.some(), inputs = inp))
+                            instr.execute(code, params, state.copy(pointer = pointer.some()))
                         }
                     }
                 }
@@ -250,18 +269,18 @@ fun handleCodePoint(
         )
     }
 
-fun step(code: MutableMap<Long, Long>, state: CurrentState): Either<String, Long> {
+fun step(code: MutableMap<Long, Long>, state: CurrentState): Either<String, LinkedList<Long>> {
     return step(code, state.right())
 }
 
 tailrec fun step(
     code: MutableMap<Long, Long>,
     state: Either<String, CurrentState>
-): Either<String, Long> = when (state) {
+): Either<String, LinkedList<Long>> = when (state) {
     is Either.Left<String> -> "Error: ${state.a}".left()
     is Either.Right<CurrentState> -> {
         when (state.b.pointer) {
-            is None -> state.b.output.fold({ "No output".left() }, { it.right() })
+            is None -> state.b.output.right()
             is Some<Long> -> step(code, handleCodePoint(code, state))
         }
     }

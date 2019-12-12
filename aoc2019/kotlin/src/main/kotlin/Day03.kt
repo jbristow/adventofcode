@@ -5,11 +5,6 @@ import java.util.*
 import kotlin.math.abs
 
 
-typealias Point = Pair<Int, Int>
-
-val Point.x: Int get() = first
-val Point.y: Int get() = second
-
 object Day03 {
 
     data class Instruction(val direction: String, val count: Int)
@@ -25,12 +20,12 @@ object Day03 {
     private fun List<String>.toWires(): List<Wire> {
         return map { line ->
             line.processLine()
-                .fold(Wire(0 to 0, LinkedList())) { wire, instr ->
+                .fold(Wire(Point(0, 0), LinkedList())) { wire, instr ->
                     val newLocs = when (instr.direction) {
-                        "U" -> (wire.lastLoc.y + 1..wire.lastLoc.y + instr.count).map { (wire.lastLoc.x to it) }
-                        "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed().map { (wire.lastLoc.x to it) }
-                        "R" -> (wire.lastLoc.x + 1..wire.lastLoc.x + instr.count).map { (it to wire.lastLoc.y) }
-                        "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed().map { (it to wire.lastLoc.y) }
+                        "U" -> (wire.lastLoc.y + 1..wire.lastLoc.y + instr.count).map { Point(wire.lastLoc.x, it) }
+                        "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed().map { Point(wire.lastLoc.x, it) }
+                        "R" -> (wire.lastLoc.x + 1..wire.lastLoc.x + instr.count).map { Point(it, wire.lastLoc.y) }
+                        "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed().map { Point(it, wire.lastLoc.y) }
                         else -> throw Error("bad instruction $instr")
                     }
                     wire.locations.addAll(newLocs)
@@ -77,12 +72,12 @@ object Day03 {
 
         input.forEach { line ->
 
-            line.processLine().fold(Wire(0 to 0, LinkedList())) { wire, instr ->
+            line.processLine().fold(Wire(Point(0 , 0), LinkedList())) { wire, instr ->
                 val newLocs = when (instr.direction) {
-                    "U" -> (wire.lastLoc.y + 1..wire.lastLoc.y + instr.count).map { (wire.lastLoc.x to it) }
-                    "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed().map { (wire.lastLoc.x to it) }
-                    "R" -> (wire.lastLoc.x + 1..wire.lastLoc.x + instr.count).map { (it to wire.lastLoc.y) }
-                    "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed().map { (it to wire.lastLoc.y) }
+                    "U" -> (wire.lastLoc.y + 1..wire.lastLoc.y + instr.count).map { Point(wire.lastLoc.x , it) }
+                    "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed().map { Point(wire.lastLoc.x , it) }
+                    "R" -> (wire.lastLoc.x + 1..wire.lastLoc.x + instr.count).map { Point(it , wire.lastLoc.y) }
+                    "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed().map { Point(it , wire.lastLoc.y) }
                     else -> throw Error("bad instruction $instr")
                 }
                 newLocs.forEach { p ->
@@ -101,13 +96,13 @@ object Day03 {
             }
         }
 
-        field[0 to 0] = "o"
+        field[Point(0 , 0)] = "o"
 
         println(field.size)
         PrintWriter(Files.newBufferedWriter(Paths.get("output-day03-$filename.txt"))).use { out ->
             (minY..maxY).reversed().forEach { y ->
                 out.println((minX..maxX).joinToString("") { x ->
-                    field[(x to y)] ?: "."
+                    field[Point(x , y)] ?: "."
                 })
             }
         }

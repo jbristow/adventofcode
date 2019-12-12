@@ -18,7 +18,7 @@ internal class IntcodeInterpreterKtTest {
             4L to 1L,
             5L to 2L
         )
-        val state = CurrentState(pointer = 2L.some(), inputs = mutableListOf())
+        val state = CurrentState(pointer = 2L.some())
         val code = initialCode.toMutableMap()
         handleCodePoint(code, state.right()).fold({
             fail<String>(it)
@@ -44,7 +44,7 @@ internal class IntcodeInterpreterKtTest {
             4L to 1L,
             5L to 2L
         )
-        val state = CurrentState(pointer = 2L.some(), inputs = mutableListOf(), relativeBase = 1L)
+        val state = CurrentState(pointer = 2L.some(), relativeBase = 1L)
         val code = initialCode.toMutableMap()
         handleCodePoint(code, state.right()).fold({
             fail<String>(it)
@@ -68,7 +68,7 @@ internal class IntcodeInterpreterKtTest {
             4L to 1L,
             5L to 2L
         )
-        val state = CurrentState(pointer = 2L.some(), inputs = mutableListOf(), relativeBase = 1L)
+        val state = CurrentState(pointer = 2L.some(), relativeBase = 1L)
         val code = initialCode.toMutableMap()
         handleCodePoint(code, state.right()).fold({
             fail<String>(it)
@@ -89,7 +89,7 @@ internal class IntcodeInterpreterKtTest {
             0L to 109L,
             1L to 988L
         )
-        val state = CurrentState(pointer = 0L.some(), inputs = mutableListOf())
+        val state = CurrentState()
         val code = initialCode.toMutableMap()
         handleCodePoint(code, state.right()).fold({
             fail<String>(it)
