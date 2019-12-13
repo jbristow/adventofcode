@@ -12,6 +12,8 @@ import arrow.core.rightIfNotNull
 import arrow.core.some
 import arrow.core.toOption
 import arrow.optics.optics
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
 
 sealed class Mode {
@@ -286,3 +288,10 @@ tailrec fun step(
     }
 }
 
+fun String.toIntCodeProgram(): Map<Long, Long> {
+    return Files.readAllLines(Paths.get(this))
+        .first()
+        .splitToSequence(",")
+        .mapIndexed { i, it -> i.toLong() to it.toLong() }
+        .toMap()
+}
