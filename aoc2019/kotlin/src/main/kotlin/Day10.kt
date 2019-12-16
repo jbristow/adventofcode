@@ -2,6 +2,7 @@ import Day10.destruction
 import Day10.mostVisible
 import arrow.core.andThen
 import arrow.optics.optics
+import util.TwoD
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.math.PI
@@ -11,7 +12,7 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 @optics
-data class Point(val x: Int, val y: Int) {
+data class Point(override val x: Int, override val y: Int) : TwoD<Int> {
     companion object
 }
 

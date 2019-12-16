@@ -16,6 +16,8 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
 
+typealias IntCode = MutableMap<Long, Long>
+
 sealed class Mode {
     fun assignable(first: Long, offset: Long) =
         when (this) {
@@ -58,12 +60,12 @@ fun Pair<Long, Mode>.value(code: Map<Long, Long>, state: CurrentState) =
 sealed class Instruction {
     abstract val opcodes: Int
     abstract fun execute(
-        code: MutableMap<Long, Long>,
+        code: IntCode,
         params: List<Pair<Long, Mode>>,
         state: CurrentState
     ): Either<String, CurrentState>
 
-    open fun findInputs(code: MutableMap<Long, Long>, state: CurrentState): Either<String, List<Pair<Long, Mode>>> =
+    open fun findInputs(code: IntCode, state: CurrentState): Either<String, List<Pair<Long, Mode>>> =
         state.pointer.fold(
             { emptyList<Pair<Long, Mode>>().right() },
             { pointer ->
@@ -81,7 +83,7 @@ sealed class Instruction {
                     }
             })
 
-    private fun extractParameterType(pointer: Long, code: MutableMap<Long, Long>) =
+    private fun extractParameterType(pointer: Long, code: IntCode) =
         "%010d".format((code[pointer] ?: 0) / 100).takeLast(opcodes).reversed()
             .map {
                 when (it) {
@@ -98,7 +100,7 @@ sealed class Instruction {
 
         class Add : ThreeParameterInstruction() {
             override fun execute(
-                code: MutableMap<Long, Long>,
+                code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
             ): Either<String, CurrentState> {
@@ -109,7 +111,7 @@ sealed class Instruction {
 
         class Multiply : ThreeParameterInstruction() {
             override fun execute(
-                code: MutableMap<Long, Long>,
+                code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
             ): Either<String, CurrentState> {
@@ -120,7 +122,7 @@ sealed class Instruction {
 
         class LessThan : ThreeParameterInstruction() {
             override fun execute(
-                code: MutableMap<Long, Long>,
+                code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
             ): Either<String, CurrentState> {
@@ -134,7 +136,7 @@ sealed class Instruction {
 
         class Equal : ThreeParameterInstruction() {
             override fun execute(
-                code: MutableMap<Long, Long>,
+                code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
             ): Either<String, CurrentState> {
@@ -152,7 +154,7 @@ sealed class Instruction {
 
         class JumpIfTrue : TwoParameterInstruction() {
             override fun execute(
-                code: MutableMap<Long, Long>,
+                code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
             ): Either<String, CurrentState> {
@@ -165,7 +167,7 @@ sealed class Instruction {
 
         class JumpIfFalse : TwoParameterInstruction() {
             override fun execute(
-                code: MutableMap<Long, Long>,
+                code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
             ): Either<String, CurrentState> =
@@ -179,7 +181,7 @@ sealed class Instruction {
     class SetFromInput(private val inputs: LinkedList<Long>) : Instruction() {
         override val opcodes: Int = 1
         override fun execute(
-            code: MutableMap<Long, Long>,
+            code: IntCode,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
         ) = when {
@@ -195,7 +197,7 @@ sealed class Instruction {
     class Output : Instruction() {
         override val opcodes: Int = 1
         override fun execute(
-            code: MutableMap<Long, Long>,
+            code: IntCode,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
         ): Either<String, CurrentState> {
@@ -211,7 +213,7 @@ sealed class Instruction {
     class ModifyRelativeBase : Instruction() {
         override val opcodes: Int = 1
         override fun execute(
-            code: MutableMap<Long, Long>,
+            code: IntCode,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
         ): Either<String, CurrentState> {
@@ -225,7 +227,7 @@ sealed class Instruction {
     object End : Instruction() {
         override val opcodes: Int = 0
         override fun execute(
-            code: MutableMap<Long, Long>,
+            code: IntCode,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
         ): Either<String, CurrentState> = state.copy(pointer = Option.empty()).right()
@@ -253,7 +255,7 @@ fun parseInstruction(
 
 
 fun handleCodePoint(
-    code: MutableMap<Long, Long>,
+    code: IntCode,
     eitherState: Either<String, CurrentState>
 ): Either<String, CurrentState> =
     eitherState.flatMap { state ->
@@ -271,12 +273,12 @@ fun handleCodePoint(
         )
     }
 
-fun step(code: MutableMap<Long, Long>, state: CurrentState): Either<String, LinkedList<Long>> {
+fun step(code: IntCode, state: CurrentState): Either<String, LinkedList<Long>> {
     return step(code, state.right())
 }
 
 tailrec fun step(
-    code: MutableMap<Long, Long>,
+    code: IntCode,
     state: Either<String, CurrentState>
 ): Either<String, LinkedList<Long>> = when (state) {
     is Either.Left<String> -> "Error: ${state.a}".left()
@@ -295,3 +297,5 @@ fun String.toIntCodeProgram(): Map<Long, Long> {
         .mapIndexed { i, it -> i.toLong() to it.toLong() }
         .toMap()
 }
+
+

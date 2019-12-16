@@ -1,5 +1,4 @@
 import arrow.optics.optics
-import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.security.MessageDigest
@@ -70,11 +69,9 @@ fun main() {
         Moon(location = Point3d(9, -8, -3))
     )
 
-    val newMoons = PrintWriter(Files.newOutputStream(Paths.get("day12out.csv"))).use {
-        moons.stepForever(out = it)
-    }
-    println(newMoons.first)
-    println(newMoons.second.joinToString("\n"))
+    val newMoons = moons.map { it.location.x to 0 }.toTypedArray()
+        .stepForever()
+    println("x $newMoons")
 }
 
 private tailrec fun Array<Moon>.step(times: Int = 1): Array<Moon> {
@@ -106,35 +103,27 @@ fun String.toMD5(): ByteArray {
 val base64 = Base64.getEncoder()
 
 @ExperimentalStdlibApi
-private tailrec fun Array<Moon>.stepForever(
+private tailrec fun Array<Pair<Int, Int>>.stepForever(
     step: Int = 0,
-    seen: MutableMap<Int, MutableSet<String>> = mutableMapOf(),
-    out: PrintWriter
-): Pair<Int, Array<Moon>> {
-
-    val total = this[0].total
-    val blob = this[0].toString()
+    target: Array<Pair<Int, Int>> = this.copyOf()
+): Int {
     return when {
-        total in seen && seen[total]?.contains(blob) ?: false -> step to this
+        (step > 0 && this.contentDeepEquals(target)) -> step
         else -> {
-            val next = seen.getOrDefault(total, mutableSetOf())
-            next.add(blob)
-            seen[total] = next
             indices.forEach { a ->
-                indices.filterNot { b -> a == b }
-                    .forEach {
-                        this[a].velocity.x += this[a].location.x.gravity1d(this[it].location.x)
-                        this[a].velocity.y += this[a].location.y.gravity1d(this[it].location.y)
-                        this[a].velocity.z += this[a].location.z.gravity1d(this[it].location.z)
-                    }
+                this[a] = this[a].copy(second =
+                indices.filterNot(a::equals).sumBy { b ->
+                    this[a].first.gravity1d(this[b].first)
+                })
             }
-            indices.forEach {
-                this[it].location += this[it].velocity
+            indices.forEach { a ->
+                this[a] = this[a].copy(first = this[a].first + this[a].second)
             }
-            //out.println("$step,${this.joinToString(",")}")
-            stepForever(step + 1, seen, out)
+            stepForever(step + 1, target)
         }
     }
+
+
 }
 
 private operator fun Point3d.plus(other: Point3d) = this.apply {

@@ -7,11 +7,13 @@ import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import arrow.core.some
+import arrow.optics.optics
 import intcode.CurrentState
 import intcode.handleCodePoint
 import intcode.toIntCodeProgram
 import util.TwoD
 
+@optics
 data class PointL(
     override val x: Long,
     override val y: Long
@@ -128,15 +130,20 @@ object Day13 {
 private fun ArcadeGame.output(): ArcadeGame {
     val newBall = screen.findFirst(GameTile.Ball)
     val newPaddle = screen.findFirst(GameTile.Ball)
-    if (newBall != ballPosition || newPaddle != paddlePosition) {
-        printScreen()
+    return if (newBall.isDefined() && newPaddle.isDefined()) {
+        if (newBall != ballPosition || newPaddle != paddlePosition) {
+            printScreen()
+        }
+        copy(ballPosition = newBall, paddlePosition = newPaddle)
+    } else {
+        this
     }
-    return this.copy(ballPosition = newBall, paddlePosition = newPaddle)
 }
 
 fun main() {
     Day13.part1()
     Day13.part2()
+
 }
 
 fun ArcadeGame.printScreen() {

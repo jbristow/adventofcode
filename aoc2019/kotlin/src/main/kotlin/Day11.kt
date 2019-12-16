@@ -21,11 +21,14 @@ object Day11 {
 
 }
 
-sealed class Direction {
-    object Up : Direction()
-    object Down : Direction()
-    object Left : Direction()
-    object Right : Direction()
+sealed class Direction(private val intVal: Int) {
+
+    fun toLong(): Long = intVal.toLong()
+
+    class Up : Direction(1)
+    class Down : Direction(2)
+    class Left : Direction(3)
+    class Right : Direction(4)
 }
 
 val Direction.glyph: String
@@ -53,7 +56,7 @@ private fun HullColor?.toInput(): Long {
 @optics
 data class Robot(
     val location: Point = Point(0, 0),
-    val direction: Direction = Direction.Up,
+    val direction: Direction = Direction.Up(),
     val state: Either<String, CurrentState> = CurrentState().right(),
     val code: MutableMap<Long, Long>,
     val hull: MutableMap<Point, HullColor> = mutableMapOf(),
@@ -65,29 +68,33 @@ data class Robot(
 
 
 fun Robot.turnLeft(): Robot = copy(
-    direction = when (direction) {
-        Direction.Up -> Direction.Left
-        Direction.Down -> Direction.Right
-        Direction.Left -> Direction.Down
-        Direction.Right -> Direction.Up
-    }
+    direction = direction.turnLeft()
 )
+
+fun Direction.turnLeft(): Direction {
+    return when (this) {
+        is Direction.Up -> Direction.Left()
+        is Direction.Down -> Direction.Right()
+        is Direction.Left -> Direction.Down()
+        is Direction.Right -> Direction.Up()
+    }
+}
 
 fun Robot.turnRight(): Robot = copy(
     direction = when (direction) {
-        Direction.Up -> Direction.Right
-        Direction.Down -> Direction.Left
-        Direction.Left -> Direction.Up
-        Direction.Right -> Direction.Down
+        is Direction.Up -> Direction.Right()
+        is Direction.Down -> Direction.Left()
+        is Direction.Left -> Direction.Up()
+        is Direction.Right -> Direction.Down()
     }
 )
 
 fun Robot.goForward(): Robot = copy(
     location = when (direction) {
-        Direction.Up -> Point.y.set(location, location.y - 1)
-        Direction.Down -> Point.y.set(location, location.y + 1)
-        Direction.Left -> Point.x.set(location, location.x - 1)
-        Direction.Right -> Point.x.set(location, location.x + 1)
+        is Direction.Up -> Point.y.set(location, location.y - 1)
+        is Direction.Down -> Point.y.set(location, location.y + 1)
+        is Direction.Left -> Point.x.set(location, location.x - 1)
+        is Direction.Right -> Point.x.set(location, location.x + 1)
     }
 )
 
