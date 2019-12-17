@@ -290,12 +290,12 @@ tailrec fun step(
     }
 }
 
-fun String.toIntCodeProgram(): Map<Long, Long> {
+fun String.toIntCodeProgram(): IntCode {
     return Files.readAllLines(Paths.get(this))
         .first()
         .splitToSequence(",")
         .mapIndexed { i, it -> i.toLong() to it.toLong() }
-        .toMap()
+        .toMap().toMutableMap()
 }
 
 
