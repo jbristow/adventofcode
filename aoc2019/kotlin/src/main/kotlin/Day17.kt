@@ -9,7 +9,6 @@ import intcode.IntCode
 import intcode.handleCodePoint
 import intcode.toIntCodeProgram
 import java.util.*
-import kotlin.system.exitProcess
 
 @optics
 data class Ascii(
@@ -44,7 +43,6 @@ private fun Ascii.sendInput(): Ascii {
                     val nInstr = inputs.pop()
                     it.inputs.add(nInstr.toLong())
                     copy(state = it.right())
-                    exitProcess(1)
                 }
                 else -> {
                     this
@@ -61,12 +59,15 @@ private tailrec fun Ascii.processOutput(): Ascii {
             state.b.output.isEmpty() -> this
             else -> {
                 val o = state.b.output.pop()
-                if (o > 127) {
-                    println("NONASCII:$o")
-                } else {
-                    print(o.toChar())
+                when {
+                    o > 127 -> println("NONASCII:$o")
+                    else -> print(o.toChar())
                 }
                 output.add(o)
+                if (o.toChar() == '\n') {
+                    output.clear()
+                }
+
                 processOutput()
             }
         }
@@ -105,7 +106,7 @@ object Day17 {
     fun part2() {
         println(prog.lines().map { it.length })
         println(prog.map { b -> b.toLong() })
-        val newCode = fileData.toMutableMap().apply { this[0] = 2 }
+        val newCode = FILENAME.toIntCodeProgram().apply { this[0] = 2 }
         val ascii = Ascii(
             code = newCode,
             inputs = LinkedList(prog.map { it.toLong() }),
