@@ -57,13 +57,9 @@ fun Pair<Long, Mode>.index(state: CurrentState) = second.assignable(first, state
 fun Pair<Long, Mode>.value(code: Map<Long, Long>, state: CurrentState) =
     second.valueOf(first, code, state.relativeBase)
 
-sealed class Instruction {
+sealed class Instruction
+    : (IntCode, List<Pair<Long, Mode>>, CurrentState) -> Either<String, CurrentState> {
     abstract val opcodes: Int
-    abstract fun execute(
-        code: IntCode,
-        params: List<Pair<Long, Mode>>,
-        state: CurrentState
-    ): Either<String, CurrentState>
 
     open fun findInputs(code: IntCode, state: CurrentState): Either<String, List<Pair<Long, Mode>>> =
         state.pointer.fold(
@@ -99,7 +95,7 @@ sealed class Instruction {
         override val opcodes: Int = 3
 
         class Add : ThreeParameterInstruction() {
-            override fun execute(
+            override fun invoke(
                 code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
@@ -110,7 +106,7 @@ sealed class Instruction {
         }
 
         class Multiply : ThreeParameterInstruction() {
-            override fun execute(
+            override fun invoke(
                 code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
@@ -121,7 +117,7 @@ sealed class Instruction {
         }
 
         class LessThan : ThreeParameterInstruction() {
-            override fun execute(
+            override fun invoke(
                 code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
@@ -135,7 +131,7 @@ sealed class Instruction {
         }
 
         class Equal : ThreeParameterInstruction() {
-            override fun execute(
+            override fun invoke(
                 code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
@@ -153,7 +149,7 @@ sealed class Instruction {
         override val opcodes: Int = 2
 
         class JumpIfTrue : TwoParameterInstruction() {
-            override fun execute(
+            override fun invoke(
                 code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
@@ -166,7 +162,7 @@ sealed class Instruction {
         }
 
         class JumpIfFalse : TwoParameterInstruction() {
-            override fun execute(
+            override fun invoke(
                 code: IntCode,
                 params: List<Pair<Long, Mode>>,
                 state: CurrentState
@@ -180,7 +176,7 @@ sealed class Instruction {
 
     class SetFromInput(private val inputs: LinkedList<Long>) : Instruction() {
         override val opcodes: Int = 1
-        override fun execute(
+        override fun invoke(
             code: IntCode,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
@@ -196,7 +192,7 @@ sealed class Instruction {
 
     class Output : Instruction() {
         override val opcodes: Int = 1
-        override fun execute(
+        override fun invoke(
             code: IntCode,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
@@ -212,7 +208,7 @@ sealed class Instruction {
 
     class ModifyRelativeBase : Instruction() {
         override val opcodes: Int = 1
-        override fun execute(
+        override fun invoke(
             code: IntCode,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
@@ -226,7 +222,7 @@ sealed class Instruction {
 
     object End : Instruction() {
         override val opcodes: Int = 0
-        override fun execute(
+        override fun invoke(
             code: IntCode,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
@@ -265,7 +261,7 @@ fun handleCodePoint(
                 code[pointer].rightIfNotNull { "Code point $pointer undefined." }.flatMap { codeValue ->
                     parseInstruction(codeValue, state.inputs).flatMap { instr ->
                         instr.findInputs(code, state).flatMap { params ->
-                            instr.execute(code, params, state.copy(pointer = pointer.some()))
+                            instr(code, params, state.copy(pointer = pointer.some()))
                         }
                     }
                 }

@@ -187,6 +187,14 @@ fun PointL.inDirection(direction: Direction): PointL =
         is Direction.Right -> PointL.x.set(this, this.x + 1)
     }
 
+fun Point.inDirection(direction: Direction): Point =
+    when (direction) {
+        is Direction.Up -> Point.y.set(this, this.y - 1)
+        is Direction.Down -> Point.y.set(this, this.y + 1)
+        is Direction.Left -> Point.x.set(this, this.x - 1)
+        is Direction.Right -> Point.x.set(this, this.x + 1)
+    }
+
 private tailrec fun RepairRobot.processReturn(): RepairRobot {
     return when (state) {
         is Either.Left<String> -> this
@@ -214,17 +222,14 @@ fun allDirections(): Collection<Direction> {
     )
 }
 
-private fun Direction.reverse(): Direction {
+fun Direction.reverse(): Direction {
     return this.turnLeft().turnLeft()
 }
 
 fun RepairRobot.printScreen() {
     println(instructions.size)
     val toConsider = grid + (position to ShipTile.Empty)
-    val topLeft = PointL(
-        toConsider.keys.map(PointL::x).min() ?: 0L,
-        toConsider.keys.map(PointL::y).min() ?: 0L
-    )
+    val topLeft = toConsider.topLeft()
     val bottomRight = PointL(
         toConsider.keys.map(PointL::x).max() ?: 0L,
         toConsider.keys.map(PointL::y).max() ?: 0L
@@ -241,6 +246,21 @@ fun RepairRobot.printScreen() {
     )
     println("---")
 }
+
+private fun <T> Map<PointL, T>.topLeft() = PointL(
+    keys.map(PointL::x).min() ?: 0L,
+    keys.map(PointL::y).min() ?: 0L
+)
+
+private fun <T> Map<Point, T>.topLeft() = Point(
+    keys.map(Point::x).min() ?: 0,
+    keys.map(Point::y).min() ?: 0
+)
+
+private fun <T> Map<Point, T>.bottomRight() = Point(
+    keys.map(Point::x).max() ?: 0,
+    keys.map(Point::y).max() ?: 0
+)
 
 private fun ShipTile?.toGlyph(): String {
     return when (this) {
