@@ -74,14 +74,6 @@ private tailrec fun Ascii.processOutput(): Ascii {
     }
 }
 
-fun Point.inDirection(direction: Direction): Point =
-    when (direction) {
-        is Direction.Up -> Point.y.set(this, this.y - 1)
-        is Direction.Down -> Point.y.set(this, this.y + 1)
-        is Direction.Left -> Point.x.set(this, this.x - 1)
-        is Direction.Right -> Point.x.set(this, this.x + 1)
-    }
-
 object Day17 {
     private const val FILENAME = "src/main/resources/day17.txt"
     val fileData = FILENAME.toIntCodeProgram()
