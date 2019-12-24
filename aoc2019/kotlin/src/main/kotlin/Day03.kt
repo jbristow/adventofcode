@@ -4,7 +4,6 @@ import java.nio.file.Paths
 import java.util.*
 import kotlin.math.abs
 
-
 object Day03 {
 
     data class Instruction(val direction: String, val count: Int)
@@ -39,7 +38,6 @@ object Day03 {
 
     private val wiresAsSet = wires.map { it.toSet() }
 
-
     private fun List<Set<Point>>.overlaps(): Set<Point> {
         return this[0].intersect(this[1].toSet())
     }
@@ -72,12 +70,12 @@ object Day03 {
 
         input.forEach { line ->
 
-            line.processLine().fold(Wire(Point(0 , 0), LinkedList())) { wire, instr ->
+            line.processLine().fold(Wire(Point(0, 0), LinkedList())) { wire, instr ->
                 val newLocs = when (instr.direction) {
-                    "U" -> (wire.lastLoc.y + 1..wire.lastLoc.y + instr.count).map { Point(wire.lastLoc.x , it) }
-                    "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed().map { Point(wire.lastLoc.x , it) }
-                    "R" -> (wire.lastLoc.x + 1..wire.lastLoc.x + instr.count).map { Point(it , wire.lastLoc.y) }
-                    "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed().map { Point(it , wire.lastLoc.y) }
+                    "U" -> (wire.lastLoc.y + 1..wire.lastLoc.y + instr.count).map { Point(wire.lastLoc.x, it) }
+                    "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed().map { Point(wire.lastLoc.x, it) }
+                    "R" -> (wire.lastLoc.x + 1..wire.lastLoc.x + instr.count).map { Point(it, wire.lastLoc.y) }
+                    "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed().map { Point(it, wire.lastLoc.y) }
                     else -> throw Error("bad instruction $instr")
                 }
                 newLocs.forEach { p ->
@@ -96,20 +94,18 @@ object Day03 {
             }
         }
 
-        field[Point(0 , 0)] = "o"
+        field[Point(0, 0)] = "o"
 
         println(field.size)
         PrintWriter(Files.newBufferedWriter(Paths.get("output-day03-$filename.txt"))).use { out ->
             (minY..maxY).reversed().forEach { y ->
                 out.println((minX..maxX).joinToString("") { x ->
-                    field[Point(x , y)] ?: "."
+                    field[Point(x, y)] ?: "."
                 })
             }
         }
     }
-
 }
-
 
 fun main() {
     println("Part 1: ${Day03.part1()}")
@@ -121,5 +117,4 @@ fun main() {
     )
     Day03.draw(listOf("R75,D30,R83,U83,L12,D49,R71,U7,L72", "U62,R66,U55,R34,D71,R55,D58,R83"), "example1")
 //    Day03.draw(Files.readAllLines(Paths.get(Day03.FILENAME)), "full")
-
 }

@@ -31,7 +31,6 @@ var PointVel.velocity
         this[1] = value
     }
 
-
 fun Point3d.sum() = abs(x) + abs(y) + abs(z)
 
 @optics
@@ -43,7 +42,6 @@ data class Moon(
 
     companion object
 }
-
 
 val Moon.potential: Int get() = location.sum()
 val Moon.kinetic: Int get() = velocity.sum()
@@ -72,9 +70,7 @@ object Day12 {
         .map { o ->
             Point3d(o!!.groupValues[1].toInt(), o.groupValues[2].toInt(), o.groupValues[3].toInt())
         }.map(Point3d::asMoonLocation).toList()
-
 }
-
 
 fun Int.gravity1d(other: Int): Int {
     return when {
@@ -83,7 +79,6 @@ fun Int.gravity1d(other: Int): Int {
         else -> 0
     }
 }
-
 
 tailrec fun Array<PointVel>.stepForeverX(
     step: Int = 0,
@@ -113,7 +108,6 @@ tailrec fun Array<PointVel>.stepForeverX(
     }
 }
 
-
 private tailrec fun List<Moon>.step(times: Int = 1): List<Moon> {
     return when (times) {
         0 -> this
@@ -127,7 +121,6 @@ private tailrec fun List<Moon>.step(times: Int = 1): List<Moon> {
                                 y = this[a].location.y.gravity1d(this[it].location.y),
                                 z = this[a].location.z.gravity1d(this[it].location.z)
                             )
-
                         })
             }.map {
                 it.copy(location = it.location + it.velocity)
@@ -164,5 +157,3 @@ fun lcm(n1: BigInteger, n2: BigInteger) = (n1 * n2) / gcd(n1, n2)
 fun lcm(n1: Int, n2: Int): BigInteger = lcm(n1.toBigInteger(), n2.toBigInteger())
 
 fun lcm(n1: Int, n2: BigInteger): BigInteger = lcm(n1.toBigInteger(), n2)
-
-

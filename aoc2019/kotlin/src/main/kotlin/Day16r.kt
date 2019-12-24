@@ -18,7 +18,6 @@ object Day16r {
                 .toList()
         ).take(8).joinToString("").toInt()
 
-
     private fun fft(input: List<Long>): List<Long> {
         val half = input.size / 2
         val next = MutableList(input.size) { 0L }
@@ -36,7 +35,6 @@ object Day16r {
             next[half + it - 1] = input.slice(half + it - 1 until input.size).sum()
         }
         return next.map { abs(it) % 10 }
-
     }
 
     private tailrec fun fft2(

@@ -66,7 +66,6 @@ sealed class Instruction {
             })
     }
 
-
     sealed class ThreeParameterInstruction : Instruction() {
         override val opcodes: Int = 3
 
@@ -101,8 +100,8 @@ sealed class Instruction {
                 println("LessThan")
                 println(state)
                 println(params)
-                println(params[0].value(code,state))
-                println(params[1].value(code,state))
+                println(params[0].value(code, state))
+                println(params[1].value(code, state))
                 println(params[2].index(state))
                 code[params[2].index(state)] = when {
                     params[0].value(code, state) < params[1].value(code, state) -> 1
@@ -213,7 +212,6 @@ sealed class Instruction {
     }
 }
 
-
 object Day05 {
 
     private fun parseInstruction(
@@ -233,7 +231,6 @@ object Day05 {
             99L -> (Instruction.End to input).right()
             else -> "Problem parsing instruction $instruction".left()
         }
-
 
     fun handleCodePoint(
         code: Array<Long>,
@@ -294,5 +291,4 @@ fun main() {
             state = CurrentState(inputs = mutableListOf(5)).right()
         )
     )
-
 }

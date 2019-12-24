@@ -6,7 +6,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.math.max
 
-
 object Day01 {
     private const val FILENAME = "src/main/resources/day01.txt"
 
@@ -25,7 +24,6 @@ object Day01 {
     fun part2() = Files.readAllLines(Paths.get(FILENAME))
         .sumBy { totalFuelNeeded(it.toInt()) }
         .toString()
-
 }
 
 fun main() {

@@ -83,7 +83,6 @@ object Day07 {
         return Amplifier(code, result)
     }
 
-
     private fun runFeedback(list: List<Long>, input: Array<Long>): Either<String, Long> {
         var amps = list.map { ampId ->
             Amplifier(
@@ -128,4 +127,3 @@ fun main() {
     println(Day07.part1())
     println(Day07.part2())
 }
-

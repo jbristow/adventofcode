@@ -12,7 +12,6 @@ import intcode.handleCodePoint
 import intcode.toIntCodeProgram
 import java.util.*
 
-
 @optics
 data class DroneController(
     val code: IntCode,
@@ -37,7 +36,6 @@ object Day19 {
     private const val FILENAME = "src/main/resources/day19.txt"
     val fileData get() = FILENAME.toIntCodeProgram()
 
-
     val cache: MutableMap<PointL, Long> = mutableMapOf()
 
     fun findPowerAt(p: PointL): Long {
@@ -55,9 +53,9 @@ object Day19 {
 
     fun fourCorners(point: PointL, squareSize: Long) = listOf(
         ::identity,
-        PointL.x::modify::partially2{ it + squareSize },
-        PointL.x::modify::partially2{ it + squareSize } compose PointL.y::modify::partially2{ it - squareSize },
-        PointL.y::modify::partially2{ it - squareSize }
+        PointL.x::modify::partially2 { it + squareSize },
+        PointL.x::modify::partially2 { it + squareSize } compose PointL.y::modify::partially2 { it - squareSize },
+        PointL.y::modify::partially2 { it - squareSize }
     ).all { findPowerAt(it(point)) == 1L }
 
     fun part1() {
@@ -76,7 +74,6 @@ object Day19 {
             generateSequence(y * 0.7) { it + 1 }.takeWhile { it <= y }.map { x ->
                 PointL(x.toLong(), y.toLong())
             }.dropWhile { findPowerAt(it) == 0L }.first()
-
         }.dropWhile { !fourCorners(it, squareSize) }.first()
         println(n.x * 10000 + n.y - squareSize)
     }

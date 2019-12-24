@@ -44,7 +44,6 @@ object Day08 {
             .findPixelColors()
             .chunked(25)
             .renderImage()
-
 }
 
 fun main() {

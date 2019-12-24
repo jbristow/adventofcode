@@ -57,7 +57,6 @@ private object EmptySequence : Sequence<Nothing>, DropTakeSequence<Nothing> {
  */
 inline fun <T> Sequence<T>?.orEmpty(): Sequence<T> = this ?: emptySequence()
 
-
 /**
  * Returns a sequence that iterates through the elements either of this sequence
  * or, if this sequence turns out to be empty, of the sequence returned by [defaultValue] function.
@@ -558,7 +557,6 @@ private class DistinctIterator<T, K>(private val source: Iterator<T>, private va
     }
 }
 
-
 private class GeneratorSequence<T : Any>(
     private val getInitialValue: () -> T?,
     private val getNextValue: (T) -> T?
@@ -612,10 +610,9 @@ internal class ConstrainedOnceSequence<T> constructor(sequence: Sequence<T>) : S
 
 fun <T> Sequence<T>.constrainOnce(): Sequence<T> {
     // as? does not work in js
-    //return this as? ConstrainedOnceSequence<T> ?: ConstrainedOnceSequence(this)
+    // return this as? ConstrainedOnceSequence<T> ?: ConstrainedOnceSequence(this)
     return if (this is ConstrainedOnceSequence<T>) this else ConstrainedOnceSequence(this)
 }
-
 
 /**
  * Returns a sequence which invokes the function to calculate the next value on each iteration until the function returns `null`.
@@ -665,4 +662,3 @@ fun <T : Any> generateSequence(seed: T?, nextFunction: (T) -> T?): Sequence<T> =
  */
 fun <T : Any> generateSequence(seedFunction: () -> T?, nextFunction: (T) -> T?): Sequence<T> =
     GeneratorSequence(seedFunction, nextFunction)
-

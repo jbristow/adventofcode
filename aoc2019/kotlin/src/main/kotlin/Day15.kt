@@ -12,8 +12,8 @@ import intcode.CurrentState
 import intcode.IntCode
 import intcode.handleCodePoint
 import intcode.toIntCodeProgram
-import util.PointGridL
 import java.util.*
+import util.PointGridL
 
 @optics
 sealed class ShipTile {
@@ -52,7 +52,6 @@ sealed class ShipTile {
     }
 
     companion object
-
 }
 
 private fun ShipTile?.isNull(): Boolean = this == null
@@ -63,7 +62,6 @@ fun Long.toShipTile(): Option<ShipTile> = when (this) {
     2L -> ShipTile.Oxygen.some()
     else -> None
 }
-
 
 @optics
 data class RepairRobot(
@@ -90,7 +88,6 @@ private tailrec fun RepairRobot.move(): RepairRobot {
     }
 }
 
-
 object Day15 {
 
     private const val FILENAME = "src/main/resources/day15.txt"
@@ -102,7 +99,6 @@ object Day15 {
         ).move()
     }
     private val oxygenLoc by lazy { repairRobot.grid.findOxygen() }
-
 
     private tailrec fun distanceToOxygen(
         points: PointGridL<ShipTile>,
@@ -143,7 +139,6 @@ object Day15 {
                 .toSet(),
             setOf(oxygenLoc)
         )
-
 
     private tailrec fun fillWithOxygen(remaining: Set<PointL>, position: Set<PointL>, minutes: Int = 0): Int =
         when {
@@ -270,4 +265,3 @@ private fun ShipTile?.toGlyph(): String {
         null -> " "
     }
 }
-

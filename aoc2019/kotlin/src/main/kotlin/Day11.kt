@@ -9,7 +9,6 @@ import intcode.handleCodePoint
 import java.nio.file.Files
 import java.nio.file.Paths
 
-
 object Day11 {
     private const val FILENAME = "src/main/resources/day11.txt"
     val fileData =
@@ -18,7 +17,6 @@ object Day11 {
             .mapIndexed { i, it -> i.toLong() to it.toLong() }
             .toMap()
             .toMutableMap()
-
 }
 
 sealed class Direction(private val intVal: Int) {
@@ -38,7 +36,6 @@ val Direction.glyph: String
         is Direction.Left -> "⬅️"
         is Direction.Right -> "➡️"
     }
-
 
 sealed class HullColor {
     object Black : HullColor()
@@ -65,7 +62,6 @@ data class Robot(
 ) {
     companion object
 }
-
 
 fun Robot.turnLeft(): Robot = copy(
     direction = direction.turnLeft()
@@ -112,7 +108,6 @@ fun Robot.move(instr: Long): Robot = when (instr) {
     else -> throw Error("Bad move instruction: $instr")
 }.goForward()
 
-
 tailrec fun Robot.bodyStep(): Robot = when {
     state is Either.Left<String> || state is Either.Right<CurrentState> && state.b.output.size < 2 -> this
     state is Either.Right<CurrentState> ->
@@ -122,7 +117,6 @@ tailrec fun Robot.bodyStep(): Robot = when {
             .bodyStep()
     else -> throw Error("BodyStep Problem: $this")
 }
-
 
 private fun Either<String, CurrentState>.withUpdatedInputs(hullColor: HullColor?) =
     map {
@@ -151,7 +145,6 @@ private fun Either<String, Robot>.fullOutput(): String {
                 }
             }
         }
-
     })
 }
 
@@ -165,8 +158,7 @@ tailrec fun Robot.brainStep(): Either<String, Robot> =
                     state = handleCodePoint(
                         code,
                         state.withUpdatedInputs(hull[location])
-                    )
-                    , brainCounter = brainCounter + 1
+                    ), brainCounter = brainCounter + 1
                 ).bodyStep().brainStep()
             }
         }
@@ -184,4 +176,3 @@ fun main() {
         Robot(code = Day11.fileData, hull = mutableMapOf(Point(0, 0) to HullColor.White)).brainStep().fullOutput()
     )
 }
-

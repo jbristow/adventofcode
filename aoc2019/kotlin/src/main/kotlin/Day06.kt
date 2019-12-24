@@ -12,7 +12,6 @@ object Day06 {
         } ?: throw Error("Bad orbit: $s")
     }
 
-
     private fun List<String>.countPaths() =
         map(::parseOrbit).fold(mapOf<String, Set<String>>()) { m, (a, b) ->
             val nset = (m[a] ?: emptySet()) + b
@@ -33,7 +32,6 @@ object Day06 {
             nextPaths.isEmpty() -> size + paths.sumBy(Pair<String, Int>::second)
             else -> countChildren(nextPaths, size + paths.sumBy(Pair<String, Int>::second))
         }
-
     }
 
     private fun List<String>.shortestDistanceToSanta(): Int {
@@ -45,7 +43,6 @@ object Day06 {
         val youParents = paths.filterValues { "YOU" in it }.keys.map { it to 0 }
 
         return paths.findDistanceToSan(queue = LinkedList(youParents), seen = setOf("YOU"))
-
     }
 
     private tailrec fun MutableMap<String, Set<String>>.findDistanceToSan(
@@ -67,9 +64,7 @@ object Day06 {
     fun part1() = Files.readAllLines(Paths.get(FILENAME)).countPaths()
 
     fun part2(): Int = Files.readAllLines(Paths.get(FILENAME)).shortestDistanceToSanta()
-
 }
-
 
 fun main() {
     println(Day06.part1())

@@ -57,8 +57,8 @@ fun Pair<Long, Mode>.index(state: CurrentState) = second.assignable(first, state
 fun Pair<Long, Mode>.value(code: Map<Long, Long>, state: CurrentState) =
     second.valueOf(first, code, state.relativeBase)
 
-sealed class Instruction
-    : (IntCode, List<Pair<Long, Mode>>, CurrentState) -> Either<String, CurrentState> {
+sealed class Instruction :
+    (IntCode, List<Pair<Long, Mode>>, CurrentState) -> Either<String, CurrentState> {
     abstract val opcodes: Int
 
     open fun findInputs(code: IntCode, state: CurrentState): Either<String, List<Pair<Long, Mode>>> =
@@ -89,7 +89,6 @@ sealed class Instruction
                     else -> "Bad mode $it".left()
                 }
             }
-
 
     sealed class ThreeParameterInstruction : Instruction() {
         override val opcodes: Int = 3
@@ -205,7 +204,6 @@ sealed class Instruction
         }
     }
 
-
     class ModifyRelativeBase : Instruction() {
         override val opcodes: Int = 1
         override fun invoke(
@@ -228,7 +226,6 @@ sealed class Instruction
             state: CurrentState
         ): Either<String, CurrentState> = state.copy(pointer = Option.empty()).right()
     }
-
 }
 
 fun parseInstruction(
@@ -248,7 +245,6 @@ fun parseInstruction(
         99L -> Instruction.End.right()
         else -> "Problem parsing instruction $instruction".left()
     }
-
 
 fun handleCodePoint(
     code: IntCode,
@@ -293,5 +289,3 @@ fun String.toIntCodeProgram(): IntCode {
         .mapIndexed { i, it -> i.toLong() to it.toLong() }
         .toMap().toMutableMap()
 }
-
-

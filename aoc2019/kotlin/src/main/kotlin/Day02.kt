@@ -6,7 +6,6 @@ import arrow.core.right
 import java.nio.file.Files
 import java.nio.file.Paths
 
-
 object Day02 {
 
     private const val FILENAME = "src/main/resources/day02.txt"
@@ -28,7 +27,6 @@ object Day02 {
                 else -> throw Error("Unknown opcode: ${opcodeChunk[0]}")
             }
         }
-
 
     fun part1() = Files.readString(Paths.get(FILENAME))
         .trim()

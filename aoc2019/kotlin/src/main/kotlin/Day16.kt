@@ -23,7 +23,6 @@ object Day16 {
         }.collect(Collectors.toUnmodifiableList()).asSequence()
     }
 
-
     tailrec fun fftTimes(input: Sequence<Int>, size: Int, n: Int): Sequence<Int> {
         println("$n) sum(${input.sum()})" + input.joinToString(""))
         return when {
@@ -37,7 +36,6 @@ object Day16 {
         return fftTimes(list.asSequence(), list.size, 100).take(8).joinToString("")
     }
 }
-
 
 fun main() {
     println(Day16.fftTimes("12345678".asSequence().map { it.toString().toInt() }, 8, 3).joinToString(""))

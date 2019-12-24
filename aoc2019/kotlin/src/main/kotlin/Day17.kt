@@ -92,8 +92,6 @@ object Day17 {
             points.filterKeys { p -> allDirections().map { d -> p.inDirection(d) }.all(points::contains) }.keys
 
         println(intersections.sumBy { p -> p.x * p.y })
-
-
     }
 
     val prog = "A,B,A,C,B,C,B,C,A,B\n" +
@@ -120,4 +118,3 @@ fun main() {
     Day17.part1()
     Day17.part2()
 }
-

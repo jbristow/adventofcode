@@ -2,7 +2,6 @@ const val MIN_BOUND = 245182
 const val MAX_BOUND = 790572
 val passwordRange = (MIN_BOUND..MAX_BOUND)
 
-
 object Day04 {
 
     private fun has5DistinctNumbers(it: Int) = it.toString().toSet().size < 6
@@ -28,7 +27,6 @@ object Day04 {
         passwordRange.asSequence()
             .filter { hasAllIncreasingDigits(it) && hasAtLeastOneDigitAppearingExactlyTwice(it) }
             .count()
-
 }
 
 fun main() {

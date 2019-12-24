@@ -7,7 +7,6 @@ import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Paths
 
-
 fun String.toReaction() = split(" => ").let { (list, material) ->
     Reaction(
         list = list.split(", ").map(String::toMaterial),
@@ -16,7 +15,6 @@ fun String.toReaction() = split(" => ").let { (list, material) ->
 }
 
 fun String.toMaterial() = split(" ").let { Material(it[0].toBigInteger(), it[1]) }
-
 
 @optics
 data class Material(val amount: BigInteger, val name: String) {

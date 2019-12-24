@@ -143,7 +143,6 @@ private fun ArcadeGame.output(): ArcadeGame {
 fun main() {
     Day13.part1()
     Day13.part2()
-
 }
 
 fun ArcadeGame.printScreen() {
