@@ -42,12 +42,11 @@ object Day20 {
         }
         val shortest = djikstra(
             start = endpoints[0].second,
-            end = endpoints[1].second,
-            q = warpedMap.keys,
-            dist = mapOf(endpoints[0].second to 0)
+            end = endpoints[1].second.some(),
+            q = warpedMap.keys
         ) { warpedMap[it] ?: emptyList() }
         println("dist")
-        println(shortest)
+        println(shortest.first)
     }
 
     fun part2(input: List<String>) {
@@ -227,7 +226,7 @@ private fun List<String>.pointSet(yOffset: Int = 0, xOffset: Int = 0): Set<Point
 }
 
 fun main() {
-//    Day20.part1(Day20.fileData)
+    Day20.part1(Day20.fileData)
     val sample1 = """         A           
          A           
   #######.#########  
@@ -251,37 +250,50 @@ FG..#########.....#
     Day20.part2(Day20.fileData)
 }
 
-tailrec fun <P> djikstra(
+fun <P> djikstra(
     start: P,
-    end: P,
+    end: Option<P>,
     q: Set<P>,
-    dist: Map<P, Int>,
-    prev: Map<P, P> = emptyMap(),
     neighborFn: (P) -> List<P>
-): Option<Int> =
-    when (val u = q.filter { it in dist }.minByM { dist[it].toOption() }) {
-        None -> None
-        end.some() -> u.flatMap { uo -> dist[uo].toOption() }
-        is Some<P> -> {
-            val updates =
-                q.filter { v ->
-                    u.exists { uo ->
-                        uo in q &&
-                                dist[v].toOption().forall { vdist ->
-                                    ((dist[uo] ?: 0) + 1) < vdist
-                                }
+): Pair<Option<Int>, List<P>> {
+
+    tailrec fun djikstraPrime(
+        q: Set<P>,
+        dist: Map<P, Int>,
+        prev: Map<P, P> = emptyMap()
+    ): Pair<Option<Int>, List<P>> {
+        tailrec fun reconstructPath(
+            end: Option<P>,
+            output: List<P>
+        ): List<P> = when (end) {
+            is None -> output + start
+            is Some<P> -> reconstructPath(prev[end.t].toOption(), output + end.t)
+        }
+        return when (val u = q.filter { it in dist }.minByM { dist[it].toOption() }) {
+            None -> None to emptyList()
+            end -> u.fold(
+                { None to emptyList<P>() },
+                { uo -> dist[uo].toOption() to reconstructPath(uo.some(), emptyList()) })
+            is Some<P> -> {
+                val updates =
+                    neighborFn(u.t).filter { v ->
+                        u.exists { uo ->
+                            uo in q &&
+                                    dist[v].toOption().forall { vdist ->
+                                        ((dist[uo] ?: 0) + 1) < vdist
+                                    }
+                        }
                     }
-                }
-            djikstra(
-                start,
-                end,
-                q - u.t,
-                dist + updates.map { it to dist[u.t].toOption().getOrElse { 0 } + 1 },
-                prev + updates.map { it to u.t },
-                neighborFn
-            )
+                djikstraPrime(
+                    q - u.t,
+                    dist + updates.map { it to dist[u.t].toOption().getOrElse { 0 } + 1 },
+                    prev + updates.map { it to u.t }
+                )
+            }
         }
     }
+    return djikstraPrime(q, mapOf(start to 0), emptyMap())
+}
 
 /**
  * Returns the first element yielding the smallest value of the given function or `null` if there are no elements.
@@ -364,3 +376,13 @@ fun djikstra2(
 
     return djikstra2Prime(0, qStart, mapOf(start to 0), emptyMap(), setOf(0))
 }
+
+fun Option<Point>.plus(element: Option<Point>) = this.fold(
+    ifEmpty = { element.map(::listOf) },
+    ifSome = { a ->
+        element.fold(
+            ifEmpty = { listOf(a) },
+            ifSome = { b -> listOf(a, b) }
+        ).some()
+    }
+)
