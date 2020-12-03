@@ -13,7 +13,6 @@ object Day02 {
         val password = groups[4]
 
         return password.count(matchChar::equals) in minCount..maxCount
-
     }
 
     fun validateLinePart2(input: String): Boolean {
@@ -24,8 +23,7 @@ object Day02 {
         val password = groups[4]
 
         return password[first] == matchChar && password[last] != matchChar
-                || password[first] != matchChar && password[last] == matchChar
-
+            || password[first] != matchChar && password[last] == matchChar
     }
 
     private fun applyRegex(input: String) = """(\d+)-(\d+) (.): (.*)""".toRegex().matchEntire(input)

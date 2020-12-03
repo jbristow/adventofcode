@@ -5,7 +5,6 @@ import util.Point2d.Companion.modX
 import util.Point2d.Companion.plus
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.stream.Collectors
 
 private const val FILENAME = "src/main/resources/day03.txt"
 
@@ -36,7 +35,6 @@ object Day03 {
             (curr.y + slope.y) > height -> nextTreesHit
             else -> treeHits(slope, width, height, trees, curr + slope, nextTreesHit)
         }
-
     }
 
     fun part1(): Int {
@@ -51,6 +49,7 @@ object Day03 {
 
     fun part2(): Int {
         val lines = Files.readAllLines(Paths.get(FILENAME))
+        val data = processData(lines)
         return listOf(
             Point2d(1, 1),
             Point2d(3, 1),
@@ -58,7 +57,7 @@ object Day03 {
             Point2d(7, 1),
             Point2d(1, 2)
         ).parallelStream().map {
-            treeHits(it, lines.first().length, lines.size, processData(lines))
+            treeHits(it, lines.first().length, lines.size, data)
         }.reduce(1) { acc, curr -> acc * curr }
     }
 }

@@ -21,7 +21,6 @@ object Day01 {
         return recurse(sorted.first(), sorted.drop(1))
     }
 
-
     private fun find2020From3(lines: List<Int>): Int {
         val tuple = (lines.indices).asSequence().flatMap { i ->
             (i until lines.size).asSequence().flatMap { j ->
