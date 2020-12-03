@@ -6,7 +6,7 @@ private const val FILENAME = "src/main/resources/day02.txt"
 object Day02 {
 
     fun validateLinePart1(input: String): Boolean {
-        val groups = """(\d+)-(\d+) (.): (.*)""".toRegex().matchEntire(input)!!.groupValues
+        val groups = applyRegex(input)!!.groupValues
         val minCount = groups[1].toInt()
         val maxCount = groups[2].toInt()
         val matchChar = groups[3].first()
@@ -17,16 +17,18 @@ object Day02 {
     }
 
     fun validateLinePart2(input: String): Boolean {
-        val groups = """(\d+)-(\d+) (.): (.*)""".toRegex().matchEntire(input)!!.groupValues
+        val groups = applyRegex(input)!!.groupValues
         val first = groups[1].toInt() - 1
         val last = groups[2].toInt() - 1
         val matchChar = groups[3].first()
         val password = groups[4]
 
-        return (password[first] == matchChar && password[last] != matchChar)
-                || (password[first] != matchChar && password[last] == matchChar)
+        return password[first] == matchChar && password[last] != matchChar
+                || password[first] != matchChar && password[last] == matchChar
 
     }
+
+    private fun applyRegex(input: String) = """(\d+)-(\d+) (.): (.*)""".toRegex().matchEntire(input)
 }
 
 fun main() {
