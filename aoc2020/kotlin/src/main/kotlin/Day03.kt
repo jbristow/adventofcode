@@ -12,8 +12,9 @@ object Day03 {
 
     private fun processData(input: List<String>): Set<Point2d> {
         return input.mapIndexed { y, row ->
-            row.mapIndexed { x, c -> listOf(Point2d(x, y), c) }
-                .filter { (_, c) -> c == '#' }
+            row.mapIndexed { x, c ->
+                Pair(Point2d(x, y), c)
+            }.filter { (_, c) -> c == '#' }
         }
             .flatten()
             .map { (p, _) -> p as Point2d }.toSet()
