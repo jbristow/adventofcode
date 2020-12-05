@@ -1,9 +1,8 @@
 import java.nio.file.Files
 import java.nio.file.Paths
 
-private const val FILENAME = "src/main/resources/day02.txt"
-
 object Day02 {
+    const val FILENAME = "src/main/resources/day02.txt"
 
     fun validateLinePart1(input: String): Boolean {
         val groups = applyRegex(input)!!.groupValues
@@ -27,10 +26,13 @@ object Day02 {
     }
 
     private fun applyRegex(input: String) = """(\d+)-(\d+) (.): (.*)""".toRegex().matchEntire(input)
+
+    fun part1(lines:List<String>) = lines.count(Day02::validateLinePart1)
+    fun part2(lines:List<String>) = lines.count(Day02::validateLinePart2)
 }
 
 fun main() {
-    val lines = Files.readAllLines(Paths.get(FILENAME))
-    println("Part1: ${lines.count(Day02::validateLinePart1)}")
-    println("Part2: ${lines.count(Day02::validateLinePart2)}")
+    val lines = Files.readAllLines(Paths.get(Day02.FILENAME))
+    println("Part1: ${Day02.part1(lines)}")
+    println("Part2: ${Day02.part2(lines)}")
 }

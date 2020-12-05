@@ -1,21 +1,20 @@
+import Day04.FILENAME
 import Day04.part1
 import Day04.part2
 import java.nio.file.Files
 import java.nio.file.Paths
 
 object Day04 {
-    private const val FILENAME = "src/main/resources/day04.txt"
+    const val FILENAME = "src/main/resources/day04.txt"
 
-    fun part1(): Int {
-        val data = Files.readString(Paths.get(FILENAME))
+    fun part1(data: String): Int {
         val chunks = data.split("\n\n")
         val passports = chunks.map(Passport::of)
 
-        return passports.count(Passport::valid)
+        return passports.count { it.valid }
     }
 
-    fun part2(): Int {
-        val data = Files.readString(Paths.get(FILENAME))
+    fun part2(data: String): Int {
         val chunks = data.split("\n\n")
         return chunks.count(StrictPassport::validateChunk)
     }
@@ -30,11 +29,6 @@ object Day04 {
         val pid: String?,
         val cid: String?,
     ) {
-        val valid: Boolean
-            get() {
-
-                return byr != null && iyr != null && eyr != null && hgt != null && hcl != null && ecl != null && pid != null
-            }
 
         companion object {
             private val byrRegex = """byr:([^ ]+)""".toRegex()
@@ -59,6 +53,17 @@ object Day04 {
             }
         }
     }
+
+    val Passport.valid: Boolean
+        get() {
+            return byr != null
+                && iyr != null
+                && eyr != null
+                && hgt != null
+                && hcl != null
+                && ecl != null
+                && pid != null
+        }
 
     object StrictPassport {
 
@@ -108,6 +113,7 @@ object Day04 {
 }
 
 fun main() {
-    println("Part 1: ${part1()}")
-    println("Part 2: ${part2()}")
+    val data = Files.readString(Paths.get(FILENAME))
+    println("Part 1: ${part1(data)}")
+    println("Part 2: ${part2(data)}")
 }

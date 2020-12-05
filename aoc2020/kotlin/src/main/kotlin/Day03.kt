@@ -1,3 +1,4 @@
+import Day03.FILENAME
 import Day03.part1
 import Day03.part2
 import util.Point2d
@@ -6,10 +7,10 @@ import util.Point2d.Companion.plus
 import java.nio.file.Files
 import java.nio.file.Paths
 
-private const val FILENAME = "src/main/resources/day03.txt"
 
 object Day03 {
 
+    const val FILENAME = "src/main/resources/day03.txt"
     private fun processData(input: List<String>): Set<Point2d> {
         return input.mapIndexed { y, row ->
             row.mapIndexed { x, c ->
@@ -38,8 +39,7 @@ object Day03 {
         }
     }
 
-    fun part1(): Int {
-        val lines = Files.readAllLines(Paths.get(FILENAME))
+    fun part1(lines: List<String>): Int {
         return treeHits(
             Point2d(3, 1),
             lines.first().length,
@@ -48,8 +48,7 @@ object Day03 {
         )
     }
 
-    fun part2(): Int {
-        val lines = Files.readAllLines(Paths.get(FILENAME))
+    fun part2(lines: List<String>): Int {
         val data = processData(lines)
         return listOf(
             Point2d(1, 1),
@@ -64,6 +63,6 @@ object Day03 {
 }
 
 fun main() {
-    println("Part 1: ${part1()}")
-    println("Part 2: ${part2()}")
+    println("Part 1: ${part1(Files.readAllLines(Paths.get(FILENAME)))}")
+    println("Part 2: ${part2(Files.readAllLines(Paths.get(FILENAME)))}")
 }

@@ -4,7 +4,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 object Day01 {
-    private const val FILENAME = "src/main/resources/day01.txt"
+    const val FILENAME = "src/main/resources/day01.txt"
 
     private fun find2020(lines: List<Int>): Int {
         val sorted = lines.sorted()
@@ -37,13 +37,14 @@ object Day01 {
         return lines[x] * lines[y] * lines[z]
     }
 
-    fun part1() = find2020(Files.readAllLines(Paths.get(FILENAME)).map(String::toInt))
+    fun part1(input: List<Int>) = find2020(input)
 
-    fun part2() = find2020From3(Files.readAllLines(Paths.get(FILENAME)).map(String::toInt))
+    fun part2(input: List<Int>) = find2020From3(input)
 }
 
 fun main() {
-    println("Part 1: ${part1()}")
-    println("Part 2: ${part2()}")
+    val data = Files.readAllLines(Paths.get(Day01.FILENAME)).map(String::toInt)
+    println("Part 1: ${part1(data)}")
+    println("Part 2: ${part2(data)}")
 }
 
