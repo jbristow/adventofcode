@@ -32,7 +32,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$jupiterVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jupiterVersion")
-    testCompile("org.assertj:assertj-core:3.18.1")
+    testImplementation("org.assertj:assertj-core:3.18.1")
+
 }
 
 tasks.withType<KotlinCompile> {
@@ -41,6 +42,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    systemProperties = mapOf(
+        "junit.jupiter.extensions.autodetection.enabled" to true,
+    "junit.jupiter.testinstance.lifecycle.default" to "per_class"
+    )
     testLogging {
         events("passed", "skipped", "failed")
     }

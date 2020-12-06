@@ -95,6 +95,7 @@ object Day04 {
         }
 
         fun validateChunk(input: String): Boolean {
+            println("###\n${input}\n###")
             val byr = input.parseUsing(byrRegex)?.toIntOrNull()
             val iyr = input.parseUsing(iyrRegex)?.toIntOrNull()
             val eyr = input.parseUsing(eyrRegex)?.toIntOrNull()
