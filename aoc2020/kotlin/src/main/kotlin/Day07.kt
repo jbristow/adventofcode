@@ -3,6 +3,7 @@ import Day07.part1
 import Day07.part2
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
 
 object Day07 {
     const val FILENAME = "src/main/resources/day07.txt"
@@ -65,10 +66,20 @@ object Day07 {
         val bagMap: Map<String, List<Pair<Int, String>>> = input.map { processLine(it) }.toMap()
         return countUpBags(listOf(1 to "shiny gold"), bagMap = bagMap) - 1
     }
+
+    fun generateGraph(data: List<String>) {
+        val m = data.asSequence().map { processLine(it) }.flatMap { (key, vals) ->
+            vals.map { (n, k2) ->
+                """  "$k2" -> "$key" [weight=$n];"""
+            }
+        }.joinToString("\n")
+        Files.writeString(Paths.get("day07.dot"), "digraph {\n$m\n}", StandardOpenOption.CREATE)
+    }
 }
 
 fun main() {
     val data = Files.readAllLines(Paths.get(FILENAME))
     println("Part 1: ${part1(data)}")
     println("Part 2: ${part2(data)}")
+    Day07.generateGraph(data)
 }
