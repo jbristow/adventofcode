@@ -14,7 +14,7 @@ object Day05 {
                 'B' -> (((rowrange.first + rowrange.last + 1) / 2)..rowrange.last) to colrange
                 'L' -> rowrange to (colrange.first..((colrange.first + colrange.last) / 2))
                 'R' -> rowrange to (((colrange.first + colrange.last + 1) / 2)..colrange.last)
-                else -> throw Exception("Fart: ${this}, $rowrange -- $colrange -- $instr")
+                else -> throw Exception("Fart: $this, $rowrange -- $colrange -- $instr")
             }
         }
         return ranges.first.first to ranges.second.last

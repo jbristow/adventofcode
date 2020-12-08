@@ -56,13 +56,13 @@ object Day04 {
 
     val Passport.valid: Boolean
         get() {
-            return byr != null
-                && iyr != null
-                && eyr != null
-                && hgt != null
-                && hcl != null
-                && ecl != null
-                && pid != null
+            return byr != null &&
+                iyr != null &&
+                eyr != null &&
+                hgt != null &&
+                hcl != null &&
+                ecl != null &&
+                pid != null
         }
 
     object StrictPassport {

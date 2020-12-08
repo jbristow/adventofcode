@@ -22,7 +22,7 @@ class Day06Test {
             a
             
             b
-            """.trimIndent()
+    """.trimIndent()
 
     @Nested
     inner class Part1 {

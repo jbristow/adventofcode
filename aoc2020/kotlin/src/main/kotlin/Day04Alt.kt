@@ -3,7 +3,6 @@ import arrow.core.Either
 import arrow.core.Invalid
 import arrow.core.Valid
 import arrow.core.Validated
-import arrow.core.computations.validated
 import arrow.core.extensions.applicativeNel
 import arrow.core.fix
 import arrow.core.invalid
@@ -42,7 +41,7 @@ object Day04Alt {
             fun nDigitRead(digitCount: Int): Read<String> = object : Read<String>() {
                 override fun read(s: String) =
                     when {
-                        s.matches(Regex("""\d{${digitCount}}""")) -> s.right()
+                        s.matches(Regex("""\d{$digitCount}""")) -> s.right()
                         else -> ParseError.WrongDigitCount(s).left()
                     }
             }
@@ -56,7 +55,6 @@ object Day04Alt {
                             in range.first..range.second -> s.right()
                             else -> ParseError.OutOfBounds(i, range.first, range.second).left()
                         }
-
                     }
             }
 
@@ -134,27 +132,29 @@ fun main() {
     val data = Files.readString(Paths.get("src/main/resources/day04.txt")).trim()
     val chunks = data.split("\n\n")
 
-
     val part1Valid = chunks.parallelStream().map { validatePart1(Input(it)) }.collect(Collectors.toList())
     val part1Count = part1Valid.count { it.isValid }
     println("------")
-    println(part1Valid.filter { it.isInvalid }.joinToString("\n") {
-        when (it) {
-            is Valid -> "Valid"
-            is Invalid -> "Invalid:\n" + it.e.joinToString("\n") { err -> "\t${err}" }
+    println(
+        part1Valid.filter { it.isInvalid }.joinToString("\n") {
+            when (it) {
+                is Valid -> "Valid"
+                is Invalid -> "Invalid:\n" + it.e.joinToString("\n") { err -> "\t$err" }
+            }
         }
-    })
+    )
     val validatedChunks = chunks.parallelStream()
         .map { validatePart2(Input(it)) }
         .collect(Collectors.toList())
 
-    println(validatedChunks.filter { it.isInvalid }.joinToString("\n") {
-        when (it) {
-            is Valid -> "Valid"
-            is Invalid -> "Invalid:\n" + it.e.joinToString("\n") { err -> "\t${err}" }
+    println(
+        validatedChunks.filter { it.isInvalid }.joinToString("\n") {
+            when (it) {
+                is Valid -> "Valid"
+                is Invalid -> "Invalid:\n" + it.e.joinToString("\n") { err -> "\t$err" }
+            }
         }
-    })
+    )
     println("Valid Count Part1: $part1Count")
     println("Valid Count Part2: ${validatedChunks.count { it.isValid }}")
 }
-

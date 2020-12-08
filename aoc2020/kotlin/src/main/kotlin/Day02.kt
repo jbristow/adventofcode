@@ -21,14 +21,14 @@ object Day02 {
         val matchChar = groups[3].first()
         val password = groups[4]
 
-        return password[first] == matchChar && password[last] != matchChar
-            || password[first] != matchChar && password[last] == matchChar
+        return password[first] == matchChar && password[last] != matchChar ||
+            password[first] != matchChar && password[last] == matchChar
     }
 
     private fun applyRegex(input: String) = """(\d+)-(\d+) (.): (.*)""".toRegex().matchEntire(input)
 
-    fun part1(lines:List<String>) = lines.count(Day02::validateLinePart1)
-    fun part2(lines:List<String>) = lines.count(Day02::validateLinePart2)
+    fun part1(lines: List<String>) = lines.count(Day02::validateLinePart1)
+    fun part2(lines: List<String>) = lines.count(Day02::validateLinePart2)
 }
 
 fun main() {

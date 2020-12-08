@@ -7,7 +7,6 @@ import util.Point2d.Companion.plus
 import java.nio.file.Files
 import java.nio.file.Paths
 
-
 object Day03 {
 
     const val FILENAME = "src/main/resources/day03.txt"
