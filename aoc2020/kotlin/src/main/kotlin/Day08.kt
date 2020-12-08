@@ -1,11 +1,6 @@
 import Day08.FILENAME
 import Day08.part1
 import Day08.part2
-import arrow.core.Either
-import arrow.core.getOrElse
-import arrow.core.left
-import arrow.core.right
-import java.lang.IllegalArgumentException
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -43,18 +38,26 @@ object Day08 {
         }
     }
 
-    data class Terminated(val accumulator: Int)
-    data class LoopDetected(val lineNumber: Int, val accumulator: Int, val log: List<Int>)
+    sealed class Outcome {
+        data class Terminated(val acc: Int) : Outcome()
+        data class LoopDetected(val lineNumber: Int, val acc: Int, val log: List<Int>) : Outcome()
+
+        val accumulator: Int
+            get() = when (this) {
+                is Terminated -> this.acc
+                is LoopDetected -> this.acc
+            }
+    }
 
     tailrec fun loopDetector(
         current: Int,
         accumulator: Int,
         instrs: List<Operation>,
         seenLines: List<Int> = emptyList()
-    ): Either<LoopDetected, Terminated> =
+    ): Outcome =
         when {
-            current >= instrs.size -> Terminated(accumulator).right()
-            current in seenLines -> LoopDetected(current, accumulator, seenLines).left()
+            current >= instrs.size -> Outcome.Terminated(accumulator)
+            current in seenLines -> Outcome.LoopDetected(current, accumulator, seenLines)
             else -> {
                 val (nextCurrent, nextAccumulator) = instrs[current].operate(current, accumulator)
                 loopDetector(nextCurrent, nextAccumulator, instrs, seenLines + current)
@@ -62,27 +65,23 @@ object Day08 {
         }
 
     fun part1(input: List<String>) =
-        loopDetector(0, 0, input.map(Day08::processLine))
-            .fold(
-                ifLeft = { it.accumulator },
-                ifRight = { it.accumulator }
-            )
+        loopDetector(0, 0, input.map(Day08::processLine)).accumulator
 
     fun part2(input: List<String>): Int? {
         val originalInstrs = input.map(::processLine)
         val condition = loopDetector(0, 0, originalInstrs)
-        val changeable = condition.fold(
-            ifLeft = { it.log.filter { instr -> originalInstrs[instr] !is Operation.Acc }.toSet() },
-            ifRight = { throw Exception("Impossible") }
-        )
+        val changeable =
+            (condition as Outcome.LoopDetected).log
+                .filter { instr -> originalInstrs[instr] !is Operation.Acc }.toSet()
+
         val answer =
             changeable.reversed()
                 .asSequence()
                 .map {
                     loopDetector(0, 0, originalInstrs.swapInstructionAt(it))
-                }.find { it.isRight() }
+                }.find { it is Outcome.Terminated }
 
-        return answer?.getOrElse { throw Exception("Also impossible") }?.accumulator
+        return answer?.accumulator
     }
 
     private fun List<Operation>.swapInstructionAt(it: Int): MutableList<Operation> {

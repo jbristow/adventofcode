@@ -17,7 +17,8 @@ object Day03 {
             }.filter { (_, c) -> c == '#' }
         }
             .flatten()
-            .map { (p, _) -> p as Point2d }.toSet()
+            .map(Pair<Point2d, Char>::first)
+            .toSet()
     }
 
     private tailrec fun treeHits(
