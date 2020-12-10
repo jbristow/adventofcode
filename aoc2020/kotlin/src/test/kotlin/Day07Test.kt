@@ -55,7 +55,7 @@ class Day07Test {
 
     @Nested
     inner class Answer {
-        val data = Files.readAllLines(Paths.get(Day07.FILENAME))
+        private val data = Files.readAllLines(Paths.get(Day07.FILENAME))
         @Test
         fun part1() {
             assertThat(Day07.part1(data)).isEqualTo(238)

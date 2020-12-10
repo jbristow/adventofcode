@@ -39,9 +39,14 @@ object Day08 {
     }
 
     sealed class Outcome {
-        data class Terminated(val acc: Int) : Outcome()
-        data class LoopDetected(val lineNumber: Int, val acc: Int, val log: List<Int>) : Outcome()
+        data class Terminated(val line: Int, val acc: Int, val seen: List<Int>) : Outcome()
+        data class LoopDetected(val line: Int, val acc: Int, val seen: List<Int>) : Outcome()
 
+        val log: List<Int>
+            get() = when (this) {
+                is Terminated -> this.seen
+                is LoopDetected -> this.seen
+            }
         val accumulator: Int
             get() = when (this) {
                 is Terminated -> this.acc
@@ -56,7 +61,7 @@ object Day08 {
         seenLines: List<Int> = emptyList()
     ): Outcome =
         when {
-            current >= instrs.size -> Outcome.Terminated(accumulator)
+            current >= instrs.size -> Outcome.Terminated(current, accumulator, seenLines)
             current in seenLines -> Outcome.LoopDetected(current, accumulator, seenLines)
             else -> {
                 val (nextCurrent, nextAccumulator) = instrs[current].operate(current, accumulator)
@@ -69,19 +74,14 @@ object Day08 {
 
     fun part2(input: List<String>): Int? {
         val originalInstrs = input.map(::processLine)
-        val condition = loopDetector(0, 0, originalInstrs)
-        val changeable =
-            (condition as Outcome.LoopDetected).log
-                .filter { instr -> originalInstrs[instr] !is Operation.Acc }.toSet()
 
-        val answer =
-            changeable.reversed()
-                .asSequence()
-                .map {
-                    loopDetector(0, 0, originalInstrs.swapInstructionAt(it))
-                }.find { it is Outcome.Terminated }
-
-        return answer?.accumulator
+        return loopDetector(0, 0, originalInstrs).log
+            .filter { instr -> originalInstrs[instr] !is Operation.Acc }
+            .reversed()
+            .asSequence()
+            .map {
+                loopDetector(0, 0, originalInstrs.swapInstructionAt(it))
+            }.find { it is Outcome.Terminated }?.accumulator
     }
 
     private fun List<Operation>.swapInstructionAt(it: Int): MutableList<Operation> {
