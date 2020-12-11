@@ -59,7 +59,7 @@ class Day10Test {
         6
         12
         4
-        """.trimIndent().lines().map(String::toInt)
+    """.trimIndent().lines().map(String::toInt)
     val complexData =
         """
         28

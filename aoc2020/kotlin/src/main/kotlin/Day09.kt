@@ -91,6 +91,3 @@ fun main() {
         println("Part 2: ${Day09.part02(data, it)}")
     }
 }
-
-
-

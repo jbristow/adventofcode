@@ -54,7 +54,3 @@ fun main() {
     println("Part 1: ${Day10.part1(Day10.fileData)}")
     println("Part 2: ${Day10.part2(Day10.fileData)}")
 }
-
-
-
-

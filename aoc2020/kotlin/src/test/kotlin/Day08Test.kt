@@ -20,7 +20,7 @@ class Day08Test {
         acc +1
         jmp -4
         acc +6
-        """.trimIndent().lines()
+    """.trimIndent().lines()
 
     private val testDataFixed = """
         nop +0
@@ -32,7 +32,7 @@ class Day08Test {
         acc +1
         nop -4
         acc +6
-        """.trimIndent().lines()
+    """.trimIndent().lines()
 
     @Test
     fun testPart1() {

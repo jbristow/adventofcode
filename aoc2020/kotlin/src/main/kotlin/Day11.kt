@@ -41,7 +41,7 @@ object Day11 {
         is Seat.Occupied -> "#"
     }
 
-    fun Point2d.neighbors() =
+    fun Point2d.neighbors(map: Map<Point2d, Seat>) =
         listOf(
             Point2d(x + 1, y + 1),
             Point2d(x + 1, y),
@@ -51,7 +51,7 @@ object Day11 {
             Point2d(x - 1, y + 1),
             Point2d(x - 1, y),
             Point2d(x - 1, y - 1),
-        )
+        ).mapNotNull(map::get)
 
     fun Point2d.seenNeighbors(map: Map<Point2d, Seat>, maxX: Int, maxY: Int): List<Seat> {
         fun Point2d.lookingAt(direction: Point2d) =
@@ -67,7 +67,28 @@ object Day11 {
             lookingAt(Point2d(1, -1)),
             lookingAt(Point2d(1, 0)),
             lookingAt(Point2d(1, 1))
-        ).map { map[it]!! }
+        ).mapNotNull(map::get)
+    }
+
+    tailrec fun findLoop(
+        map: Map<Point2d, Seat>,
+        displayFn: (Map<Point2d, Seat>) -> String,
+        lastSeen: String = displayFn(map),
+        stepFn: (Map<Point2d, Seat>) -> Map<Point2d, Seat>,
+    ): Int {
+        val nextmap = stepFn(map)
+        return when (val currSeen = displayFn(nextmap)) {
+            lastSeen -> nextmap.values.count { it is Seat.Occupied }
+            else -> findLoop(nextmap, displayFn, currSeen, stepFn)
+        }
+    }
+
+    private fun Map<Point2d, Seat>.output(maxX: Int, maxY: Int): String {
+        return (0 until maxY).joinToString("\n") { y ->
+            (0 until maxX).joinToString("") { x ->
+                this[Point2d(x, y)].toString()
+            }
+        }
     }
 
     fun part1(data: List<String>): Int {
@@ -84,31 +105,9 @@ object Day11 {
             }
         }.toMap()
 
-        return findLoop(map, maxX, maxY) {
-            mapValues { (k: Point2d, v: Seat) ->
-                v.nextState(k.neighbors().mapNotNull { this[it] })
-            }
-        }
-    }
-
-    tailrec fun findLoop(
-        map: Map<Point2d, Seat>,
-        maxX: Int,
-        maxY: Int,
-        lastSeen: String = map.output(maxX, maxY),
-        stepFn: Map<Point2d, Seat>.() -> Map<Point2d, Seat>,
-    ): Int {
-        val nextmap = map.stepFn()
-        return when (val currSeen = nextmap.output(maxX, maxY)) {
-            lastSeen -> nextmap.values.count { it is Seat.Occupied }
-            else -> findLoop(nextmap, maxX, maxY, currSeen, stepFn)
-        }
-    }
-
-    private fun Map<Point2d, Seat>.output(maxX: Int, maxY: Int): String {
-        return (0 until maxY).joinToString("\n") { y ->
-            (0 until maxX).joinToString("") { x ->
-                this[Point2d(x, y)].toString()
+        return findLoop(map, displayFn = { it.output(maxX, maxY) }) {
+            it.mapValues { (k: Point2d, v: Seat) ->
+                v.nextState(k.neighbors(it))
             }
         }
     }
@@ -127,10 +126,9 @@ object Day11 {
             }
         }.toMap()
 
-
-        return findLoop(map, maxX, maxY) {
-            mapValues { (k: Point2d, v: Seat) ->
-                v.nextState2(k.seenNeighbors(this, maxX, maxY))
+        return findLoop(map, displayFn = { it.output(maxX, maxY) }) {
+            it.mapValues { (k: Point2d, v: Seat) ->
+                v.nextState2(k.seenNeighbors(it, maxX, maxY))
             }
         }
     }
