@@ -136,11 +136,16 @@ object Day12 {
             is Instruction.N, is Instruction.E,
             is Instruction.S, is Instruction.W,
             -> copy(position = instr.motion * instr.value + position)
-            is Instruction.L -> copy(heading = heading.turnLeft(instr.value))
-            is Instruction.R -> copy(heading = heading.turnRight(instr.value))
+            is Instruction.L -> turnLeft(instr.value)
+            is Instruction.R -> turnRight(instr.value)
             is Instruction.F -> copy(position = heading.motion * instr.value + position)
         }
     }
+
+    fun Ship.turnLeft(value: Int) = copy(heading = heading.turnLeft(value))
+    fun Ship.turnRight(value: Int) = copy(heading = heading.turnRight(value))
+    fun Ship.rotateLeft(value: Int) = position.rotateLeft(value)
+    fun Ship.rotateRight(value: Int) = position.rotateRight(value)
 
     fun Pair<Ship, Ship>.executePart2(instr: Instruction): Pair<Ship, Ship> {
         val (ship, waypoint) = this
@@ -152,9 +157,9 @@ object Day12 {
             ->
                 ship to waypoint.copy(position = instr.motion * instr.value + waypoint.position)
             is Instruction.L ->
-                ship to waypoint.copy(position = waypoint.position.rotateLeft(instr.value))
+                ship to waypoint.copy(position = waypoint.rotateLeft(instr.value))
             is Instruction.R ->
-                ship to waypoint.copy(position = waypoint.position.rotateRight(instr.value))
+                ship to waypoint.copy(position = waypoint.rotateRight(instr.value))
             is Instruction.F ->
                 ship.copy(position = waypoint.position * instr.value + ship.position) to waypoint
         }
@@ -197,4 +202,3 @@ fun main() {
 private fun Point2d.manhattanDistance(from: Point2d = Point2d(0, 0)): Long {
     return abs(x.toLong() - from.x) + abs(y.toLong() - from.y)
 }
-
