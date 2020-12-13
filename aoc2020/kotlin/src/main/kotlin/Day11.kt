@@ -1,6 +1,7 @@
 import util.AdventOfCode
 import util.Point2d
 import util.Point2d.Companion.plus
+import java.util.stream.Collectors
 
 object Day11 : AdventOfCode() {
     sealed class Seat {
@@ -107,9 +108,9 @@ object Day11 : AdventOfCode() {
         }.toMap()
 
         return findLoop(map, displayFn = { it.output(maxX, maxY) }) {
-            it.mapValues { (k: Point2d, v: Seat) ->
-                v.nextState(k.neighbors(it))
-            }
+            it.toList().parallelStream().map { (k: Point2d, v: Seat) ->
+                k to v.nextState(k.neighbors(it))
+            }.collect(Collectors.toMap({ (k, _) -> k }, { (_, v) -> v }))
         }
     }
 
@@ -128,9 +129,9 @@ object Day11 : AdventOfCode() {
         }.toMap()
 
         return findLoop(map, displayFn = { it.output(maxX, maxY) }) {
-            it.mapValues { (k: Point2d, v: Seat) ->
-                v.nextState2(k.seenNeighbors(it, maxX, maxY))
-            }
+            it.toList().parallelStream().map { (k: Point2d, v: Seat) ->
+                k to v.nextState2(k.seenNeighbors(it, maxX, maxY))
+            }.collect(Collectors.toMap({ (k, _) -> k }, { (_, v) -> v }))
         }
     }
 }
