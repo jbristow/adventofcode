@@ -1,13 +1,8 @@
+import util.AdventOfCode
 import util.Point2d
 import util.Point2d.Companion.plus
-import java.nio.file.Files
-import java.nio.file.Paths
 
-object Day11 {
-    const val FILENAME = "src/main/resources/day11.txt"
-
-    val fileData = Files.readAllLines(Paths.get(FILENAME))
-
+object Day11 : AdventOfCode() {
     sealed class Seat {
         object Empty : Seat()
         object Occupied : Seat()
@@ -19,6 +14,18 @@ object Day11 {
                     else -> null
                 }
         }
+
+        override fun toString() =
+            when (this) {
+                Empty -> "Empty"
+                Occupied -> "Occupied"
+            }
+
+        fun toGlyph() =
+            when (this) {
+                Empty -> "L"
+                Occupied -> "#"
+            }
     }
 
     fun Seat.nextState(neighbors: List<Seat>) =
@@ -34,12 +41,6 @@ object Day11 {
             this is Seat.Occupied && neighbors.count { it is Seat.Occupied } > 4 -> Seat.Empty
             else -> this
         }
-
-    fun Seat?.toString() = when (this) {
-        null -> "."
-        is Seat.Empty -> "L"
-        is Seat.Occupied -> "#"
-    }
 
     fun Point2d.neighbors(map: Map<Point2d, Seat>) =
         listOf(
@@ -86,7 +87,7 @@ object Day11 {
     private fun Map<Point2d, Seat>.output(maxX: Int, maxY: Int): String {
         return (0 until maxY).joinToString("\n") { y ->
             (0 until maxX).joinToString("") { x ->
-                this[Point2d(x, y)].toString()
+                this[Point2d(x, y)]?.toGlyph() ?: "."
             }
         }
     }
@@ -135,7 +136,6 @@ object Day11 {
 }
 
 fun main() {
-    println("hello")
-    println("Step 1: ${Day11.part1(Day11.fileData)}")
-    println("Step 2: ${Day11.part2(Day11.fileData)}")
+    println("Step 1: ${Day11.part1(Day11.inputFileLines)}")
+    println("Step 2: ${Day11.part2(Day11.inputFileLines)}")
 }

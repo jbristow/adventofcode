@@ -1,10 +1,6 @@
-import java.nio.file.Files
-import java.nio.file.Paths
+import util.AdventOfCode
 
-object Day10 {
-    const val FILENAME = "src/main/resources/day10.txt"
-    val fileData = Files.readAllLines(Paths.get(FILENAME)).map(String::toInt)
-
+object Day10 : AdventOfCode() {
     private tailrec fun Map<Int, List<Int>>.countPossible(
         toConsider: List<Int>,
         totals: Map<Int, Long> = mapOf(0 to 1L)
@@ -51,6 +47,6 @@ object Day10 {
 }
 
 fun main() {
-    println("Part 1: ${Day10.part1(Day10.fileData)}")
-    println("Part 2: ${Day10.part2(Day10.fileData)}")
+    println("Part 1: ${Day10.part1(Day10.inputFileInts)}")
+    println("Part 2: ${Day10.part2(Day10.inputFileInts)}")
 }

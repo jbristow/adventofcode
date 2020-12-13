@@ -1,11 +1,8 @@
-import Day04.FILENAME
 import Day04.part1
 import Day04.part2
-import java.nio.file.Files
-import java.nio.file.Paths
+import util.AdventOfCode
 
-object Day04 {
-    const val FILENAME = "src/main/resources/day04.txt"
+object Day04 : AdventOfCode() {
 
     fun part1(data: String): Int {
         val chunks = data.split("\n\n")
@@ -74,7 +71,6 @@ object Day04 {
         private val hclRegex = """\bhcl:(#[0-9a-f]{6})\b""".toRegex()
         private val eclRegex = """\becl:(amb|blu|brn|gry|grn|hzl|oth)\b""".toRegex()
         private val pidRegex = """\bpid:([0-9]{9})\b""".toRegex()
-        private val cidRegex = """\bcid:([^\s]+)""".toRegex()
         fun String?.parseHeight(): Int? {
             return when {
                 this == null -> null
@@ -114,7 +110,6 @@ object Day04 {
 }
 
 fun main() {
-    val data = Files.readString(Paths.get(FILENAME))
-    println("Part 1: ${part1(data)}")
-    println("Part 2: ${part2(data)}")
+    println("Part 1: ${part1(Day04.inputFileString)}")
+    println("Part 2: ${part2(Day04.inputFileString)}")
 }

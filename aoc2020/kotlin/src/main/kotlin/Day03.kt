@@ -1,15 +1,12 @@
-import Day03.FILENAME
 import Day03.part1
 import Day03.part2
+import util.AdventOfCode
 import util.Point2d
 import util.Point2d.Companion.modX
 import util.Point2d.Companion.plus
-import java.nio.file.Files
-import java.nio.file.Paths
 
-object Day03 {
+object Day03 : AdventOfCode() {
 
-    const val FILENAME = "src/main/resources/day03.txt"
     private fun processData(input: List<String>): Set<Point2d> {
         return input.mapIndexed { y, row ->
             row.mapIndexed { x, c ->
@@ -63,6 +60,6 @@ object Day03 {
 }
 
 fun main() {
-    println("Part 1: ${part1(Files.readAllLines(Paths.get(FILENAME)))}")
-    println("Part 2: ${part2(Files.readAllLines(Paths.get(FILENAME)))}")
+    println("Part 1: ${part1(Day03.inputFileLines)}")
+    println("Part 2: ${part2(Day03.inputFileLines)}")
 }

@@ -1,11 +1,6 @@
-import Day01.part1
-import Day01.part2
-import java.nio.file.Files
-import java.nio.file.Paths
+import util.AdventOfCode
 
-object Day01 {
-    const val FILENAME = "src/main/resources/day01.txt"
-
+object Day01 : AdventOfCode() {
     private fun find2020(lines: List<Int>): Int {
         val sorted = lines.sorted()
 
@@ -43,7 +38,6 @@ object Day01 {
 }
 
 fun main() {
-    val data = Files.readAllLines(Paths.get(Day01.FILENAME)).map(String::toInt)
-    println("Part 1: ${part1(data)}")
-    println("Part 2: ${part2(data)}")
+    println("Part 1: ${Day01.part1(Day01.inputFileInts)}")
+    println("Part 2: ${Day01.part2(Day01.inputFileInts)}")
 }

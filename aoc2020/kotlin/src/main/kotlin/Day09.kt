@@ -1,9 +1,7 @@
-import java.nio.file.Files
-import java.nio.file.Paths
+import util.AdventOfCode
 import java.util.Optional
 
-object Day09 {
-    const val FILENAME = "src/main/resources/day09.txt"
+object Day09 : AdventOfCode() {
     tailrec fun findTwoNumbersThatSumTo(
         target: Long,
         current: Long,
@@ -83,11 +81,10 @@ object Day09 {
 }
 
 fun main() {
-    val data = Files.readAllLines(Paths.get(Day09.FILENAME)).map(String::toLong)
-    val part1Answer = Day09.part01(data)!!
+    val part1Answer = Day09.part01(Day09.inputFileLongs)!!
 
     part1Answer.ifPresent {
         println("Part 1: $it")
-        println("Part 2: ${Day09.part02(data, it)}")
+        println("Part 2: ${Day09.part02(Day09.inputFileLongs, it)}")
     }
 }

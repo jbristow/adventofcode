@@ -1,9 +1,6 @@
-import java.nio.file.Files
-import java.nio.file.Paths
+import util.AdventOfCode
 
-object Day02 {
-    const val FILENAME = "src/main/resources/day02.txt"
-
+object Day02 : AdventOfCode() {
     fun validateLinePart1(input: String): Boolean {
         val groups = applyRegex(input)!!.groupValues
         val minCount = groups[1].toInt()
@@ -32,7 +29,6 @@ object Day02 {
 }
 
 fun main() {
-    val lines = Files.readAllLines(Paths.get(Day02.FILENAME))
-    println("Part1: ${Day02.part1(lines)}")
-    println("Part2: ${Day02.part2(lines)}")
+    println("Part1: ${Day02.part1(Day02.inputFileLines)}")
+    println("Part2: ${Day02.part2(Day02.inputFileLines)}")
 }

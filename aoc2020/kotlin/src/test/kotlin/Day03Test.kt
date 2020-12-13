@@ -1,22 +1,20 @@
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class Day03Test {
-    val testData = """..##.......
-                     |#...#...#..
-                     |.#....#..#.
-                     |..#.#...#.#
-                     |.#...##..#.
-                     |..#.##.....
-                     |.#.#.#....#
-                     |.#........#
-                     |#.##...#...
-                     |#...##....#
-                     |.#..#...#.#""".trimMargin().lines()
+    private val testData = """..##.......
+                             |#...#...#..
+                             |.#....#..#.
+                             |..#.#...#.#
+                             |.#...##..#.
+                             |..#.##.....
+                             |.#.#.#....#
+                             |.#........#
+                             |#.##...#...
+                             |#...##....#
+                             |.#..#...#.#""".trimMargin().lines()
 
-    val data = Files.readAllLines(Paths.get(Day03.FILENAME))
     @Test
     fun testPart01() {
         assertThat(Day03.part1(testData)).isEqualTo(7)
@@ -27,13 +25,16 @@ class Day03Test {
         assertThat(Day03.part2(testData)).isEqualTo(336)
     }
 
-    @Test
-    fun answerPart01() {
-        assertThat(Day03.part1(data)).isEqualTo(257)
-    }
+    @Nested
+    inner class Answer {
+        @Test
+        fun part01() {
+            assertThat(Day03.part1(Day03.inputFileLines)).isEqualTo(257)
+        }
 
-    @Test
-    fun answerPart02() {
-        assertThat(Day03.part2(data)).isEqualTo(1744787392)
+        @Test
+        fun part02() {
+            assertThat(Day03.part2(Day03.inputFileLines)).isEqualTo(1744787392)
+        }
     }
 }

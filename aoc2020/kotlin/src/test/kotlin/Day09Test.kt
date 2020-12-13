@@ -1,8 +1,6 @@
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class Day09Test {
 
@@ -37,16 +35,15 @@ class Day09Test {
 
     @Nested
     inner class Answers {
-        private val fileData = Files.readAllLines(Paths.get(Day09.FILENAME)).map(String::toLong)
 
         @Test
         fun answerPart01() {
-            assertThat(Day09.part01(fileData)).hasValue(217430975)
+            assertThat(Day09.part01(Day09.inputFileLongs)).hasValue(217430975)
         }
 
         @Test
         fun answerPart02() {
-            assertThat(Day09.part02(fileData, 217430975)).isEqualTo(28509180L)
+            assertThat(Day09.part02(Day09.inputFileLongs, 217430975)).isEqualTo(28509180L)
         }
     }
 }

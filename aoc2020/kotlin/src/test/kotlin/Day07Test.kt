@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.stream.Stream
 
 class Day07Test {
@@ -55,14 +53,13 @@ class Day07Test {
 
     @Nested
     inner class Answer {
-        private val data = Files.readAllLines(Paths.get(Day07.FILENAME))
         @Test
         fun part1() {
-            assertThat(Day07.part1(data)).isEqualTo(238)
+            assertThat(Day07.part1(Day07.inputFileLines)).isEqualTo(238)
         }
         @Test
         fun part2() {
-            assertThat(Day07.part2(data)).isEqualTo(82930)
+            assertThat(Day07.part2(Day07.inputFileLines)).isEqualTo(82930)
         }
     }
 

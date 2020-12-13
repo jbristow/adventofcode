@@ -1,7 +1,6 @@
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class Day01Test {
     private val testData01 = """1721
@@ -11,7 +10,6 @@ class Day01Test {
                                |675
                                |1456"""
         .trimMargin().lines().map(String::toInt)
-    private val actualData = Files.readAllLines(Paths.get(Day01.FILENAME)).map(String::toInt)
 
     @Test
     fun part01Test() {
@@ -23,13 +21,16 @@ class Day01Test {
         assertThat(Day01.part2(testData01)).isEqualTo(241861950)
     }
 
-    @Test
-    fun part01Answer() {
-        assertThat(Day01.part1(actualData)).isEqualTo(889779)
-    }
+    @Nested
+    inner class Answer {
+        @Test
+        fun part01() {
+            assertThat(Day01.part1(Day01.inputFileInts)).isEqualTo(889779)
+        }
 
-    @Test
-    fun part02Answer() {
-        assertThat(Day01.part2(actualData)).isEqualTo(76110336)
+        @Test
+        fun part02() {
+            assertThat(Day01.part2(Day01.inputFileInts)).isEqualTo(76110336)
+        }
     }
 }

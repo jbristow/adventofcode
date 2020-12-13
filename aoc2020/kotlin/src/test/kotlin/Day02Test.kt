@@ -1,11 +1,9 @@
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class Day02Test {
 
-    val data = Files.readAllLines(Paths.get(Day02.FILENAME))
     @Test
     fun validTest01() {
         assertThat(Day02::validateLinePart1)
@@ -20,13 +18,16 @@ class Day02Test {
             .rejects("1-3 b: cdefg", "2-9 c: ccccccccc")
     }
 
-    @Test
-    fun part01Answer() {
-        assertThat(Day02.part1(data)).isEqualTo(506)
-    }
+    @Nested
+    inner class Answer {
+        @Test
+        fun part01() {
+            assertThat(Day02.part1(Day02.inputFileLines)).isEqualTo(506)
+        }
 
-    @Test
-    fun part02Answer() {
-        assertThat(Day02.part2(data)).isEqualTo(443)
+        @Test
+        fun part02() {
+            assertThat(Day02.part2(Day02.inputFileLines)).isEqualTo(443)
+        }
     }
 }

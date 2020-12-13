@@ -1,11 +1,6 @@
-import Day08.FILENAME
-import Day08.part1
-import Day08.part2
-import java.nio.file.Files
-import java.nio.file.Paths
+import util.AdventOfCode
 
-object Day08 {
-    const val FILENAME = "src/main/resources/day08.txt"
+object Day08 : AdventOfCode() {
 
     sealed class Operation {
         data class Acc(val value: Int) : Operation()
@@ -92,7 +87,6 @@ object Day08 {
 }
 
 fun main() {
-    val data = Files.readAllLines(Paths.get(FILENAME))
-    println("Part 1: ${part1(data)}")
-    println("Part 2: ${part2(data)}")
+    println("Part 1: ${Day08.part1(Day08.inputFileLines)}")
+    println("Part 2: ${Day08.part2(Day08.inputFileLines)}")
 }

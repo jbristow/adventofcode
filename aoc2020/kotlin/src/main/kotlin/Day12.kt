@@ -1,11 +1,10 @@
-import Day12.fileData
+import util.AdventOfCode
 import util.Point2d
+import util.Point2d.Companion.manhattanDistance
 import util.Point2d.Companion.plus
-import java.nio.file.Files
-import java.nio.file.Paths
-import kotlin.math.abs
+import util.Point2d.Companion.times
 
-object Day12 {
+object Day12 : AdventOfCode() {
 
     sealed class Direction {
         object North : Direction()
@@ -167,9 +166,10 @@ object Day12 {
 
     data class Ship(val position: Point2d, val heading: Direction)
 
-    private operator fun Point2d.times(value: Int): Point2d {
-        return Point2d(x * value, y * value)
-    }
+    val initialWaypoint: Ship
+        get() = Ship(Direction.East.motion * 10 + Direction.North.motion * 1, Direction.East)
+    val initialShip: Ship
+        get() = Ship(Point2d(0, 0), Direction.East)
 
     fun part1(input: List<String>) =
         input.map(Day12.Instruction::of)
@@ -184,21 +184,11 @@ object Day12 {
             .position
             .manhattanDistance()
 
-    const val FILENAME = "src/main/resources/day12.txt"
-
-    val fileData = Files.readAllLines(Paths.get(FILENAME))
-
-    val initialWaypoint: Ship
-        get() = Ship(Direction.East.motion * 10 + Direction.North.motion * 1, Direction.East)
-    val initialShip: Ship
-        get() = Ship(Point2d(0, 0), Direction.East)
 }
 
 fun main() {
-    println("Part 1: ${Day12.part1(fileData)}")
-    println("Part 2: ${Day12.part2(fileData)}")
+    println("Part 1: ${Day12.part1(Day12.inputFileLines)}")
+    println("Part 2: ${Day12.part2(Day12.inputFileLines)}")
 }
 
-private fun Point2d.manhattanDistance(from: Point2d = Point2d(0, 0)): Long {
-    return abs(x.toLong() - from.x) + abs(y.toLong() - from.y)
-}
+

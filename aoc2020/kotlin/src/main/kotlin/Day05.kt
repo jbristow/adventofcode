@@ -1,12 +1,7 @@
-import Day05.FILENAME
-import Day05.part1Alt
-import Day05.part2
-import java.nio.file.Files
-import java.nio.file.Paths
+import util.AdventOfCode
 
-object Day05 {
+object Day05 : AdventOfCode() {
 
-    const val FILENAME = "src/main/resources/day05.txt"
     fun String.toSeatLocation(): Pair<Int, Int> {
         val ranges = fold((0..127) to (0..7)) { (rowrange, colrange), instr ->
             when (instr) {
@@ -43,7 +38,6 @@ object Day05 {
 }
 
 fun main() {
-    val data = Files.readAllLines(Paths.get(FILENAME))
-    println("Part 1: ${part1Alt(data)}")
-    println("Part 2: ${part2(data)}")
+    println("Part 1: ${Day05.part1Alt(Day05.inputFileLines)}")
+    println("Part 2: ${Day05.part2(Day05.inputFileLines)}")
 }

@@ -1,9 +1,6 @@
-import Day06.FILENAME
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class Day06Test {
     val testData = """
@@ -44,16 +41,15 @@ class Day06Test {
 
     @Nested
     inner class Answer {
-        val data = Files.readString(Paths.get(FILENAME))
 
         @Test
         fun part1() {
-            assertThat(Day06.part1(data)).isEqualTo(6170)
+            assertThat(Day06.part1(Day06.inputFileString)).isEqualTo(6170)
         }
 
         @Test
         fun part2() {
-            assertThat(Day06.part2(data)).isEqualTo(2947)
+            assertThat(Day06.part2(Day06.inputFileString)).isEqualTo(2947)
         }
     }
 }

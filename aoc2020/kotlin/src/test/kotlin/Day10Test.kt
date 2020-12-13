@@ -1,8 +1,6 @@
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class Day10Test {
 
@@ -34,64 +32,21 @@ class Day10Test {
 
     @Nested
     inner class Answers {
-        private val fileData = Files.readAllLines(Paths.get(Day10.FILENAME)).map(String::toInt)
 
         @Test
         fun answerPart01() {
-            assertThat(Day10.part1(fileData)).isEqualTo(1836)
+            assertThat(Day10.part1(Day10.inputFileInts)).isEqualTo(1836)
         }
 
         @Test
         fun answerPart02() {
-            assertThat(Day10.part2(fileData)).isEqualTo(43406276662336)
+            assertThat(Day10.part2(Day10.inputFileInts)).isEqualTo(43406276662336)
         }
     }
 
-    val simpleData = """
-        16
-        10
-        15
-        5
-        1
-        11
-        7
-        19
-        6
-        12
-        4
-    """.trimIndent().lines().map(String::toInt)
-    val complexData =
-        """
-        28
-        33
-        18
-        42
-        31
-        14
-        46
-        20
-        48
-        47
-        24
-        23
-        49
-        45
-        19
-        38
-        39
-        11
-        1
-        32
-        25
-        35
-        8
-        17
-        7
-        9
-        4
-        2
-        34
-        10
-        3
-        """.trimIndent().lines().map(String::toInt)
+    val simpleData = "16\n10\n15\n5\n1\n11\n7\n19\n6\n12\n4".lines().map(String::toInt)
+    val complexData = (
+        "28\n33\n18\n42\n31\n14\n46\n20\n48\n47\n24\n23\n49\n45\n19" +
+            "\n38\n39\n11\n1\n32\n25\n35\n8\n17\n7\n9\n4\n2\n34\n10\n3"
+        ).lines().map(String::toInt)
 }

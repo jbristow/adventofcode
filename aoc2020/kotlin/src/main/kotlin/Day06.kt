@@ -1,8 +1,4 @@
-import Day06.FILENAME
-import Day06.part1
-import Day06.part2
-import java.nio.file.Files
-import java.nio.file.Paths
+import util.AdventOfCode
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
@@ -12,8 +8,7 @@ private fun String.onlyUniqueLetters() =
 private fun String.chunkify(): Stream<String> =
     split("\n\n").parallelStream()
 
-object Day06 {
-    const val FILENAME = "src/main/resources/day06.txt"
+object Day06 : AdventOfCode() {
 
     fun part1(input: String): Int =
         input.chunkify()
@@ -31,7 +26,6 @@ object Day06 {
 }
 
 fun main() {
-    val data: String = Files.readString(Paths.get(FILENAME))
-    println("Part 1: ${part1(data)}")
-    println("Part 2: ${part2(data)}")
+    println("Part 1: ${Day06.part1(Day06.inputFileString)}")
+    println("Part 2: ${Day06.part2(Day06.inputFileString)}")
 }

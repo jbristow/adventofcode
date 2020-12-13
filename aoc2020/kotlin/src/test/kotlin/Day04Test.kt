@@ -1,8 +1,7 @@
 import Day04.valid
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class Day04Test {
     val testChunk1 = """
@@ -28,8 +27,6 @@ class Day04Test {
     """.trimIndent()
 
     val testData = listOf(testChunk1, testChunk2, testChunk3, testChunk4).joinToString("\n\n")
-
-    val data = Files.readString(Paths.get(Day04.FILENAME))
 
     @Test
     fun testValidatorPart1() {
@@ -91,13 +88,16 @@ class Day04Test {
             )
     }
 
-    @Test
-    fun answerPart01() {
-        assertThat(Day04.part1(data)).isEqualTo(170)
-    }
+    @Nested
+    inner class Answer {
+        @Test
+        fun part01() {
+            assertThat(Day04.part1(Day04.inputFileString)).isEqualTo(170)
+        }
 
-    @Test
-    fun answerPart02() {
-        assertThat(Day04.part2(data)).isEqualTo(103)
+        @Test
+        fun part02() {
+            assertThat(Day04.part2(Day04.inputFileString)).isEqualTo(103)
+        }
     }
 }
