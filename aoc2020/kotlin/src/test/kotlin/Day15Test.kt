@@ -1,8 +1,6 @@
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.parallel.Execution
-import org.junit.jupiter.api.parallel.ExecutionMode
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -25,7 +23,8 @@ class Day15Test {
             arguments(listOf(1, 2, 3), 27),
             arguments(listOf(2, 3, 1), 78),
             arguments(listOf(3, 2, 1), 438),
-            arguments(listOf(3, 1, 2), 1836))
+            arguments(listOf(3, 1, 2), 1836)
+        )
     }
 
     @Nested
@@ -44,7 +43,8 @@ class Day15Test {
             arguments(listOf(1, 2, 3), 261214),
             arguments(listOf(2, 3, 1), 6895259),
             arguments(listOf(3, 2, 1), 18),
-            arguments(listOf(3, 1, 2), 362))
+            arguments(listOf(3, 1, 2), 362)
+        )
     }
 
     @Nested
@@ -59,6 +59,5 @@ class Day15Test {
         fun part2() {
             assertThat(Day15.part2(fileInput)).isEqualTo(8546398)
         }
-
     }
 }

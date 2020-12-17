@@ -183,12 +183,9 @@ object Day12 : AdventOfCode() {
             .first
             .position
             .manhattanDistance()
-
 }
 
 fun main() {
     println("Part 1: ${Day12.part1(Day12.inputFileLines)}")
     println("Part 2: ${Day12.part2(Day12.inputFileLines)}")
 }
-
-

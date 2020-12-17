@@ -29,7 +29,6 @@ object Day14 : AdventOfCode() {
                 '1' -> '1'
                 else -> b
             }
-
         }.joinToString("")
     }
 
@@ -94,4 +93,3 @@ object Day14 : AdventOfCode() {
     private fun part1(data: List<String>) = updateMemory(data, mutableMapOf(), null)
     private fun part2(data: List<String>) = updateMemory2(data, mutableMapOf(), null).values.sum()
 }
-

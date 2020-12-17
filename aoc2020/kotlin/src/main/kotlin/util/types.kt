@@ -2,6 +2,10 @@ package util
 
 import kotlin.math.abs
 
+interface Point {
+    val neighbors: Set<Point>
+}
+
 data class Point2d(val x: Int, val y: Int) {
     companion object {
         operator fun Point2d.plus(other: Point2d) = Point2d(this.x + other.x, this.y + other.y)
@@ -13,5 +17,69 @@ data class Point2d(val x: Int, val y: Int) {
         }
 
         operator fun Point2d.times(value: Int): Point2d = Point2d(x * value, y * value)
+    }
+}
+
+data class Point3d(val x: Int, val y: Int, val z: Int) : Point {
+    override val neighbors: Set<Point3d>
+        get() {
+            return (-1..1).flatMap { dx ->
+                (-1..1).flatMap { dy ->
+                    (-1..1).mapNotNull { dz ->
+                        when (val p = Point3d(x + dx, y + dy, z + dz)) {
+                            this -> null
+                            else -> p
+                        }
+                    }
+                }
+            }.toSet()
+        }
+
+    companion object {
+        operator fun Point3d.plus(other: Point3d) = Point3d(this.x + other.x, this.y + other.y, this.z + other.z)
+
+        infix fun Point3d.modX(other: Int) = copy(x = x % other)
+
+        fun Point3d.manhattanDistance(from: Point3d = Point3d(0, 0, 0)): Long {
+            return abs(x.toLong() - from.x) +
+                abs(y.toLong() - from.y) +
+                abs(z.toLong() - from.z)
+        }
+
+        operator fun Point3d.times(value: Int): Point3d = Point3d(x * value, y * value, z * value)
+    }
+}
+
+data class Point4d(val x: Int, val y: Int, val z: Int, val w: Int) : Point {
+    override val neighbors: Set<Point4d>
+        get() {
+            return (-1..1).flatMap { dx ->
+                (-1..1).flatMap { dy ->
+                    (-1..1).flatMap { dz ->
+                        (-1..1).mapNotNull { dw ->
+                            when (val p = Point4d(x + dx, y + dy, z + dz, w + dw)) {
+                                this -> null
+                                else -> p
+                            }
+                        }
+                    }
+                }
+            }.toSet()
+        }
+
+    companion object {
+        operator fun Point4d.plus(other: Point4d) =
+            Point4d(this.x + other.x, this.y + other.y, this.z + other.z, this.w + other.w)
+
+        infix fun Point4d.modX(other: Int) = copy(x = x % other)
+
+        fun Point4d.manhattanDistance(from: Point4d = Point4d(0, 0, 0, 0)): Long {
+            return abs(x.toLong() - from.x) +
+                abs(y.toLong() - from.y) +
+                abs(z.toLong() - from.z) +
+                abs(w.toLong() - from.w)
+        }
+
+        operator fun Point4d.times(value: Int): Point4d = Point4d(x * value, y * value, z * value, w * value)
     }
 }

@@ -22,7 +22,9 @@ object Day15 : AdventOfCode() {
 
     fun part1(input: List<Int>) =
         nextTurn(
-            input.dropLast(1).mapIndexed { i, it -> it to i }.toMap().toMutableMap(),
+            input.dropLast(1)
+                .mapIndexed { i, it -> it to i }
+                .toMap().toMutableMap(),
             input.last(),
             input.size,
             2020
@@ -30,7 +32,9 @@ object Day15 : AdventOfCode() {
 
     fun part2(input: List<Int>) =
         nextTurn(
-            input.dropLast(1).mapIndexed { i, it -> it to i }.toMap().toMutableMap(),
+            input.dropLast(1)
+                .mapIndexed { i, it -> it to i }
+                .toMap().toMutableMap(),
             input.last(),
             input.size,
             30000000
