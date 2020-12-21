@@ -5,22 +5,22 @@ import util.Point4d
 
 object Day17 : AdventOfCode() {
 
-    tailrec fun Map<Point3d, Boolean>.cycle3d(
+    tailrec fun Set<Point3d>.cycle3d(
         maxCount: Int,
         xBound: Pair<Int, Int>,
         yBound: Pair<Int, Int>,
         zBound: Pair<Int, Int> = (0 to 0),
         count: Int = 0,
-    ): Map<Point3d, Boolean> {
+    ): Set<Point3d> {
         if (count == maxCount) {
             return this
         }
 
         val nextMap = xBound.range.flatMap { x ->
             yBound.range.flatMap { y ->
-                zBound.range.map { z -> nextStatePair(Point3d(x, y, z), this) }
+                zBound.range.map { z -> Point3d(x, y, z).nextStatePair(this) }
             }
-        }.toMap()
+        }.filter { it.second }.map { it.first }.toSet()
 
         return nextMap.cycle3d(
             maxCount = maxCount,
@@ -31,30 +31,27 @@ object Day17 : AdventOfCode() {
         )
     }
 
-    private fun <T : Point> nextStatePair(k: T, map: Map<T, Boolean>): Pair<T, Boolean> {
-        val v = map[k] == true
-        val neighborCount = k.neighbors.count { map[it] == true }
-        return k to nextState(v, neighborCount)
-    }
+    private fun <T : Point> T.nextStatePair(active: Set<T>) =
+        this to nextState(this in active, neighbors.count { it in active })
 
-    tailrec fun Map<Point4d, Boolean>.cycle4d(
+    tailrec fun Set<Point4d>.cycle4d(
         maxCount: Int,
         xBound: Pair<Int, Int>,
         yBound: Pair<Int, Int>,
         zBound: Pair<Int, Int> = (0 to 0),
         wBound: Pair<Int, Int> = (0 to 0),
         count: Int = 0,
-    ): Map<Point4d, Boolean> {
+    ): Set<Point4d> {
         if (count == maxCount) {
             return this
         }
         val nextMap = xBound.range.flatMap { x ->
             yBound.range.flatMap { y ->
                 zBound.range.flatMap { z ->
-                    wBound.range.map { w -> nextStatePair(Point4d(x, y, z, w), this) }
+                    wBound.range.map { w -> Point4d(x, y, z, w).nextStatePair(this) }
                 }
             }
-        }.toMap()
+        }.filter { it.second }.map { it.first }.toSet()
 
         return nextMap.cycle4d(
             maxCount = maxCount,
@@ -73,31 +70,35 @@ object Day17 : AdventOfCode() {
     }
 
     fun Pair<Int, Int>.expand() = (first - 1) to (second + 1)
-    val Pair<Int, Int>.range: IntRange
-        get() = (first - 1)..(second + 1)
+    val Pair<Int, Int>.range: Sequence<Int>
+        get() = ((first - 1)..(second + 1)).asSequence()
 
     private fun part1(data: List<String>): Int {
-        val map = data.flatMapIndexed { y, row ->
-            row.mapIndexed { x, c -> Point3d(x, y, 0) to c.inputToBool() }
-        }.toMap()
+        val active = data.asSequence().flatMapIndexed { y, row ->
+            row.asSequence().mapIndexed { x, c -> Point3d(x, y, 0) to c.inputToBool() }
+        }.filter { it.second }
+            .map { it.first }.toSet()
 
-        return map.cycle3d(
+        return active.cycle3d(
             maxCount = 6,
             xBound = 0 to data.first().length,
             yBound = 0 to data.size,
-        ).values.count { it }
+        ).size
     }
 
     private fun part2(data: List<String>): Int {
-        val map = data.flatMapIndexed { y, row ->
-            row.mapIndexed { x, c -> Point4d(x, y, 0, 0) to c.inputToBool() }
-        }.toMap()
+        val active = data.flatMapIndexed { y, row ->
+            row.mapIndexed { x, c ->
+                Point4d(x, y, 0, 0) to c.inputToBool()
+            }
+        }.filter { it.second }
+            .map { it.first }.toSet()
 
-        return map.cycle4d(
+        return active.cycle4d(
             maxCount = 6,
             xBound = 0 to data.first().length,
             yBound = 0 to data.size,
-        ).values.count { it }
+        ).size
     }
 
     private fun Char.inputToBool() = when (this) {
