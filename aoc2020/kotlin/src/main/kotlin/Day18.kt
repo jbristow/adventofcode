@@ -10,35 +10,33 @@ object Day18 : AdventOfCode() {
         object Plus : Symbol()
         data class Number(val n: Long) : Symbol()
 
-        operator fun plus(x: Symbol): Number {
-            return when {
+        operator fun plus(x: Symbol) =
+            when {
                 this is Number && x is Number -> this.copy(n = this.n + x.n)
                 else -> throw IllegalArgumentException()
             }
-        }
 
-        operator fun times(x: Symbol): Number {
-            return when {
+        operator fun times(x: Symbol) =
+            when {
                 this is Number && x is Number -> this.copy(n = this.n * x.n)
                 else -> throw IllegalArgumentException()
             }
-        }
 
-        fun toLong(): Long = when (this) {
-            is Number -> this.n
-            else -> throw Exception("Can't extract number from non-number value")
-        }
+        fun toLong(): Long =
+            when (this) {
+                is Number -> this.n
+                else -> throw Exception("Can't extract number from non-number value")
+            }
 
-        fun greaterPrecedenceThan(other: Symbol): Boolean {
-            return when {
+        fun greaterPrecedenceThan(other: Symbol) =
+            when {
                 this is Plus && other is Multi -> true
                 this is Multi && other is Plus -> false
                 else -> false
             }
-        }
     }
 
-    fun calculate(s: ArrayDeque<Symbol>, dq: ArrayDeque<Symbol>): Long {
+    tailrec fun calculate(s: ArrayDeque<Symbol>, dq: ArrayDeque<Symbol>): Long {
         return when (val currToken = s.firstOrNull()) {
             null -> return dq.first().toLong()
             is Symbol.Number -> {
@@ -55,6 +53,7 @@ object Day18 : AdventOfCode() {
                     Symbol.OpenParen -> {
                         dq.add(currToken)
                     }
+                    else -> throw Exception("Unexpected symbol. ${dq.lastOrNull()}")
                 }
                 s.removeFirst()
                 calculate(s, dq)
@@ -84,7 +83,7 @@ object Day18 : AdventOfCode() {
         }
     }
 
-    fun priorityCalculation(tokens: ArrayDeque<Day18.Symbol>): Long {
+    fun priorityCalculation(tokens: ArrayDeque<Symbol>): Long {
         val output = shuntingYard(tokens)
         return rpn(output)
     }
@@ -143,12 +142,8 @@ object Day18 : AdventOfCode() {
         }
         when (val current = tokens.removeFirst()) {
             is Symbol.Number -> memory.addLast(current.toLong())
-            is Symbol.Plus -> {
-                memory.addLast(memory.removeLast() + memory.removeLast())
-            }
-            is Symbol.Multi -> {
-                memory.addLast(memory.removeLast() * memory.removeLast())
-            }
+            is Symbol.Plus -> memory.addLast(memory.removeLast() + memory.removeLast())
+            is Symbol.Multi -> memory.addLast(memory.removeLast() * memory.removeLast())
             else -> throw Exception("Unexpected: ${tokens.firstOrNull()}")
         }
         return rpn(tokens, memory)
@@ -156,9 +151,6 @@ object Day18 : AdventOfCode() {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        println("hello")
-        println(calculate("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2".toDeque(), ArrayDeque()))
-
         println(
             inputFileLines.parallelStream().map { calculate(it.toDeque(), ArrayDeque()) }
                 .collect(Collectors.summingLong { it })
@@ -168,19 +160,18 @@ object Day18 : AdventOfCode() {
                 .collect(Collectors.summingLong { it })
         )
     }
+
+    private fun Char.toSymbol() =
+        when (this) {
+            '+' -> Symbol.Plus
+            '*' -> Symbol.Multi
+            '(' -> Symbol.OpenParen
+            ')' -> Symbol.CloseParen
+            in '0'..'9' -> Symbol.Number(this.toString().toLong())
+            else -> null
+        }
+
+    private fun String.toDeque() = ArrayDeque(this.mapNotNull { it.toSymbol() })
 }
 
-private fun String.toDeque(): ArrayDeque<Day18.Symbol> {
-    return ArrayDeque(
-        this.mapNotNull {
-            when (it) {
-                '+' -> Day18.Symbol.Plus
-                '*' -> Day18.Symbol.Multi
-                '(' -> Day18.Symbol.OpenParen
-                ')' -> Day18.Symbol.CloseParen
-                in '0'..'9' -> Day18.Symbol.Number(it.toString().toLong())
-                else -> null
-            }
-        }
-    )
-}
+

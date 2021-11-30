@@ -12,14 +12,13 @@ object Day12 : AdventOfCode() {
         object East : Direction()
         object West : Direction()
 
-        override fun toString(): String {
-            return when (this) {
+        override fun toString() =
+            when (this) {
                 is North -> "N"
                 is East -> "E"
                 is South -> "S"
                 is West -> "W"
             }
-        }
     }
 
     private val Direction.right: Direction
@@ -48,52 +47,35 @@ object Day12 : AdventOfCode() {
     fun Direction.turnRight(degrees: Int) = (1..degrees / 90).fold(this) { acc, _ -> acc.right }
     fun Direction.turnLeft(degrees: Int) = (1..degrees / 90).fold(this) { acc, _ -> acc.left }
 
-    fun Point2d.rotateLeft(degrees: Int): Point2d {
-        return when (degrees % 360) {
+    fun Point2d.rotateLeft(degrees: Int) =
+        when (degrees % 360) {
             0 -> this
             90 -> Point2d(y, -x)
             180 -> Point2d(-x, -y)
             270 -> Point2d(-y, x)
             else -> throw Exception("Unexpected rotation amount: $degrees")
         }
-    }
 
-    fun Point2d.rotateRight(degrees: Int): Point2d {
-        return when (degrees % 360) {
+    fun Point2d.rotateRight(degrees: Int) =
+        when (degrees % 360) {
             0 -> this
             90 -> Point2d(-y, x)
             180 -> Point2d(-x, -y)
             270 -> Point2d(y, -x)
             else -> throw Exception("Unexpected rotation amount: $degrees")
         }
-    }
 
     sealed class Instruction {
-
-        // Action N means to move north by the given value.
         data class N(val value: Int) : Instruction()
-
-        // Action S means to move south by the given value.
         data class S(val value: Int) : Instruction()
-
-        // Action E means to move east by the given value.
         data class E(val value: Int) : Instruction()
-
-        // Action W means to move west by the given value.
         data class W(val value: Int) : Instruction()
-
-        // Action L means to turn left the given number of degrees.
         data class L(val value: Int) : Instruction()
-
-        // Action R means to turn right the given number of degrees.
         data class R(val value: Int) : Instruction()
-
-        // Action F means to move forward by the given value in the direction the ship is currently facing.
         data class F(val value: Int) : Instruction()
-
         companion object {
-            fun of(input: String): Instruction {
-                return when (input.first()) {
+            fun of(input: String) =
+                when (input.first()) {
                     'N' -> N(input.drop(1).toInt())
                     'E' -> E(input.drop(1).toInt())
                     'S' -> S(input.drop(1).toInt())
@@ -103,35 +85,30 @@ object Day12 : AdventOfCode() {
                     'F' -> F(input.drop(1).toInt())
                     else -> throw Exception("Illegal input: $input")
                 }
-            }
         }
     }
 
     val Instruction.motion: Point2d
-        get() {
-            return when (this) {
-                is Instruction.N -> Direction.North.motion
-                is Instruction.E -> Direction.East.motion
-                is Instruction.S -> Direction.South.motion
-                is Instruction.W -> Direction.West.motion
-                else -> throw Exception("Instruction $this doesn't have a direction.")
-            }
+        get() = when (this) {
+            is Instruction.N -> Direction.North.motion
+            is Instruction.E -> Direction.East.motion
+            is Instruction.S -> Direction.South.motion
+            is Instruction.W -> Direction.West.motion
+            else -> throw Exception("Instruction $this doesn't have a direction.")
         }
     val Instruction.value: Int
-        get() {
-            return when (this) {
-                is Instruction.N -> value
-                is Instruction.E -> value
-                is Instruction.S -> value
-                is Instruction.W -> value
-                is Instruction.L -> value
-                is Instruction.R -> value
-                is Instruction.F -> value
-            }
+        get() = when (this) {
+            is Instruction.N -> value
+            is Instruction.E -> value
+            is Instruction.S -> value
+            is Instruction.W -> value
+            is Instruction.L -> value
+            is Instruction.R -> value
+            is Instruction.F -> value
         }
 
-    fun Ship.execute(instr: Instruction): Ship {
-        return when (instr) {
+    fun Ship.execute(instr: Instruction) =
+        when (instr) {
             is Instruction.N, is Instruction.E,
             is Instruction.S, is Instruction.W,
             -> copy(position = instr.motion * instr.value + position)
@@ -139,7 +116,6 @@ object Day12 : AdventOfCode() {
             is Instruction.R -> turnRight(instr.value)
             is Instruction.F -> copy(position = heading.motion * instr.value + position)
         }
-    }
 
     fun Ship.turnLeft(value: Int) = copy(heading = heading.turnLeft(value))
     fun Ship.turnRight(value: Int) = copy(heading = heading.turnRight(value))
@@ -183,9 +159,12 @@ object Day12 : AdventOfCode() {
             .first
             .position
             .manhattanDistance()
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println("Day 12")
+        println("\tPart 1: ${part1(inputFileLines)}")
+        println("\tPart 2: ${part2(inputFileLines)}")
+    }
 }
 
-fun main() {
-    println("Part 1: ${Day12.part1(Day12.inputFileLines)}")
-    println("Part 2: ${Day12.part2(Day12.inputFileLines)}")
-}

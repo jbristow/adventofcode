@@ -19,7 +19,7 @@ object Day19 : AdventOfCode() {
                 tokens.fill()
                 val parser = Aoc2020Part1Parser(tokens)
                 parser.removeErrorListeners()
-                parser.start()
+                // parser.start()
                 parser.numberOfSyntaxErrors == 0 && parser.currentToken.text == "<EOF>"
             }.count()
     }
@@ -36,7 +36,7 @@ object Day19 : AdventOfCode() {
 
                 val parser = Aoc2020Part2Parser(tokens)
                 parser.removeErrorListeners()
-                parser.start()
+                // parser.start()
                 parser.numberOfSyntaxErrors == 0 && parser.currentToken.text == "<EOF>"
             }
 

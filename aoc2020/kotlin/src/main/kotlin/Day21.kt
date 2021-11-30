@@ -1,10 +1,9 @@
 import util.AdventOfCode
 
-private val <K, V> Map<K, V>.keySet: Set<K>
-    get() = this.keys.toSet()
-
 object Day21 : AdventOfCode() {
 
+    private val <K, V> Map<K, V>.keySet: Set<K>
+        get() = this.keys.toSet()
     val test = """
         mxmxvkd kfcds sqjhc nhms (contains dairy, fish)
         trh fvjkl sbzzf mxmxvkd (contains dairy)

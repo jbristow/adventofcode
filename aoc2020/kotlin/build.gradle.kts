@@ -1,8 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.20"
-    kotlin("kapt") version "1.4.20"
+    kotlin("jvm") version "1.4.21"
 }
 
 version = "1.0-SNAPSHOT"
@@ -19,8 +18,6 @@ dependencies {
 
     implementation("io.arrow-kt:arrow-core:$arrowVersion")
     implementation("io.arrow-kt:arrow-syntax:$arrowVersion")
-    implementation("io.arrow-kt:arrow-optics:$arrowVersion")
-    kapt("io.arrow-kt:arrow-meta:$arrowVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
     // Use the Kotlin test library
     testImplementation(kotlin("test"))
@@ -33,6 +30,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:$jupiterVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jupiterVersion")
     testImplementation("org.assertj:assertj-core:3.18.1")
+
+    implementation("com.github.almasb:grammy:0.0.2")
+    implementation("org.antlr:antlr4:4.9")
 }
 
 tasks.withType<KotlinCompile> {

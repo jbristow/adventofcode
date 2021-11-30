@@ -35,9 +35,13 @@ object Day01 : AdventOfCode() {
     fun part1(input: List<Int>) = find2020(input)
 
     fun part2(input: List<Int>) = find2020From3(input)
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println("Day 1")
+        println("\tPart 1: ${part1(inputFileInts)}")
+        println("\tPart 2: ${part2(inputFileInts)}")
+    }
 }
 
-fun main() {
-    println("Part 1: ${Day01.part1(Day01.inputFileInts)}")
-    println("Part 2: ${Day01.part2(Day01.inputFileInts)}")
-}
+

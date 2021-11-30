@@ -26,9 +26,13 @@ object Day02 : AdventOfCode() {
 
     fun part1(lines: List<String>) = lines.count(Day02::validateLinePart1)
     fun part2(lines: List<String>) = lines.count(Day02::validateLinePart2)
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println("Day 2")
+        println("\tPart1: ${part1(inputFileLines)}")
+        println("\tPart2: ${part2(inputFileLines)}")
+    }
 }
 
-fun main() {
-    println("Part1: ${Day02.part1(Day02.inputFileLines)}")
-    println("Part2: ${Day02.part2(Day02.inputFileLines)}")
-}
+

@@ -1,5 +1,3 @@
-import Day04.part1
-import Day04.part2
 import util.AdventOfCode
 
 object Day04 : AdventOfCode() {
@@ -107,9 +105,12 @@ object Day04 : AdventOfCode() {
     fun String.parseUsing(regex: Regex): String? {
         return regex.findAll(this).firstOrNull()?.groupValues?.get(1)
     }
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println("Day 4")
+        println("\tPart 1: ${part1(inputFileString)}")
+        println("\tPart 2: ${part2(inputFileString)}")
+    }
 }
 
-fun main() {
-    println("Part 1: ${part1(Day04.inputFileString)}")
-    println("Part 2: ${part2(Day04.inputFileString)}")
-}

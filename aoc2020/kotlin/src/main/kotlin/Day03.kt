@@ -1,5 +1,3 @@
-import Day03.part1
-import Day03.part2
 import util.AdventOfCode
 import util.Point2d
 import util.Point2d.Companion.modX
@@ -24,7 +22,7 @@ object Day03 : AdventOfCode() {
         height: Int,
         trees: Set<Point2d>,
         curr: Point2d = Point2d(0, 0),
-        treesHit: Int = 0
+        treesHit: Int = 0,
     ): Int {
         val nextTreesHit = when {
             curr modX width in trees -> treesHit + 1
@@ -57,9 +55,13 @@ object Day03 : AdventOfCode() {
             treeHits(it, lines.first().length, lines.size, data)
         }.reduce(1) { acc, curr -> acc * curr }
     }
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println("Day 3")
+        println("\tPart 1: ${part1(inputFileLines)}")
+        println("\tPart 2: ${part2(inputFileLines)}")
+    }
 }
 
-fun main() {
-    println("Part 1: ${part1(Day03.inputFileLines)}")
-    println("Part 2: ${part2(Day03.inputFileLines)}")
-}
+
