@@ -2,10 +2,11 @@ import util.AdventOfCode
 
 object Day01 : AdventOfCode() {
 
-    fun part1(input: List<Int>) =
-        input.windowed(2, 1).count { (a, b) -> a < b }
+    fun part1(input: Sequence<Int>): Int {
+        return input.windowed(2, 1).count { (a, b) -> a < b }
+    }
 
-    fun part2(input: List<Int>) =
+    fun part2(input: Sequence<Int>) =
         part1(input.windowed(3, 1).map(List<Int>::sum))
 
     @JvmStatic
@@ -15,5 +16,3 @@ object Day01 : AdventOfCode() {
         println("\tPart 2: ${part2(inputFileInts)}")
     }
 }
-
-

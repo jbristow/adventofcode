@@ -15,7 +15,7 @@ internal class Day01Test {
                                |240
                                |269
                                |260
-                               |263""".trimMargin().lines().map(String::toInt)
+                               |263""".trimMargin().lineSequence().map(String::toInt)
 
         @Test
         fun part1() {
@@ -40,6 +40,5 @@ internal class Day01Test {
         fun part2() {
             assertThat(Day01.part2(Day01.inputFileInts)).isEqualTo(1611)
         }
-
     }
 }

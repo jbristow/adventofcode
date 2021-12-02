@@ -6,7 +6,7 @@ interface Point {
     val neighbors: Set<Point>
 }
 
-data class Point2d(val x: Int, val y: Int) {
+data class Point2d(val x: Int, val y: Int) : Point {
     companion object {
         operator fun Point2d.plus(other: Point2d) = Point2d(this.x + other.x, this.y + other.y)
 
@@ -18,22 +18,18 @@ data class Point2d(val x: Int, val y: Int) {
 
         operator fun Point2d.times(value: Int): Point2d = Point2d(x * value, y * value)
     }
+
+    override val neighbors: Set<Point>
+        get() = (-1..1).flatMap { dx -> (-1..1).map { dy -> Point2d(x + dx, y + dy) } }.toSet()
 }
 
 data class Point3d(val x: Int, val y: Int, val z: Int) : Point {
     override val neighbors: Set<Point3d>
-        get() {
-            return (-1..1).flatMap { dx ->
-                (-1..1).flatMap { dy ->
-                    (-1..1).mapNotNull { dz ->
-                        when (val p = Point3d(x + dx, y + dy, z + dz)) {
-                            this -> null
-                            else -> p
-                        }
-                    }
-                }
-            }.toSet()
-        }
+        get() = (-1..1).flatMap { dx ->
+            (-1..1).flatMap { dy ->
+                (-1..1).mapNotNull { dz -> Point3d(x + dx, y + dy, z + dz) }
+            }
+        }.toSet()
 
     companion object {
         operator fun Point3d.plus(other: Point3d) = Point3d(this.x + other.x, this.y + other.y, this.z + other.z)
@@ -52,20 +48,13 @@ data class Point3d(val x: Int, val y: Int, val z: Int) : Point {
 
 data class Point4d(val x: Int, val y: Int, val z: Int, val w: Int) : Point {
     override val neighbors: Set<Point4d>
-        get() {
-            return (-1..1).flatMap { dx ->
-                (-1..1).flatMap { dy ->
-                    (-1..1).flatMap { dz ->
-                        (-1..1).mapNotNull { dw ->
-                            when (val p = Point4d(x + dx, y + dy, z + dz, w + dw)) {
-                                this -> null
-                                else -> p
-                            }
-                        }
-                    }
+        get() = (-1..1).flatMap { dx ->
+            (-1..1).flatMap { dy ->
+                (-1..1).flatMap { dz ->
+                    (-1..1).map { dw -> Point4d(x + dx, y + dy, z + dz, w + dw) }
                 }
-            }.toSet()
-        }
+            }
+        }.toSet()
 
     companion object {
         operator fun Point4d.plus(other: Point4d) =

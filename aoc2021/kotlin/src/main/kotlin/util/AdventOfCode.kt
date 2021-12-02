@@ -1,23 +1,25 @@
 package util
 
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 import java.time.Instant
+import kotlin.streams.asSequence
 
 abstract class AdventOfCode {
     private val fileName: String =
         "src/main/resources/${this::class.simpleName!!.lowercase()}.txt"
-    private val file: File = File(fileName)
+    private val file: Path = Path.of(fileName)
 
-    val inputFileLines: List<String>
-        get() = file.readLines()
+    val inputFileLines: Sequence<String>
+        get() = Files.lines(file).asSequence()
     val inputFileString: String
-        get() = file.readText()
-    val inputFileInts: List<Int>
+        get() = Files.readString(file)
+    val inputFileInts: Sequence<Int>
         get() = inputFileLines.map(String::toInt)
-    val inputFileLongs: List<Long>
+    val inputFileLongs: Sequence<Long>
         get() = inputFileLines.map(String::toLong)
 
-    fun <T:Any?> timed(function: () -> T): T {
+    fun <T : Any?> timed(function: () -> T): T {
         val start = Instant.now()
         val value = function()
         println("Took: ${start.elapsed()}")
