@@ -1,62 +1,60 @@
+import Day03.Extractor.Least
+import Day03.Extractor.Most
 import util.AdventOfCode
 
 object Day03 : AdventOfCode() {
 
     fun part1(input: List<String>): Int {
-        val sum =
+        val digitCounts =
             input.map { it.mapIndexed { i, c -> i to c.digitToInt() }.toMap() }
-                .fold(mutableMapOf<Int, Int>()) { acc, map ->
-                    map.forEach { (k, v) ->
-                        val nv = v + (acc[k] ?: 0)
-                        acc[k] = nv
-                    }
-                    acc
+                .fold(mapOf<Int, Int>()) { acc, map ->
+                    map.mapValues { (k, v) -> v + (acc[k] ?: 0) }
                 }
 
-        val gamma = (0 until sum.size).map {
-            if ((sum[it] ?: 0) >= input.size / 2) {
-                1
-            } else {
-                0
-            }
-        }.joinToString("")
+        val gamma = Most.compareDigits(digitCounts, input.size)
+        val epsilon = Least.compareDigits(digitCounts, input.size)
 
-        val epsilon = (0 until sum.size).map {
-            if ((sum[it] ?: 0) < input.size / 2) {
-                1
-            } else {
-                0
-            }
-        }.joinToString("")
-
-        return gamma.toInt(2) * epsilon.toInt(2)
+        return gamma * epsilon
     }
 
-    fun computeMost(input: List<String>): String {
-        return compute("", input) {
-            if (it.count { s -> s.first() == '1' } >= (it.size / 2.0)) {
-                "1"
+    private enum class Extractor(val a: String, val b: String) {
+        Most("1", "0"),
+        Least("0", "1");
+
+        fun extract(list: List<String>): String {
+            return if (list.count { s -> s.first() == '1' } >= (list.size / 2.0)) {
+                a
             } else {
-                "0"
+                b
             }
         }
-    }
 
-    fun computeLeast(input: List<String>): String {
-        return compute("", input) {
-            if (it.count { s -> s.first() == '1' } >= (it.size / 2.0)) {
-                "0"
+        fun compareDigits(
+            counts: Map<Int, Int>,
+            inputSize: Int,
+        ) = (0 until counts.size).map {
+            if ((counts[it] ?: 0) < inputSize / 2) {
+                a
             } else {
-                "1"
+                b
             }
-        }
+        }.joinToString("").toInt(2)
     }
 
-    tailrec fun compute(soFar: String, input: List<String>, extractor: (List<String>) -> String): String {
+    private fun computeMost(input: List<String>): String {
+        return compute("", input, Most)
+    }
+
+    private fun computeLeast(input: List<String>): String {
+        return compute("", input, Least)
+    }
+
+    private tailrec fun compute(soFar: String, input: List<String>, extractor: Extractor): String {
         if (input.size == 1) {
             return soFar + input.first()
         }
-        val next: String = extractor(input);
+
+        val next: String = extractor.extract(input)
         return compute(soFar + next, input.filter { it.startsWith(next) }.map { it.drop(1) }, extractor)
     }
 
