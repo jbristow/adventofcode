@@ -7,6 +7,18 @@ object Day04 : AdventOfCode() {
         private val flipped: Map<Point2d, Int>
         private val hitLocs: MutableMap<Point2d, Boolean> = mutableMapOf()
 
+        private val hasWinningColumn: Boolean
+            get() = (0 until 5).any { x -> (0 until 5).all { y -> hitLocs[Point2d(x, y)] ?: false } }
+
+        private val hasWinningRow: Boolean
+            get() = (0 until 5).any { y -> (0 until 5).all { x -> hitLocs[Point2d(x, y)] ?: false } }
+
+        val hasWon: Boolean
+            get() = hitLocs.size >= 5 && (hasWinningColumn || hasWinningRow)
+
+        val sum: Int
+            get() = flipped.filterKeys { it !in hitLocs }.values.sum()
+
         init {
             numberLocs = (0 until 5).flatMap { x ->
                 (0 until 5).map { y ->
@@ -22,21 +34,6 @@ object Day04 : AdventOfCode() {
                 hitLocs[ballLoc] = true
             }
         }
-
-        val hasWon: Boolean
-            get() {
-                if (hitLocs.size < 5) {
-                    return false
-                }
-
-                return (0 until 5).any { y -> (0 until 5).all { x -> hitLocs[Point2d(x, y)] ?: false } } ||
-                    (0 until 5).any { x -> (0 until 5).all { y -> hitLocs[Point2d(x, y)] ?: false } }
-            }
-
-        val sum: Int
-            get() {
-                return flipped.filterKeys { k -> k !in hitLocs }.values.sum()
-            }
     }
 
     fun List<String>.extractBalls() = first().split(",").map { it.toInt() }
@@ -82,11 +79,16 @@ object Day04 : AdventOfCode() {
         }
 
         boards.forEach { it.recordBall(balls.first()) }
+        
+        val boardsByStatus = boards.groupBy { it.hasWon }
+        val winners = boardsByStatus[true] ?: listOf()
+        val losers = boardsByStatus[false] ?: listOf()
+
         return playGameToLose(
             balls.drop(1),
-            boards.filter { !it.hasWon },
+            losers,
             balls.first(),
-            boards.filter { it.hasWon }
+            winners
         )
     }
 
