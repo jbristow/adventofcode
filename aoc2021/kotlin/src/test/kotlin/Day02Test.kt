@@ -29,12 +29,12 @@ internal class Day02Test {
 
         @Test
         fun part1() {
-            assertThat(Day02.part1(Day02.inputFileLines)).isEqualTo(1660158)
+            assertThat(Day02.part1(Day02.inputFileLineSequence)).isEqualTo(1660158)
         }
 
         @Test
         fun part2() {
-            assertThat(Day02.part2(Day02.inputFileLines)).isEqualTo(1604592846)
+            assertThat(Day02.part2(Day02.inputFileLineSequence)).isEqualTo(1604592846)
         }
     }
 }

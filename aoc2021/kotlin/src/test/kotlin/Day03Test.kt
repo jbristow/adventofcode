@@ -35,12 +35,12 @@ internal class Day03Test {
 
         @Test
         fun part1() {
-            assertThat(Day03.part1(Day03.inputFileLines.toList())).isEqualTo(3959450)
+            assertThat(Day03.part1(Day03.inputFileLines)).isEqualTo(3959450)
         }
 
         @Test
         fun part2() {
-            assertThat(Day03.part2(Day03.inputFileLines.toList())).isEqualTo(7440311)
+            assertThat(Day03.part2(Day03.inputFileLines)).isEqualTo(7440311)
         }
     }
 }

@@ -3,6 +3,7 @@ package util
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Instant
+import kotlin.io.path.readLines
 import kotlin.streams.asSequence
 
 abstract class AdventOfCode {
@@ -10,13 +11,15 @@ abstract class AdventOfCode {
         "src/main/resources/${this::class.simpleName!!.lowercase()}.txt"
     private val file: Path = Path.of(fileName)
 
-    val inputFileLines: Sequence<String>
+    val inputFileLines: List<String>
+        get() = file.readLines()
+    val inputFileLineSequence: Sequence<String>
         get() = Files.lines(file).asSequence()
     val inputFileString: String
         get() = Files.readString(file)
-    val inputFileInts: Sequence<Int>
+    val inputFileInts: List<Int>
         get() = inputFileLines.map(String::toInt)
-    val inputFileLongs: Sequence<Long>
+    val inputFileLongs: List<Long>
         get() = inputFileLines.map(String::toLong)
 
     fun <T : Any?> timed(function: () -> T): T {
