@@ -7,9 +7,19 @@ import kotlin.io.path.readLines
 import kotlin.streams.asSequence
 
 abstract class AdventOfCode {
-    private val fileName: String =
-        "src/main/resources/${this::class.simpleName!!.lowercase()}.txt"
-    private val file: Path = Path.of(fileName)
+
+    private val fileName: String
+    private val file: Path
+
+    constructor() {
+        fileName = "src/main/resources/${this::class.simpleName!!.lowercase()}.txt"
+        file = Path.of(fileName)
+    }
+
+    constructor(f: String) {
+        fileName = "src/main/resources/$f"
+        file = Path.of(fileName)
+    }
 
     val inputFileLines: List<String>
         get() = file.readLines()
