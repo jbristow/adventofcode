@@ -31,6 +31,9 @@ object Day06 : AdventOfCode() {
         day: Int = 0,
         count: Long = this.size.toLong()
     ): Long {
+
+        println("Day $day")
+        println(this.toList().sorted().joinToString("\n") { "  - $it" })
         if (daysLeftToSimulate == 0) {
             return count
         }

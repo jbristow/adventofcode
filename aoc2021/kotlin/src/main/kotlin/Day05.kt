@@ -109,15 +109,19 @@ object Day05 : AdventOfCode() {
             val maxX = lines.maxOf { it.maxX }
             val minY = lines.minOf { it.minY }
             val maxY = lines.maxOf { it.maxY }
-            bw.write(((minY..maxY).joinToString("\n") { y ->
-                (minX..maxX).joinToString("") { x ->
-                    val p = Point2d(x, y)
-                    when (p in mpm && mpm[p] != 0) {
-                        true -> "${mpm[p]}"
-                        else -> "."
+            bw.write(
+                (
+                    (minY..maxY).joinToString("\n") { y ->
+                        (minX..maxX).joinToString("") { x ->
+                            val p = Point2d(x, y)
+                            when (p in mpm && mpm[p] != 0) {
+                                true -> "${mpm[p]}"
+                                else -> "."
+                            }
+                        }
                     }
-                }
-            }))
+                    )
+            )
             bw.newLine()
         }
     }

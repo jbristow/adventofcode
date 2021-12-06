@@ -79,7 +79,7 @@ object Day04 : AdventOfCode() {
         }
 
         boards.forEach { it.recordBall(balls.first()) }
-        
+
         val boardsByStatus = boards.groupBy { it.hasWon }
         val winners = boardsByStatus[true] ?: listOf()
         val losers = boardsByStatus[false] ?: listOf()
