@@ -1,79 +1,61 @@
 import util.AdventOfCode
 import java.util.PriorityQueue
-import java.util.UUID
 
 object Day06 : AdventOfCode() {
 
-    data class Lanternfish(var timer: Int = 8) {
-
-        fun tick(): Lanternfish? {
-            return if (timer == 0) {
-                timer = 6
-                Lanternfish()
-            } else {
-                timer -= 1
-                null
-            }
-        }
-    }
-
-    var sample = "3,4,3,1,2"
-
     fun part1(input: String): Int {
-        val start = input.split(",").map { Lanternfish(it.toInt()) }
-        return simulation(80, start)
+        val start = input.split(",").map { it.toInt() }
+        return start.simulation(80)
     }
 
-    tailrec fun simulation(daysToSimulate: Int, fish: List<Lanternfish>): Int {
+    tailrec fun List<Int>.simulation(daysToSimulate: Int): Int {
         if (daysToSimulate == 0) {
-            return fish.size
+            return size
         }
 
-        val newFish = fish.fold(mutableListOf<Lanternfish>()) { acc, f ->
-            acc.add(f)
-            when (val newf = f.tick()) {
-                null -> {
-                    /*empty*/
+        val newFish = this.fold(mutableListOf<Int>()) { acc, f ->
+            when (f) {
+                0 -> {
+                    acc.add(8)
+                    acc.add(6)
                 }
-                else -> acc.add(newf)
+                else -> acc.add(f - 1)
             }
             acc
         }
-        return simulation(daysToSimulate - 1, newFish)
+        return newFish.simulation(daysToSimulate - 1)
     }
 
-    tailrec fun simulationB(
-        day: Int = 1,
-        fish: PriorityQueue<DaySpawn>,
-        count: Long,
-        daysLeftToSimulate: Int
+    tailrec fun PriorityQueue<DaySpawn>.simulationB(
+        daysLeftToSimulate: Int,
+        day: Int = 0,
+        count: Long = this.size.toLong()
     ): Long {
         if (daysLeftToSimulate == 0) {
             return count
         }
 
-        val topOfQueue = fish.peek()
+        val topOfQueue = peek()
         if (topOfQueue.spawnDate != day) {
-            return simulationB(day + 1, fish, count, daysLeftToSimulate - 1)
+            return simulationB(daysLeftToSimulate - 1, day + 1, count)
         }
 
         val spawners = mutableListOf<DaySpawn>()
 
-        while (topOfQueue.spawnDate == fish.peek()?.spawnDate) {
-            spawners.add(fish.remove())
+        while (topOfQueue.spawnDate == peek()?.spawnDate) {
+            spawners.add(remove())
         }
 
         val totalSpawning = spawners.sumOf { it.count }
-        fish.add(DaySpawn(day + 7, totalSpawning))
-        fish.add(DaySpawn(day + 9, totalSpawning))
+        add(DaySpawn(day + 7, totalSpawning))
+        add(DaySpawn(day + 9, totalSpawning))
 
-        return simulationB(day + 1, fish, count + totalSpawning, daysLeftToSimulate - 1)
+        return simulationB(daysLeftToSimulate - 1, day + 1, count + totalSpawning)
     }
 
     data class DaySpawn(
         val spawnDate: Int,
-        val count: Long,
-        val id: UUID = UUID.randomUUID()
+        val count: Long
     ) : Comparable<DaySpawn> {
         override fun compareTo(other: DaySpawn): Int {
             return spawnDate.compareTo(other.spawnDate)
@@ -85,7 +67,7 @@ object Day06 : AdventOfCode() {
 
         val fish = PriorityQueue<DaySpawn>()
         fish.addAll(start)
-        return simulationB(1, fish, fish.size.toLong(), 256 - 1)
+        return fish.simulationB(256)
     }
 
     @JvmStatic
