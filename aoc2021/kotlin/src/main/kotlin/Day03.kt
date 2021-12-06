@@ -31,7 +31,7 @@ object Day03 : AdventOfCode() {
 
         fun compareDigits(
             counts: Map<Int, Int>,
-            inputSize: Int,
+            inputSize: Int
         ) = (0 until counts.size).map {
             if ((counts[it] ?: 0) < inputSize / 2) {
                 a

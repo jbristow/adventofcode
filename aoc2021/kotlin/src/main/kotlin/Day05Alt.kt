@@ -4,7 +4,6 @@ import util.Point2d
 object Day05Alt : AdventOfCode("day05.txt") {
 
     fun part1(input: List<String>): Int {
-
         return input.asSequence()
             .map { it.toLine2d() }
             .filter { it.slope is Slope.Horizontal || it.slope is Slope.Vertical }

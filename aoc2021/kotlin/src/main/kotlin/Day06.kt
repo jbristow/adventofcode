@@ -29,11 +29,8 @@ object Day06 : AdventOfCode() {
     tailrec fun PriorityQueue<DaySpawn>.simulationB(
         daysLeftToSimulate: Int,
         day: Int = 0,
-        count: Long = this.size.toLong()
+        count: Long = sumOf { it.count }
     ): Long {
-
-        println("Day $day")
-        println(this.toList().sorted().joinToString("\n") { "  - $it" })
         if (daysLeftToSimulate == 0) {
             return count
         }
@@ -44,7 +41,6 @@ object Day06 : AdventOfCode() {
         }
 
         val spawners = mutableListOf<DaySpawn>()
-
         while (topOfQueue.spawnDate == peek()?.spawnDate) {
             spawners.add(remove())
         }
@@ -66,7 +62,9 @@ object Day06 : AdventOfCode() {
     }
 
     fun part2(input: String): Long {
-        val start = input.split(",").map { DaySpawn(it.toInt(), 1) }
+        val start = input.split(",")
+            .groupBy { it }
+            .map { (k, v) -> DaySpawn(k.toInt(), v.size.toLong()) }
 
         val fish = PriorityQueue<DaySpawn>()
         fish.addAll(start)
