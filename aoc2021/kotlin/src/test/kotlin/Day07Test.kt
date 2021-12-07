@@ -11,7 +11,6 @@ internal class Day07Test {
     @Nested
     inner class Examples {
         private val sample = "16,1,2,0,4,2,7,1,2,14"
-        private val sampleFish = sample.split(",").map(String::toInt)
 
         @Test
         fun part1() {
@@ -41,7 +40,7 @@ internal class Day07Test {
     @ParameterizedTest(name = "[{index}] {0} movement should take {1} fuel")
     @MethodSource("fuelSource")
     fun part2_increasing_fuel_cost_test(moveAmount: Int, expectedFuel: Int) {
-        assertThat(Day07.triangle_number(moveAmount)).isEqualTo(expectedFuel)
+        assertThat(Day07.triangleNumber(moveAmount)).isEqualTo(expectedFuel)
     }
 
     companion object {
