@@ -1,3 +1,4 @@
+import Day07.triangleNumber
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -40,7 +41,7 @@ internal class Day07Test {
     @ParameterizedTest(name = "[{index}] {0} movement should take {1} fuel")
     @MethodSource("fuelSource")
     fun part2_increasing_fuel_cost_test(moveAmount: Int, expectedFuel: Int) {
-        assertThat(Day07.triangleNumber(moveAmount)).isEqualTo(expectedFuel)
+        assertThat(moveAmount.triangleNumber()).isEqualTo(expectedFuel)
     }
 
     companion object {
@@ -58,4 +59,5 @@ internal class Day07Test {
             )
         }
     }
+
 }
