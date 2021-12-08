@@ -17,30 +17,30 @@ object Day08 : AdventOfCode() {
 
     fun part1(input: List<String>) = input.sumOf { seekUniqueSignatures(it) }
 
-    data class SignalInfo(val c: Char, val appearances: Int, val appearsIn: List<String>, val neverIn: List<String>)
+    data class SignalInfo(val c: Char, val appearances: Int)
 
     // Two is the only number lacking the most common segment
-    private fun Map<String, List<DigitDisplay>>.establishTwo(c: Char) =
+    private fun Map<String, List<DigitDisplay>>.establishTwo(frequencies: List<SignalInfo>) =
         mapValues { (k, v) ->
-            when (c in k) {
+            when (frequencies.last().c in k) {
                 true -> v - Two
                 else -> listOf(Two)
             }
         }
 
     // Three Five and Nine, are the only non-unique candidates that contain the least common segment.
-    private fun Map<String, List<DigitDisplay>>.removeIllegal359(c: Char) =
+    private fun Map<String, List<DigitDisplay>>.removeIllegal359(frequencies: List<SignalInfo>) =
         mapValues { (k, v) ->
-            when (c in k) {
+            when (frequencies[0].c in k) {
                 true -> v.filter { it !in listOf(Three, Five, Nine) }
                 else -> v
             }
         }
 
     // Three can never have the second least common number
-    private fun Map<String, List<DigitDisplay>>.removeIllegal3(c: Char) =
+    private fun Map<String, List<DigitDisplay>>.removeIllegal3(frequencies: List<SignalInfo>) =
         mapValues { (k, v) ->
-            when (c in k) {
+            when (frequencies[1].c in k) {
                 true -> v - Three
                 else -> v
             }
@@ -84,21 +84,20 @@ object Day08 : AdventOfCode() {
             .groupBy { it }
             .mapValues { it.value.count() }.entries
             .sortedBy { it.value }
-            .map { (segmentChar, charFreq) ->
-                SignalInfo(
-                    segmentChar,
-                    charFreq,
-                    patterns.filter { segmentChar in it },
-                    patterns.filter { segmentChar !in it })
-            }
+            .map { (segmentChar, charFreq) -> SignalInfo(segmentChar, charFreq) }
 
-        val knownCandidates = patterns.associateWith { DigitDisplay.candidatesForSize(it) }
-            .establishTwo(frequencies.last().c)
-            .removeIllegal359(frequencies[0].c)
-            .removeIllegal3(frequencies[1].c)
+        println(patterns)
+        println(displays)
+        val knownCandidatesPre = patterns.associateWith { DigitDisplay.candidatesForSize(it) }
+            .establishTwo(frequencies)
+            .removeIllegal359(frequencies)
+            .removeIllegal3(frequencies)
             .removeIllegal5()
             .isolate9()
             .establish60(frequencies).toMap()
+
+        println(knownCandidatesPre)
+        val knownCandidates = knownCandidatesPre
             .mapValues { (_, v) -> v.first() }.mapKeys { (k, _) -> k.toSortedSet() }
 
         return displays.map { knownCandidates[it.toSortedSet()]?.digit }
