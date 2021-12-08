@@ -21,24 +21,21 @@ object Day03 : AdventOfCode() {
         Most("1", "0"),
         Least("0", "1");
 
-        fun extract(list: List<String>): String {
-            return if (list.count { s -> s.first() == '1' } >= (list.size / 2.0)) {
-                a
-            } else {
-                b
+        fun extract(list: List<String>) =
+            when {
+                list.count { s -> s.first() == '1' } >= (list.size / 2.0) -> a
+                else -> b
             }
-        }
 
         fun compareDigits(
             counts: Map<Int, Int>,
             inputSize: Int
-        ) = (0 until counts.size).map {
-            if ((counts[it] ?: 0) < inputSize / 2) {
-                a
-            } else {
-                b
+        ) = (0 until counts.size).joinToString("") {
+            when {
+                (counts[it] ?: 0) < inputSize / 2 -> a
+                else -> b
             }
-        }.joinToString("").toInt(2)
+        }.toInt(2)
     }
 
     private fun computeMost(input: List<String>): String {

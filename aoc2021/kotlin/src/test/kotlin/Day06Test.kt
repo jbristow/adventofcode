@@ -1,5 +1,5 @@
-import Day06.simulation
-import Day06.simulationB
+import Day06.megaSimulate
+import Day06.simluate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -19,21 +19,21 @@ internal class Day06Test {
 
         @Test
         fun part1_18d() {
-            assertThat(sampleFish.simulation(18)).isEqualTo(26)
+            assertThat(sampleFish.simluate(18)).isEqualTo(26)
         }
 
         @Test
         fun part2_18d() {
             val fish = PriorityQueue<Day06.DaySpawn>()
             fish.addAll(sampleFish.map { Day06.DaySpawn(it, 1) })
-            assertThat(fish.simulationB(18)).isEqualTo(26)
+            assertThat(fish.megaSimulate(18)).isEqualTo(26)
         }
 
         @Test
         fun part2_80d() {
             val fish = PriorityQueue<Day06.DaySpawn>()
             fish.addAll(sampleFish.map { Day06.DaySpawn(it, 1) })
-            assertThat(fish.simulationB(80)).isEqualTo(5934)
+            assertThat(fish.megaSimulate(80)).isEqualTo(5934)
         }
 
         @Test

@@ -26,8 +26,8 @@ object Day08 : AdventOfCode() {
     // Two is the only number lacking the most common segment
     private fun Map<String, List<DigitDisplay>>.establishTwo(frequencies: List<SignalInfo>) =
         mapValues { (k, v) ->
-            when (frequencies.last().c in k) {
-                true -> v - Two
+            when (frequencies.last().c) {
+                in k -> v - Two
                 else -> listOf(Two)
             }
         }
@@ -35,8 +35,8 @@ object Day08 : AdventOfCode() {
     // Three Five and Nine, are the only non-unique candidates that contain the least common segment.
     private fun Map<String, List<DigitDisplay>>.removeIllegal359(frequencies: List<SignalInfo>) =
         mapValues { (k, v) ->
-            when (frequencies[0].c in k) {
-                true -> v.filter { it !in listOf(Three, Five, Nine) }
+            when (frequencies[0].c) {
+                in k -> v.filter { it !in listOf(Three, Five, Nine) }
                 else -> v
             }
         }
@@ -44,8 +44,8 @@ object Day08 : AdventOfCode() {
     // Three can never have the second least common number
     private fun Map<String, List<DigitDisplay>>.removeIllegal3(frequencies: List<SignalInfo>) =
         mapValues { (k, v) ->
-            when (frequencies[1].c in k) {
-                true -> v - Three
+            when (frequencies[1].c) {
+                in k -> v - Three
                 else -> v
             }
         }
@@ -53,8 +53,8 @@ object Day08 : AdventOfCode() {
     // When we run this, we already have a five, so remove it from any lists that still contain more than just Five
     private fun Map<String, List<DigitDisplay>>.removeIllegal5() =
         mapValues { (_, v) ->
-            when (Five in v && v.size > 1) {
-                true -> v - Five
+            when {
+                Five in v && v.size > 1 -> v - Five
                 else -> v
             }
         }
@@ -62,8 +62,8 @@ object Day08 : AdventOfCode() {
     // Nine will be chilling uniquely in a 0 6 9 triplet.
     private fun Map<String, List<DigitDisplay>>.isolate9() =
         mapValues { (_, v) ->
-            when (v.size == 3 && v.containsAll(listOf(Zero, Six, Nine))) {
-                true -> listOf(Nine)
+            when {
+                v.size == 3 && v.containsAll(listOf(Zero, Six, Nine)) -> listOf(Nine)
                 else -> v
             }
         }
@@ -126,9 +126,8 @@ object Day08 : AdventOfCode() {
         Nine(6, "9");
 
         companion object {
-            fun candidatesForSize(input: String): List<DigitDisplay> {
-                return values().filter { it.numSegments == input.length }
-            }
+            fun candidatesForSize(input: String) =
+                values().filter { it.numSegments == input.length }
         }
     }
 }

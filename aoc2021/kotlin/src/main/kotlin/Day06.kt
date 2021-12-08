@@ -3,12 +3,9 @@ import java.util.PriorityQueue
 
 object Day06 : AdventOfCode() {
 
-    fun part1(input: String): Int {
-        val start = input.split(",").map { it.toInt() }
-        return start.simulation(80)
-    }
+    fun part1(input: String) = input.split(",").map { it.toInt() }.simluate(80)
 
-    tailrec fun List<Int>.simulation(daysToSimulate: Int): Int {
+    tailrec fun List<Int>.simluate(daysToSimulate: Int): Int {
         if (daysToSimulate == 0) {
             return size
         }
@@ -23,10 +20,10 @@ object Day06 : AdventOfCode() {
             }
             acc
         }
-        return newFish.simulation(daysToSimulate - 1)
+        return newFish.simluate(daysToSimulate - 1)
     }
 
-    tailrec fun PriorityQueue<DaySpawn>.simulationB(
+    tailrec fun PriorityQueue<DaySpawn>.megaSimulate(
         daysLeftToSimulate: Int,
         day: Int = 0,
         count: Long = sumOf { it.count }
@@ -37,7 +34,7 @@ object Day06 : AdventOfCode() {
 
         val topOfQueue = peek()
         if (topOfQueue.spawnDate != day) {
-            return simulationB(daysLeftToSimulate - 1, day + 1, count)
+            return megaSimulate(daysLeftToSimulate - 1, day + 1, count)
         }
 
         val spawners = mutableListOf<DaySpawn>()
@@ -49,16 +46,11 @@ object Day06 : AdventOfCode() {
         add(DaySpawn(day + 7, totalSpawning))
         add(DaySpawn(day + 9, totalSpawning))
 
-        return simulationB(daysLeftToSimulate - 1, day + 1, count + totalSpawning)
+        return megaSimulate(daysLeftToSimulate - 1, day + 1, count + totalSpawning)
     }
 
-    data class DaySpawn(
-        val spawnDate: Int,
-        val count: Long
-    ) : Comparable<DaySpawn> {
-        override fun compareTo(other: DaySpawn): Int {
-            return spawnDate.compareTo(other.spawnDate)
-        }
+    data class DaySpawn(val spawnDate: Int, val count: Long) : Comparable<DaySpawn> {
+        override fun compareTo(other: DaySpawn) = spawnDate.compareTo(other.spawnDate)
     }
 
     fun part2(input: String): Long {
@@ -68,7 +60,7 @@ object Day06 : AdventOfCode() {
 
         val fish = PriorityQueue<DaySpawn>()
         fish.addAll(start)
-        return fish.simulationB(256)
+        return fish.megaSimulate(256)
     }
 
     @JvmStatic
