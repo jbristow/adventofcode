@@ -10,6 +10,8 @@ import Day08.DigitDisplay.Two
 import Day08.DigitDisplay.Zero
 import util.AdventOfCode
 
+typealias SignalCandidates = Map<String, List<Day08.DigitDisplay>>
+
 object Day08 : AdventOfCode() {
 
     private val validLens = setOf(One, Four, Seven, Eight).map { it.numSegments }.toSet()
@@ -23,8 +25,8 @@ object Day08 : AdventOfCode() {
 
     data class SignalInfo(val c: Char, val appearances: Int)
 
-    // Two is the only number lacking the most common segment
-    private fun Map<String, List<DigitDisplay>>.establishTwo(frequencies: List<SignalInfo>) =
+    // Two is the only number lacking the most frequent segment
+    private fun SignalCandidates.establish2(frequencies: List<SignalInfo>) =
         mapValues { (k, v) ->
             when (frequencies.last().c) {
                 in k -> v - Two
@@ -32,50 +34,35 @@ object Day08 : AdventOfCode() {
             }
         }
 
-    // Three Five and Nine, are the only non-unique candidates that contain the least common segment.
-    private fun Map<String, List<DigitDisplay>>.removeIllegal359(frequencies: List<SignalInfo>) =
+    // Three Five and Nine, are the only non-unique candidates that cannot contain the least frequent segment.
+    // Since 3 and 5 always appear together, they will never have the least frequent segment anyway.
+    // In the 069 triplet, 9 is the only one that does not have the least frequent segment.
+    private fun SignalCandidates.establish9(frequencies: List<SignalInfo>) =
         mapValues { (k, v) ->
-            when (frequencies[0].c) {
-                in k -> v.filter { it !in listOf(Three, Five, Nine) }
+            when {
+                Nine in v && frequencies[0].c in k -> v - Nine
+                Nine in v -> listOf(Nine)
                 else -> v
             }
         }
 
-    // Three can never have the second least common number
-    private fun Map<String, List<DigitDisplay>>.removeIllegal3(frequencies: List<SignalInfo>) =
+    // Three can never have the second least frequent number, and it always appears alongside 5
+    private fun SignalCandidates.establish35(frequencies: List<SignalInfo>) =
         mapValues { (k, v) ->
-            when (frequencies[1].c) {
-                in k -> v - Three
-                else -> v
-            }
-        }
-
-    // When we run this, we already have a five, so remove it from any lists that still contain more than just Five
-    private fun Map<String, List<DigitDisplay>>.removeIllegal5() =
-        mapValues { (_, v) ->
             when {
-                Five in v && v.size > 1 -> v - Five
+                Three in v && frequencies[1].c in k -> listOf(Five)
+                Three in v -> listOf(Three)
                 else -> v
             }
         }
 
-    // Nine will be chilling uniquely in a 0 6 9 triplet.
-    private fun Map<String, List<DigitDisplay>>.isolate9() =
-        mapValues { (_, v) ->
-            when {
-                v.size == 3 && v.containsAll(listOf(Zero, Six, Nine)) -> listOf(Nine)
-                else -> v
-            }
-        }
-
-    // The final candidate pair is 0 and 6.  The second and third most common chars only appear in 6.
-    private fun Map<String, List<DigitDisplay>>.establish60(infos: List<SignalInfo>) =
+    // The final candidate pair is 0 and 6.  The second and third most frequent chars cannot appear in 6
+    private fun SignalCandidates.establish60(infos: List<SignalInfo>) =
         mapValues { (k, v) ->
             val (a, b) = infos.dropLast(1).takeLast(2).map(SignalInfo::c)
-            val containsChar = (a !in k || b !in k)
             when {
-                containsChar && v.contains(Six) -> listOf(Six)
-                !containsChar && v.contains(Six) -> listOf(Zero)
+                Six in v && a in k && b in k -> listOf(Zero)
+                Six in v -> listOf(Six)
                 else -> v
             }
         }
@@ -91,11 +78,9 @@ object Day08 : AdventOfCode() {
             .map { (segmentChar, charFreq) -> SignalInfo(segmentChar, charFreq) }
 
         val knownCandidates = patterns.associateWith { DigitDisplay.candidatesForSize(it) }
-            .establishTwo(frequencies)
-            .removeIllegal359(frequencies)
-            .removeIllegal3(frequencies)
-            .removeIllegal5()
-            .isolate9()
+            .establish2(frequencies)
+            .establish9(frequencies)
+            .establish35(frequencies)
             .establish60(frequencies).toMap()
             .mapValues { (_, v) -> v.first() }.mapKeys { (k, _) -> k.toSortedSet() }
 
