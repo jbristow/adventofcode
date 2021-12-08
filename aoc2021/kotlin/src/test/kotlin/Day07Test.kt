@@ -59,5 +59,4 @@ internal class Day07Test {
             )
         }
     }
-
 }

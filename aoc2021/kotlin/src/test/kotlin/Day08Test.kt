@@ -50,7 +50,8 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
         assertThat(
             listOf(DigitDisplay.One, DigitDisplay.Four, DigitDisplay.Seven, DigitDisplay.Eight)
                 .joinToString("") { it.digit }
-                .toInt())
+                .toInt()
+        )
             .isEqualTo(1478)
     }
 }

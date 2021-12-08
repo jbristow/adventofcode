@@ -1,5 +1,9 @@
+import Day08.DigitDisplay.Eight
 import Day08.DigitDisplay.Five
+import Day08.DigitDisplay.Four
 import Day08.DigitDisplay.Nine
+import Day08.DigitDisplay.One
+import Day08.DigitDisplay.Seven
 import Day08.DigitDisplay.Six
 import Day08.DigitDisplay.Three
 import Day08.DigitDisplay.Two
@@ -8,7 +12,7 @@ import util.AdventOfCode
 
 object Day08 : AdventOfCode() {
 
-    private val validLens = setOf(2, 4, 3, 7)
+    private val validLens = setOf(One, Four, Seven, Eight).map { it.numSegments }.toSet()
 
     private fun seekUniqueSignatures(input: String) =
         input.split(" | ")[1]
@@ -86,18 +90,13 @@ object Day08 : AdventOfCode() {
             .sortedBy { it.value }
             .map { (segmentChar, charFreq) -> SignalInfo(segmentChar, charFreq) }
 
-        println(patterns)
-        println(displays)
-        val knownCandidatesPre = patterns.associateWith { DigitDisplay.candidatesForSize(it) }
+        val knownCandidates = patterns.associateWith { DigitDisplay.candidatesForSize(it) }
             .establishTwo(frequencies)
             .removeIllegal359(frequencies)
             .removeIllegal3(frequencies)
             .removeIllegal5()
             .isolate9()
             .establish60(frequencies).toMap()
-
-        println(knownCandidatesPre)
-        val knownCandidates = knownCandidatesPre
             .mapValues { (_, v) -> v.first() }.mapKeys { (k, _) -> k.toSortedSet() }
 
         return displays.map { knownCandidates[it.toSortedSet()]?.digit }
@@ -133,6 +132,3 @@ object Day08 : AdventOfCode() {
         }
     }
 }
-
-
-

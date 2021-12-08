@@ -45,4 +45,3 @@ object Day07 : AdventOfCode() {
         return sumOf { crab -> abs(crab - it).triangleNumber() }
     }
 }
-
