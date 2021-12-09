@@ -10,7 +10,8 @@ import Day08.DigitDisplay.Two
 import Day08.DigitDisplay.Zero
 import util.AdventOfCode
 
-typealias SignalCandidates = Map<String, List<Day08.DigitDisplay>>
+private typealias Candidates = List<Day08.DigitDisplay>
+private typealias SignalCandidates = Map<String, Candidates>
 
 object Day08 : AdventOfCode() {
 
@@ -25,46 +26,49 @@ object Day08 : AdventOfCode() {
 
     data class SignalInfo(val c: Char, val appearances: Int)
 
-    // Two is the only number lacking the most frequent segment
-    private fun SignalCandidates.establish2(frequencies: List<SignalInfo>) =
-        mapValues { (k, v) ->
-            when (frequencies.last().c) {
-                in k -> v - Two
-                else -> listOf(Two)
+    private fun SignalCandidates.establish(
+        markerDigit: DigitDisplay,
+        excludeFn: ((Map.Entry<String, Candidates>)) -> Boolean,
+        toRemove: (Candidates) -> Candidates,
+        toSet: (Candidates) -> Candidates
+    ): SignalCandidates {
+        return mapValues {
+            when {
+                markerDigit in it.value && excludeFn.invoke(it) -> toRemove.invoke(it.value)
+                markerDigit in it.value -> toSet.invoke(it.value)
+                else -> it.value
             }
         }
+    }
+
+    private fun SignalCandidates.establish(
+        markerDigit: DigitDisplay,
+        excludeChar: Char,
+        toRemove: (Candidates) -> Candidates,
+        toSet: (Candidates) -> Candidates
+    ) = establish(markerDigit, { (k, _) -> excludeChar in k }, toRemove, toSet)
+
+    private fun SignalCandidates.establish(markerDigit: DigitDisplay, excludeChar: Char) =
+        establish(markerDigit, { (k, _) -> excludeChar in k }, { it - markerDigit }, { listOf(markerDigit) })
+
+    // Two is the only number lacking the most frequent segment
+    private fun SignalCandidates.establish2(frequencies: List<SignalInfo>) =
+        establish(Two, frequencies.last().c)
 
     // Three Five and Nine, are the only non-unique candidates that cannot contain the least frequent segment.
     // Since 3 and 5 always appear together, they will never have the least frequent segment anyway.
     // In the 069 triplet, 9 is the only one that does not have the least frequent segment.
     private fun SignalCandidates.establish9(frequencies: List<SignalInfo>) =
-        mapValues { (k, v) ->
-            when {
-                Nine in v && frequencies[0].c in k -> v - Nine
-                Nine in v -> listOf(Nine)
-                else -> v
-            }
-        }
+        establish(Nine, frequencies.first().c)
 
     // Three can never have the second least frequent number, and it always appears alongside 5
     private fun SignalCandidates.establish35(frequencies: List<SignalInfo>) =
-        mapValues { (k, v) ->
-            when {
-                Three in v && frequencies[1].c in k -> listOf(Five)
-                Three in v -> listOf(Three)
-                else -> v
-            }
-        }
+        establish(Three, frequencies[1].c, { listOf(Five) }, { listOf(Three) })
 
     // The final candidate pair is 0 and 6.  The second and third most frequent chars cannot appear in 6
-    private fun SignalCandidates.establish60(infos: List<SignalInfo>) =
-        mapValues { (k, v) ->
-            val (a, b) = infos.dropLast(1).takeLast(2).map(SignalInfo::c)
-            when {
-                Six in v && a in k && b in k -> listOf(Zero)
-                Six in v -> listOf(Six)
-                else -> v
-            }
+    private fun SignalCandidates.establish60(infos: List<SignalInfo>): SignalCandidates =
+        infos.dropLast(1).takeLast(2).map(SignalInfo::c).let { (a, b) ->
+            establish(Six, { (k, _) -> a in k && b in k }, { listOf(Zero) }, { listOf(Six) })
         }
 
     private fun processLine(input: String): Int {

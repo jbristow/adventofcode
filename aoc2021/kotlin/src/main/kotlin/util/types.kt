@@ -4,6 +4,7 @@ import kotlin.math.abs
 
 interface Point {
     val neighbors: Set<Point>
+    val orthoNeighbors: Set<Point>
 }
 
 data class Point2d(val x: Int, val y: Int) : Point {
@@ -19,6 +20,9 @@ data class Point2d(val x: Int, val y: Int) : Point {
         operator fun Point2d.times(value: Int): Point2d = Point2d(x * value, y * value)
     }
 
+    override val orthoNeighbors: Set<Point>
+        get() = listOf(-1, 1).flatMap { listOf(copy(x = x + it), copy(y = y + it)) }.toSet()
+
     override val neighbors: Set<Point>
         get() = (-1..1).flatMap { dx -> (-1..1).map { dy -> Point2d(x + dx, y + dy) } }.toSet()
 }
@@ -30,6 +34,9 @@ data class Point3d(val x: Int, val y: Int, val z: Int) : Point {
                 (-1..1).mapNotNull { dz -> Point3d(x + dx, y + dy, z + dz) }
             }
         }.toSet()
+
+    override val orthoNeighbors: Set<Point3d>
+        get() = listOf(-1, 1).flatMap { listOf(copy(x = x + it), copy(y = y + it), copy(z = z + it)) }.toSet()
 
     companion object {
         operator fun Point3d.plus(other: Point3d) = Point3d(this.x + other.x, this.y + other.y, this.z + other.z)
@@ -54,6 +61,16 @@ data class Point4d(val x: Int, val y: Int, val z: Int, val w: Int) : Point {
                     (-1..1).map { dw -> Point4d(x + dx, y + dy, z + dz, w + dw) }
                 }
             }
+        }.toSet()
+
+    override val orthoNeighbors: Set<Point4d>
+        get() = listOf(-1, 1).flatMap {
+            listOf(
+                copy(x = x + it),
+                copy(y = y + it),
+                copy(z = z + it),
+                copy(w = w + it)
+            )
         }.toSet()
 
     companion object {
