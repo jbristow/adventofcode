@@ -1,124 +1,86 @@
 import Day10.Brace.Companion.toBrace
-import Day10.BraceDirection.Closed
-import Day10.BraceDirection.Open
-import Day10.BraceType.Angle
-import Day10.BraceType.Curly
-import Day10.BraceType.Paren
-import Day10.BraceType.Square
 import util.AdventOfCode
 
 object Day10 : AdventOfCode() {
-    sealed class Brace(
-        val direction: BraceDirection,
-        val type: BraceType,
-        val score: Int? = null,
-        val completer: Brace? = null,
-        val completerScore: Int? = null
-    ) {
-        object OpenParen : Brace(direction = Open, type = Paren, completer = ClosedParen)
-        object OpenSquare : Brace(direction = Open, type = Square, completer = ClosedSquare)
-        object OpenCurly : Brace(direction = Open, type = Curly, completer = ClosedCurly)
-        object OpenAngle : Brace(direction = Open, type = Angle, completer = ClosedAngle)
-        object ClosedParen : Brace(direction = Closed, type = Paren, score = 3, completerScore = 1)
-        object ClosedSquare : Brace(direction = Closed, type = Square, score = 57, completerScore = 2)
-        object ClosedCurly : Brace(direction = Closed, type = Curly, score = 1197, completerScore = 3)
-        object ClosedAngle : Brace(direction = Closed, type = Angle, score = 25137, completerScore = 4)
+    sealed class Brace(val glyph: Char) {
+
+        sealed class Open(glyph: Char, val twin: Closed) : Brace(glyph) {
+            object Paren : Open(glyph = '(', twin = Closed.Paren)
+            object Square : Open(glyph = '[', twin = Closed.Square)
+            object Curly : Open(glyph = '{', twin = Closed.Curly)
+            object Angle : Open(glyph = '<', twin = Closed.Angle)
+        }
+
+        sealed class Closed(
+            glyph: Char,
+            val corruptionScore: Int,
+            val incompleteScore: Int
+        ) : Brace(glyph) {
+            object Paren : Closed(glyph = ')', corruptionScore = 3, incompleteScore = 1)
+            object Square : Closed(glyph = ']', corruptionScore = 57, incompleteScore = 2)
+            object Curly : Closed(glyph = '}', corruptionScore = 1197, incompleteScore = 3)
+            object Angle : Closed(glyph = '>', corruptionScore = 25137, incompleteScore = 4)
+        }
+
+        override fun toString() = this.glyph.toString()
 
         companion object {
             fun Char.toBrace(): Brace {
-                return toString().toBrace()
-            }
-
-            private fun String.toBrace(): Brace {
                 return when (this) {
-                    "(" -> OpenParen
-                    "[" -> OpenSquare
-                    "{" -> OpenCurly
-                    "<" -> OpenAngle
-                    ")" -> ClosedParen
-                    "]" -> ClosedSquare
-                    "}" -> ClosedCurly
-                    ">" -> ClosedAngle
+                    Open.Paren.glyph -> Open.Paren
+                    Open.Square.glyph -> Open.Square
+                    Open.Curly.glyph -> Open.Curly
+                    Open.Angle.glyph -> Open.Angle
+                    Closed.Paren.glyph -> Closed.Paren
+                    Closed.Square.glyph -> Closed.Square
+                    Closed.Curly.glyph -> Closed.Curly
+                    Closed.Angle.glyph -> Closed.Angle
                     else -> throw IllegalArgumentException("Could not convert $this to brace")
                 }
             }
         }
     }
 
-    enum class BraceType {
-        Paren, Square, Curly, Angle
-    }
-
-    enum class BraceDirection {
-        Open, Closed
-    }
-
-    private tailrec fun scoreLine(line: String, seen: ArrayDeque<Brace> = ArrayDeque()): Int? {
+    private tailrec fun findProblem(line: String, seen: ArrayDeque<Brace.Open> = ArrayDeque()): Problem {
         if (line.isEmpty()) {
-            return 0
+            return Problem.Incomplete(seen)
         }
 
-        val c = line.first()
-        val remaining = line.drop(1)
-
-        val brace = c.toBrace()
-        return when (brace.direction) {
-            Open -> {
-                seen.add(brace)
-                scoreLine(remaining, seen)
-            }
-            Closed -> {
-                when (seen.lastOrNull()?.type) {
-                    brace.type -> {
-                        seen.removeLast()
-                        scoreLine(remaining, seen)
-                    }
-                    else -> brace.score
+        return when (val brace = line.first().toBrace()) {
+            is Brace.Open -> findProblem(line.drop(1), seen.apply { add(brace) })
+            is Brace.Closed -> {
+                when (brace) {
+                    seen.last().twin -> findProblem(line.drop(1), seen.apply { removeLast() })
+                    else -> Problem.Corrupt(brace.corruptionScore)
                 }
             }
         }
     }
 
-    fun part1(input: List<String>) = input.mapNotNull { scoreLine(it) }.sum()
-
-    private tailrec fun completeAndScoreLine(line: String, seen: ArrayDeque<Brace> = ArrayDeque()): Long? {
-        if (line.isEmpty()) {
-            return completeLine(seen)
-        }
-
-        val c = line.first()
-        val remaining = line.drop(1)
-
-        val brace = c.toBrace()
-        return when (brace.direction) {
-            Open -> {
-                seen.add(brace)
-                completeAndScoreLine(remaining, seen)
-            }
-            Closed -> {
-                when (seen.lastOrNull()?.type) {
-                    brace.type -> {
-                        seen.removeLast()
-                        completeAndScoreLine(remaining, seen)
-                    }
-                    else -> null
-                } // corrupt!
-            }
-        }
+    sealed interface Problem {
+        data class Incomplete(val seen: ArrayDeque<Brace.Open>) : Problem
+        data class Corrupt(val score: Int) : Problem
     }
 
-    private tailrec fun completeLine(seen: ArrayDeque<Brace>, score: Long = 0): Long {
-        if (seen.isEmpty()) {
-            return score
-        }
-        val current = seen.removeLast()
-        return completeLine(seen, 5 * score + current.completer!!.completerScore!!)
-    }
+    fun part1(input: List<String>) =
+        input.asSequence()
+            .map { findProblem(it) }
+            .filterIsInstance<Problem.Corrupt>()
+            .sumOf { it.score }
+
+    private fun findProblem(seen: ArrayDeque<Brace.Open>) =
+        seen.map { it.twin.incompleteScore }
+            .reversed()
+            .fold(0L) { acc, it -> 5 * acc + it }
 
     fun part2(input: List<String>) =
-        input.mapNotNull { completeAndScoreLine(it) }.sorted().let { scores ->
-            scores.drop((scores.size - 1) / 2).first()
-        }
+        input.asSequence()
+            .map { findProblem(it) }
+            .filterIsInstance<Problem.Incomplete>()
+            .map { findProblem(it.seen) }
+            .sorted()
+            .toList()
+            .let { it.drop((it.size - 1) / 2).first() }
 
     @JvmStatic
     fun main(args: Array<String>) {
