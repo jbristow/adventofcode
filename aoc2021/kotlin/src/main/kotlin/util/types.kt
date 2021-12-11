@@ -20,10 +20,10 @@ data class Point2d(val x: Int, val y: Int) : Point {
         operator fun Point2d.times(value: Int): Point2d = Point2d(x * value, y * value)
     }
 
-    override val orthoNeighbors: Set<Point>
-        get() = listOf(-1, 1).flatMap { listOf(copy(x = x + it), copy(y = y + it)) }.toSet()
+    override val orthoNeighbors: Set<Point2d>
+        get() = listOf(-1, 1).flatMap { listOf(Point2d(x = x + it, y), Point2d(x, y = y + it)) }.toSet()
 
-    override val neighbors: Set<Point>
+    override val neighbors: Set<Point2d>
         get() = (-1..1).flatMap { dx -> (-1..1).map { dy -> Point2d(x + dx, y + dy) } }.toSet()
 }
 
