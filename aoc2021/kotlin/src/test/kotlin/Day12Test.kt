@@ -6,47 +6,43 @@ internal class Day12Test {
 
     @Nested
     inner class Examples {
-        val sample1 = (
-            "start-A\n" +
-                "start-b\n" +
-                "A-c\n" +
-                "A-b\n" +
-                "b-d\n" +
-                "A-end\n" +
-                "b-end"
-            ).lineSequence()
-        val sample2 = (
-            "dc-end\n" +
-                "HN-start\n" +
-                "start-kj\n" +
-                "dc-start\n" +
-                "dc-HN\n" +
-                "LN-dc\n" +
-                "HN-end\n" +
-                "kj-sa\n" +
-                "kj-HN\n" +
-                "kj-dc"
-            ).lineSequence()
-        val sample3 = (
-            "fs-end\n" +
-                "he-DX\n" +
-                "fs-he\n" +
-                "start-DX\n" +
-                "pj-DX\n" +
-                "end-zg\n" +
-                "zg-sl\n" +
-                "zg-pj\n" +
-                "pj-he\n" +
-                "RW-he\n" +
-                "fs-DX\n" +
-                "pj-RW\n" +
-                "zg-RW\n" +
-                "start-pj\n" +
-                "he-WI\n" +
-                "zg-he\n" +
-                "pj-fs\n" +
-                "start-RW"
-            ).lineSequence()
+        private val sample1 = """start-A
+                                |start-b
+                                |A-c
+                                |A-b
+                                |b-d
+                                |A-end
+                                |b-end""".trimMargin().lineSequence()
+        
+        private val sample2 = """dc-end
+                                |HN-start
+                                |start-kj
+                                |dc-start
+                                |dc-HN
+                                |LN-dc
+                                |HN-end
+                                |kj-sa
+                                |kj-HN
+                                |kj-dc""".trimMargin().lineSequence()
+
+        private val sample3 = """fs-end
+                                |he-DX
+                                |fs-he
+                                |start-DX
+                                |pj-DX
+                                |end-zg
+                                |zg-sl
+                                |zg-pj
+                                |pj-he
+                                |RW-he
+                                |fs-DX
+                                |pj-RW
+                                |zg-RW
+                                |start-pj
+                                |he-WI
+                                |zg-he
+                                |pj-fs
+                                |start-RW""".trimMargin().lineSequence()
 
         @Test
         fun part1_sample1() {
