@@ -13,7 +13,7 @@ internal class Day12Test {
                                 |b-d
                                 |A-end
                                 |b-end""".trimMargin().lineSequence()
-        
+
         private val sample2 = """dc-end
                                 |HN-start
                                 |start-kj
