@@ -9,24 +9,24 @@ object Day13 : AdventOfCode() {
             .map { it.split(",").let { (x, y) -> Point2d(x.toInt(), y.toInt()) } }
             .toSet()
 
-    fun foldAlongX(it: Point2d, line: Int): Point2d {
+    fun Point2d.foldAlongX(line: Int): Point2d {
         return when {
-            it.x > line -> Point2d(line - (it.x - line), it.y)
-            else -> it
+            x > line -> copy(x = 2 * line - x)
+            else -> this
         }
     }
 
-    fun foldAlongY(it: Point2d, line: Int): Point2d {
+    fun Point2d.foldAlongY(line: Int): Point2d {
         return when {
-            it.y > line -> Point2d(it.x, line - (it.y - line))
-            else -> it
+            y > line -> copy(y = 2 * line - y)
+            else -> this
         }
     }
 
     private fun buildFoldingFn(direction: String, line: Int): (Point2d) -> Point2d {
         return when (direction) {
-            "x" -> { point: Point2d -> foldAlongX(point, line) }
-            else -> { point: Point2d -> foldAlongY(point, line) }
+            "x" -> { point: Point2d -> point.foldAlongX(line) }
+            else -> { point: Point2d -> point.foldAlongY(line) }
         }
     }
 
