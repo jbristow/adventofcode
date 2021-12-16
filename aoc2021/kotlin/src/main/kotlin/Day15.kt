@@ -1,21 +1,17 @@
 import util.AdventOfCode
 import util.Point2d
 import util.Point2d.Companion.manhattanDistance
+import util.Point2d.Companion.plus
 import java.util.PriorityQueue
 
 object Day15 : AdventOfCode() {
     fun part1(input: List<String>): Int {
-        val risks =
-            input.flatMapIndexed { y, row -> row.mapIndexed { x, risk -> Point2d(x, y) to risk.digitToInt() } }.toMap()
-        val risk = aStar(Point2d(0, 0), Point2d(risks.keys.maxOf { it.x }, risks.keys.maxOf { it.y }), risks)
-
-        return risk - risks[Point2d(0, 0)]!!
+        val risks = toRiskMap(input)
+        return aStar(Point2d(0, 0), Point2d(risks.keys.maxOf { it.x }, risks.keys.maxOf { it.y }), risks)
     }
 
     fun part2(input: List<String>): Int {
-        val risks =
-            input.flatMapIndexed { y, row -> row.mapIndexed { x, risk -> Point2d(x, y) to risk.digitToInt() } }.toMap()
-                .toMutableMap()
+        val risks = toRiskMap(input).toMutableMap()
         val xWidth = input.first().count()
         val yWidth = input.size
         val allRisks = risks.toMutableMap()
@@ -23,8 +19,8 @@ object Day15 : AdventOfCode() {
             (0..4).forEach { xFactor ->
                 if (yFactor > 0 || xFactor > 0) {
                     risks.forEach { (k, v) ->
-                        val newPoint = Point2d(xFactor * xWidth + k.x, yFactor * yWidth + k.y)
-                        val riskOffset = Point2d(0, 0).manhattanDistance(Point2d(xFactor, yFactor)).toInt()
+                        val newPoint = k + Point2d(xFactor * xWidth, yFactor * yWidth)
+                        val riskOffset = Point2d(xFactor, yFactor).manhattanDistance().toInt()
                         allRisks[newPoint] = when {
                             riskOffset + v > 9 -> (riskOffset + v) - 9
                             else -> riskOffset + v
@@ -34,10 +30,11 @@ object Day15 : AdventOfCode() {
             }
         }
 
-        val risk = aStar(Point2d(0, 0), Point2d(xWidth * 5 - 1, yWidth * 5 - 1), allRisks)
-
-        return risk - risks[Point2d(0, 0)]!!
+        return aStar(Point2d(0, 0), Point2d(xWidth * 5 - 1, yWidth * 5 - 1), allRisks)
     }
+
+    private fun toRiskMap(input: List<String>) =
+        input.flatMapIndexed { y, row -> row.mapIndexed { x, risk -> Point2d(x, y) to risk.digitToInt() } }.toMap()
 
     @JvmStatic
     fun main(args: Array<String>) {
