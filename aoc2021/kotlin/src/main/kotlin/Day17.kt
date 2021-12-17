@@ -24,18 +24,14 @@ object Day17 : AdventOfCode() {
     data class Probe(
         val velocity: Point2d,
         val position: Point2d = Point2d(0, 0),
-        val maxHeight: Int = position.y
+        val maxHeight: Int = if (velocity.y <= 0) 0 else velocity.y*(velocity.y+1) / 2
     )
 
     private fun Probe.move(): Probe {
         val newPosition = this.position + velocity
         val newXv = applyDrag(velocity.x)
         val newYv = velocity.y - 1
-        val newMaxHeight = when {
-            maxHeight < newPosition.y -> newPosition.y
-            else -> maxHeight
-        }
-        return Probe(velocity = Point2d(newXv, newYv), position = newPosition, maxHeight = newMaxHeight)
+        return copy(velocity = Point2d(newXv, newYv), position = newPosition)
     }
 
     private fun applyDrag(x: Int): Int {
@@ -90,11 +86,11 @@ object Day17 : AdventOfCode() {
         val (xMin, xMax, yMin, yMax) = extractBoundaries(input)
 
         val xseq = generateSequence(0) { it + 1 }.takeWhile { it <= xMax }.mapNotNull { xThrow(xMin, xMax, it) }
-        val yseq = generateSequence(0) { it + 1 }.takeWhile { it <= -yMin }.mapNotNull { yThrow(yMin, yMax, it) }
+        val yseq = generateSequence(-yMin) { it - 1 }.takeWhile { it > 0 }.mapNotNull { yThrow(yMin, yMax, it) }
 
         return yseq.flatMap { y -> xseq.map { x -> Point2d(x, y) } }
             .mapNotNull { Probe(it).fire(Point2d(xMin, yMax), Point2d(xMax, yMin)) }
-            .maxByOrNull { it.maxHeight }!!.maxHeight
+            .first().maxHeight
     }
 
     fun part2(input: String): Int {
