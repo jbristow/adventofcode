@@ -24,7 +24,7 @@ object Day17 : AdventOfCode() {
     data class Probe(
         val velocity: Point2d,
         val position: Point2d = Point2d(0, 0),
-        val maxHeight: Int = if (velocity.y <= 0) 0 else velocity.y*(velocity.y+1) / 2
+        val maxHeight: Int = if (velocity.y <= 0) 0 else velocity.y * (velocity.y + 1) / 2
     )
 
     private fun Probe.move(): Probe {
