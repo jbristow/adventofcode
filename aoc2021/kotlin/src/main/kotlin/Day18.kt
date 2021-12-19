@@ -5,8 +5,12 @@ import kotlin.math.floor
 object Day18 : AdventOfCode() {
 
     sealed class ParserChunk {
-        data class Digits(val value: String) : ParserChunk()
+        data class Digits(val value: String) : ParserChunk() {
+            constructor(c: Char) : this(c.toString())
+        }
     }
+
+    private operator fun ParserChunk.Digits.plus(c: Char) = this.copy(value = value + c)
 
     sealed class SnailfishNumber : ParserChunk() {
         val magnitude: Long
@@ -19,7 +23,7 @@ object Day18 : AdventOfCode() {
     }
 
     data class Constant(val value: Long) : SnailfishNumber() {
-        constructor(str: String) : this(str.toLong())
+        constructor(ds: Digits) : this(ds.value.toLong())
 
         override fun toString() = value.toString()
     }
@@ -48,24 +52,25 @@ object Day18 : AdventOfCode() {
     }
 
     private fun explode(dfs: List<Pair<Constant, Int>>): List<Pair<Constant, Int>> {
-        if (dfs.all { it.second < 4 }) {
+        val before = dfs.takeWhile { it.second < 4 }
+        if (before.size == dfs.size) {
             return dfs
         }
 
-        val before = dfs.takeWhile { it.second < 4 }
-        val (l, r) = dfs.drop(before.count()).take(2)
         val after = dfs.drop(before.count() + 2)
+        val (l, r) = dfs.drop(before.count()).take(2)
 
-        val newl = when {
+        val newLeft = when {
             before.isEmpty() -> listOf()
             else -> listOf(Constant(before.last().first.value + l.first.value) to before.last().second)
         }
-        val newr = when {
+        val newRight = when {
             after.isEmpty() -> listOf()
             else -> listOf(Constant(after.first().first.value + r.first.value) to after.first().second)
         }
+        val newZero = Constant(0) to (l.second - 1)
 
-        return before.dropLast(1) + newl + (Constant(0) to (l.second - 1)) + newr + after.drop(1)
+        return before.dropLast(1) + newLeft + newZero + newRight + after.drop(1)
     }
 
     fun split(dfs: List<Pair<Constant, Int>>): List<Pair<Constant, Int>> {
@@ -96,7 +101,7 @@ object Day18 : AdventOfCode() {
 
         val (current, currentDepth) = list.first()
         val remaining = list.drop(1).toMutableList()
-        val (_, topDepth) = stack.lastOrNull() ?: (null to null)
+        val topDepth = stack.lastOrNull()?.second
         return when {
             currentDepth != topDepth -> reconstitute(remaining, stack.apply { addLast(current to currentDepth) })
             currentDepth == topDepth -> {
@@ -114,15 +119,11 @@ object Day18 : AdventOfCode() {
     ): MutableList<Pair<Constant, Int>> {
         val seen: MutableList<Pair<Constant, Int>> = mutableListOf()
         when (current.left) {
-            is Constant -> {
-                seen.add(current.left to depth)
-            }
+            is Constant -> seen.add(current.left to depth)
             is Duo -> seen.addAll(dfs(current.left, depth + 1))
         }
         when (current.right) {
-            is Constant -> {
-                seen.add(current.right to depth)
-            }
+            is Constant -> seen.add(current.right to depth)
             is Duo -> seen.addAll(dfs(current.right, depth + 1))
         }
         return seen
@@ -138,21 +139,19 @@ object Day18 : AdventOfCode() {
         val remaining = drop(1)
         return when (val current = first()) {
             '[' -> drop(1).toSnailfishNumber(stack, depth + 1)
-            ',' -> when {
-                stack.lastOrNull() is ParserChunk.Digits -> {
-                    val digits = stack.removeLast() as ParserChunk.Digits
-                    stack.addLast(Constant(digits.value))
-                    remaining.toSnailfishNumber(stack, depth)
+            ',' -> {
+                if (stack.lastOrNull() is ParserChunk.Digits) {
+                    stack.addLast(Constant(stack.removeLast() as ParserChunk.Digits))
                 }
-                else -> remaining.toSnailfishNumber(stack, depth)
+                remaining.toSnailfishNumber(stack, depth)
             }
             ']' -> {
                 val right = when (val temp = stack.removeLast()) {
-                    is ParserChunk.Digits -> Constant(temp.value.toLong())
+                    is ParserChunk.Digits -> Constant(temp)
                     is SnailfishNumber -> temp
                 }
                 val left = when (val temp = stack.removeLast()) {
-                    is ParserChunk.Digits -> Constant(temp.value.toLong())
+                    is ParserChunk.Digits -> Constant(temp)
                     is SnailfishNumber -> temp
                 }
                 stack.addLast(Duo(left, right))
@@ -162,14 +161,11 @@ object Day18 : AdventOfCode() {
                 when {
                     stack.lastOrNull() is ParserChunk.Digits -> {
                         val lastn = stack.removeLast() as ParserChunk.Digits
-                        stack.addLast(lastn.copy(value = lastn.value + current))
-                        remaining.toSnailfishNumber(stack, depth)
+                        stack.addLast(lastn + current)
                     }
-                    else -> {
-                        stack.addLast(ParserChunk.Digits(current.toString()))
-                        remaining.toSnailfishNumber(stack, depth)
-                    }
+                    else -> stack.addLast(ParserChunk.Digits(current))
                 }
+                remaining.toSnailfishNumber(stack, depth)
             }
             else -> throw Exception("Unknown character: $current")
         }
