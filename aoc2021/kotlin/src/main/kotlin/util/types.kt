@@ -40,6 +40,7 @@ data class Point3d(val x: Int, val y: Int, val z: Int) : Point {
 
     companion object {
         operator fun Point3d.plus(other: Point3d) = Point3d(this.x + other.x, this.y + other.y, this.z + other.z)
+        operator fun Point3d.minus(other: Point3d) = Point3d(this.x - other.x, this.y - other.y, this.z - other.z)
 
         infix fun Point3d.modX(other: Int) = copy(x = x % other)
 
