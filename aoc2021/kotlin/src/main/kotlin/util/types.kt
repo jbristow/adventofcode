@@ -7,6 +7,28 @@ interface Point {
     val orthoNeighbors: Set<Point>
 }
 
+class Point2dRange(val xRange: IntRange, val yRange: IntRange) : Iterable<Point2d> {
+    constructor(minX: Int, maxX: Int, minY: Int, maxY: Int) : this((minX..maxX), (minY..maxY))
+
+    constructor(points: Iterable<Point2d>) :
+        this(
+            points.minOf(Point2d::x)..points.maxOf(Point2d::x),
+            points.minOf(Point2d::y)..points.maxOf(Point2d::y)
+        )
+
+    constructor(points: Map<Point2d, Any?>) : this(points.keys)
+
+    override fun iterator(): Iterator<Point2d> {
+        return yRange.asSequence().flatMap { y -> xRange.asSequence().map { x -> Point2d(x, y) } }.iterator()
+    }
+
+    fun joinToString(transform: ((Point2d) -> CharSequence)? = null): String {
+        return yRange.joinToString("\n") { y ->
+            xRange.asSequence().joinToString("") { x -> transform?.let { it(Point2d(x, y)) } ?: "." }
+        }
+    }
+}
+
 data class Point2d(val x: Int, val y: Int) : Point {
     companion object {
         operator fun Point2d.plus(other: Point2d) = Point2d(this.x + other.x, this.y + other.y)

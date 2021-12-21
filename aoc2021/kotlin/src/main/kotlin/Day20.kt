@@ -1,5 +1,6 @@
 import util.AdventOfCode
 import util.Point2d
+import util.Point2dRange
 
 object Day20 : AdventOfCode() {
     sealed class Pixel {
@@ -57,17 +58,11 @@ object Day20 : AdventOfCode() {
         return image.enhance(iea, Pixel.Dark).enhance(iea, iea[0]).count { (_, v) -> v == Pixel.Light }
     }
 
-    private fun Map<Point2d, Pixel>.enhance(iea: List<Pixel>, default: Pixel = iea[0]): Map<Point2d, Pixel> {
-        val minX = keys.minOf { it.x } - 1
-        val minY = keys.minOf { it.y } - 1
-        val maxX = keys.maxOf { it.x } + 1
-        val maxY = keys.maxOf { it.y } + 1
-
-        return (minY..maxY).flatMap { y -> (minX..maxX).map { x -> Point2d(x, y) } }
+    private fun Map<Point2d, Pixel>.enhance(iea: List<Pixel>, default: Pixel = iea[0]) =
+        Point2dRange(this)
             .associateWith {
                 it.grid().joinToString("") { px -> (this[px] ?: default).toDigit() }.toInt(2)
             }.mapValues { iea[it.value] }
-    }
 
     fun part2(input: List<String>): Int {
         val (iea, image) = input.process()

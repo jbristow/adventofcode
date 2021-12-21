@@ -1,5 +1,6 @@
 import util.AdventOfCode
 import util.Point2d
+import util.Point2dRange
 
 object Day13 : AdventOfCode() {
     private val foldRegex = Regex("""fold along (.)=(\d+)""")
@@ -44,17 +45,11 @@ object Day13 : AdventOfCode() {
     }
 
     private fun printGrid(dots: Set<Point2d>) {
-        val minY = dots.minOf { it.y }
-        val maxY = dots.maxOf { it.y }
-        val minX = dots.minOf { it.x }
-        val maxX = dots.maxOf { it.x }
         println(
-            (minY..maxY).joinToString("\n") { y ->
-                (minX..maxX).joinToString("") { x ->
-                    when {
-                        Point2d(x, y) in dots -> "#"
-                        else -> "."
-                    }
+            Point2dRange(dots).joinToString {
+                when (it) {
+                    in dots -> "#"
+                    else -> "."
                 }
             }
         )
