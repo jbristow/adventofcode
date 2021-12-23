@@ -31,20 +31,30 @@ object Day22 : AdventOfCode() {
     private fun String.parseLine(): CubeStep {
         val match = stepRegex.matchEntire(this) ?: throw IllegalArgumentException("Couldn't parse '$this'")
         return CubeStep(
-            match.groupValues[1].toFlip(), Cuboid(
-                max(-50, match.groupValues[2].toInt()), min(50, match.groupValues[3].toInt()),
-                max(-50, match.groupValues[4].toInt()), min(50, match.groupValues[5].toInt()),
-                max(-50, match.groupValues[6].toInt()), min(50, match.groupValues[7].toInt()),
-            ))
+            match.groupValues[1].toFlip(),
+            Cuboid(
+                max(-50, match.groupValues[2].toInt()),
+                min(50, match.groupValues[3].toInt()),
+                max(-50, match.groupValues[4].toInt()),
+                min(50, match.groupValues[5].toInt()),
+                max(-50, match.groupValues[6].toInt()),
+                min(50, match.groupValues[7].toInt())
+            )
+        )
     }
 
     private fun String.parseLineUnbounded(): CubeStep {
         val match = stepRegex.matchEntire(this) ?: throw IllegalArgumentException("Couldn't parse '$this'")
         return CubeStep(
             match.groupValues[1].toFlip(),
-            Cuboid(match.groupValues[2].toInt(), match.groupValues[3].toInt(),
-                match.groupValues[4].toInt(), match.groupValues[5].toInt(),
-                match.groupValues[6].toInt(), match.groupValues[7].toInt()),
+            Cuboid(
+                match.groupValues[2].toInt(),
+                match.groupValues[3].toInt(),
+                match.groupValues[4].toInt(),
+                match.groupValues[5].toInt(),
+                match.groupValues[6].toInt(),
+                match.groupValues[7].toInt()
+            )
         )
     }
 
@@ -64,9 +74,11 @@ object Day22 : AdventOfCode() {
             get() = (xMin..xMax).flatMap { x ->
                 (yMin..yMax).flatMap { y ->
                     (zMin..zMax).map { z ->
-                        Point3d(x,
+                        Point3d(
+                            x,
                             y,
-                            z)
+                            z
+                        )
                     }
                 }
             }.toSet()
@@ -79,16 +91,16 @@ object Day22 : AdventOfCode() {
             zMin = if (other.zMin < zMin) zMin else other.zMin,
             xMax = if (other.xMax > xMax) xMax else other.xMax,
             yMax = if (other.yMax > yMax) yMax else other.yMax,
-            zMax = if (other.zMax > zMax) zMax else other.zMax,
+            zMax = if (other.zMax > zMax) zMax else other.zMax
         )
 
         if (b.volume <= 0) {
             return setOf(this)
         }
 
-        if (xMin >= b.xMin && xMax <= b.xMax
-            && yMin >= b.yMin && yMax <= b.yMax
-            && zMin >= b.zMin && zMax <= b.zMax
+        if (xMin >= b.xMin && xMax <= b.xMax &&
+            yMin >= b.yMin && yMax <= b.yMax &&
+            zMin >= b.zMin && zMax <= b.zMax
         ) {
             return setOf()
         }
@@ -99,7 +111,7 @@ object Day22 : AdventOfCode() {
             Cuboid(b.xMin, b.xMax, b.yMin, b.yMax, zMin, b.zMin - 1),
             Cuboid(b.xMin, b.xMax, b.yMin, b.yMax, b.zMax + 1, zMax),
             Cuboid(b.xMin, b.xMax, b.yMax + 1, yMax, zMin, zMax),
-            Cuboid(b.xMax + 1, xMax, yMin, yMax, zMin, zMax),
+            Cuboid(b.xMax + 1, xMax, yMin, yMax, zMin, zMax)
         ).filter { it.volume > 0 }.toSet()
     }
 
@@ -117,9 +129,11 @@ object Day22 : AdventOfCode() {
         return when (current.status) {
             Flip.Off -> processSteps(remaining, cuboids.flatMap { it.nonIntersecting(current.cubeoid) }.toMutableSet())
             Flip.On -> {
-                cuboids.addAll(cuboids.fold(setOf(current.cubeoid)) { acc, seen ->
-                    acc.flatMap { it.nonIntersecting(seen) }.toSet()
-                })
+                cuboids.addAll(
+                    cuboids.fold(setOf(current.cubeoid)) { acc, seen ->
+                        acc.flatMap { it.nonIntersecting(seen) }.toSet()
+                    }
+                )
                 processSteps(remaining, cuboids)
             }
         }
@@ -132,4 +146,3 @@ object Day22 : AdventOfCode() {
         println("\tPart 2: ${part2(inputFileLines)}")
     }
 }
-
