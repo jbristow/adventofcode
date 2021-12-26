@@ -1,9 +1,9 @@
+package aoc
+
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.extensions.list.functorFilter.filter
-import arrow.core.extensions.list.functorFilter.filterMap
-import arrow.core.extensions.sequence.monadFilter.filterMap
+import arrow.core.filterOption
 import arrow.core.getOrElse
 import arrow.core.some
 import arrow.core.toOption
@@ -73,18 +73,16 @@ object Day20 {
             .flatMap {
                 when (val ow = outerWarps[it.key].toOption()) {
                     is None -> listOf(it.value[0] to it.value[1], it.value[1] to it.value[0])
-                    is Some<List<Point>> -> listOf(it.value[0] to ow.t[0])
+                    is Some<List<Point>> -> listOf(it.value[0] to ow.value[0])
                 }
             }.toMap()
         val outerWarpMap = outerWarps
             .flatMap {
                 when (val iw = innerWarps[it.key].toOption()) {
                     is None -> listOf(it.value[0] to it.value[1], it.value[1] to it.value[0])
-                    is Some<List<Point>> -> listOf(it.value[0] to iw.t[0])
+                    is Some<List<Point>> -> listOf(it.value[0] to iw.value[0])
                 }
             }.toMap()
-
-        fun <T> identity(a: T) = a
 
         val shortest = djikstra2(
             start = LevelPoint(endpoints[0].second),
@@ -93,38 +91,38 @@ object Day20 {
             massageQ = { level: Int -> rawMap.keys.map { LevelPoint(it, level) }.toSet() }
         ) {
             (rawMap[it.point] ?: emptyList()).map { p -> LevelPoint(p, it.level) } +
-                    listOf(
-                        when (it.level) {
-                            0 -> None
-                            else -> outerWarpMap[it.point]?.let { p -> LevelPoint(p, level = it.level - 1) }.toOption()
-                        }
-                    ).filterMap(::identity) +
-                    listOf(
-                        innerWarpMap[it.point]?.let { p -> LevelPoint(p, level = it.level + 1) }.toOption()
-                    ).filterMap(::identity)
+                listOf(
+                    when (it.level) {
+                        0 -> None
+                        else -> outerWarpMap[it.point]?.let { p -> LevelPoint(p, level = it.level - 1) }.toOption()
+                    }
+                ).filterOption() +
+                listOf(
+                    innerWarpMap[it.point]?.let { p -> LevelPoint(p, level = it.level + 1) }.toOption()
+                ).filterOption()
         }
         println("dist")
         println(shortest)
     }
 
     private fun parseWidth(input: List<String>): Int {
-        return input.map {
+        return input.asSequence().map {
             it.split(regex = """[^.#]+""".toRegex()).filterNot(String::isEmpty).map(String::length)
         }.filter { it.size > 1 }.flatten().toSet().first()
     }
 
     private fun parseBottomRight(input: List<String>): Point {
         return Point(
-            input.map { it.drop(2).dropLast(2).length }.max()!!,
+            input.maxOf { it.drop(2).dropLast(2).length },
             input.drop(2).dropLast(2).size
         )
     }
 
     private fun parseUnwarpedPoints(input: List<String>): Map<Point, List<Point>> {
         val raw = input.drop(2).dropLast(2).map { it.drop(2) }.pointSet()
-        return raw.map { p ->
-            p to allDirections().map(p::inDirection).filter { it in raw }
-        }.toMap()
+        return raw.associateWith { p ->
+            allDirections().map(p::inDirection).filter { it in raw }
+        }
     }
 
     private fun bottomOuterWarps(
@@ -216,13 +214,13 @@ object Day20 {
 
 private fun List<String>.pointSet(yOffset: Int = 0, xOffset: Int = 0): Set<Point> {
     return this.asSequence().withIndex().flatMap { (y, line) ->
-        line.withIndex().asSequence().filterMap { (x, c) ->
+        line.withIndex().asSequence().map { (x, c) ->
             when (c) {
                 '.' -> Point(x + xOffset, y + yOffset).some()
                 else -> None
             }
         }
-    }.toSet()
+    }.filterOption().toSet()
 }
 
 fun main() {
@@ -256,7 +254,6 @@ fun <P> djikstra(
     q: Set<P>,
     neighborFn: (P) -> List<P>
 ): Pair<Option<Int>, List<P>> {
-
     tailrec fun djikstraPrime(
         q: Set<P>,
         dist: Map<P, Int>,
@@ -267,27 +264,28 @@ fun <P> djikstra(
             output: List<P>
         ): List<P> = when (end) {
             is None -> output + start
-            is Some<P> -> reconstructPath(prev[end.t].toOption(), output + end.t)
+            is Some<P> -> reconstructPath(prev[end.value].toOption(), output + end.value)
         }
         return when (val u = q.filter { it in dist }.minByM { dist[it].toOption() }) {
             None -> None to emptyList()
             end -> u.fold(
-                { None to emptyList<P>() },
-                { uo -> dist[uo].toOption() to reconstructPath(uo.some(), emptyList()) })
+                { None to emptyList() },
+                { uo -> dist[uo].toOption() to reconstructPath(uo.some(), emptyList()) }
+            )
             is Some<P> -> {
                 val updates =
-                    neighborFn(u.t).filter { v ->
+                    neighborFn(u.value).filter { v ->
                         u.exists { uo ->
                             uo in q &&
-                                    dist[v].toOption().forall { vdist ->
-                                        ((dist[uo] ?: 0) + 1) < vdist
-                                    }
+                                dist[v].toOption().all { vdist ->
+                                    ((dist[uo] ?: 0) + 1) < vdist
+                                }
                         }
                     }
                 djikstraPrime(
-                    q - u.t,
-                    dist + updates.map { it to dist[u.t].toOption().getOrElse { 0 } + 1 },
-                    prev + updates.map { it to u.t }
+                    q - u.value,
+                    dist + updates.map { it to dist[u.value].toOption().getOrElse { 0 } + 1 },
+                    prev + updates.map { it to u.value }
                 )
             }
         }
@@ -323,7 +321,6 @@ fun djikstra2(
     massageQ: (Int) -> Set<LevelPoint>,
     neighborFn: (LevelPoint) -> List<LevelPoint>
 ): Option<Int> {
-
     tailrec fun djikstra2Prime(
         count: Int,
         q: Set<LevelPoint>,
@@ -340,7 +337,7 @@ fun djikstra2(
                     output: List<LevelPoint>
                 ): List<LevelPoint> = when (end) {
                     is None -> output + start
-                    is Some<LevelPoint> -> reconstructPath(start, prev[end.t].toOption(), output + end.t)
+                    is Some<LevelPoint> -> reconstructPath(start, prev[end.value].toOption(), output + end.value)
                 }
                 println(
                     reconstructPath(start, u, emptyList()).chunked(100)
@@ -357,17 +354,17 @@ fun djikstra2(
                     println("djikstra2($count): $u")
                     println((0..5).map { n -> q.count { it.level == n } })
                 }
-                val neighbors = neighborFn(u.t)
+                val neighbors = neighborFn(u.value)
                 val nextLevelsSeen = levelsSeen + neighbors.map { it.level }.toSet()
                 val nextQ = q + (nextLevelsSeen - levelsSeen).flatMap { massageQ(it) }.toSet()
                 val updates = nextQ.filter { v ->
-                    v in neighbors && dist[v].toOption().forall { dv -> dv > ((dist[u.t] ?: 0) + 1) }
+                    v in neighbors && dist[v].toOption().all { dv -> dv > ((dist[u.value] ?: 0) + 1) }
                 }
                 djikstra2Prime(
                     count + 1,
-                    nextQ - u.t,
-                    dist + updates.map { it to dist[u.t].toOption().getOrElse { 0 } + 1 },
-                    prev + updates.map { it to u.t },
+                    nextQ - u.value,
+                    dist + updates.map { it to dist[u.value].toOption().getOrElse { 0 } + 1 },
+                    prev + updates.map { it to u.value },
                     nextLevelsSeen
                 )
             }

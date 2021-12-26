@@ -1,3 +1,5 @@
+package aoc
+
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -24,13 +26,12 @@ object Day06 {
         paths: List<Pair<String, Int>>,
         size: Int
     ): Int {
-
         val nextPaths = paths.flatMap {
             this[it.first].orEmpty().map { c -> c to it.second + 1 }
         }
         return when {
-            nextPaths.isEmpty() -> size + paths.sumBy(Pair<String, Int>::second)
-            else -> countChildren(nextPaths, size + paths.sumBy(Pair<String, Int>::second))
+            nextPaths.isEmpty() -> size + paths.sumOf(Pair<String, Int>::second)
+            else -> countChildren(nextPaths, size + paths.sumOf(Pair<String, Int>::second))
         }
     }
 

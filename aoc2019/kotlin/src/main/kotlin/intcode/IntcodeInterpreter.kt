@@ -7,6 +7,7 @@ import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.left
+import arrow.core.none
 import arrow.core.right
 import arrow.core.rightIfNotNull
 import arrow.core.some
@@ -77,7 +78,8 @@ sealed class Instruction :
                             })
                         }
                     }
-            })
+            }
+        )
 
     private fun extractParameterType(pointer: Long, code: IntCode) =
         "%010d".format((code[pointer] ?: 0) / 100).takeLast(opcodes).reversed()
@@ -224,7 +226,7 @@ sealed class Instruction :
             code: IntCode,
             params: List<Pair<Long, Mode>>,
             state: CurrentState
-        ): Either<String, CurrentState> = state.copy(pointer = Option.empty()).right()
+        ): Either<String, CurrentState> = state.copy(pointer = none()).right()
     }
 }
 
@@ -273,10 +275,10 @@ tailrec fun step(
     code: IntCode,
     state: Either<String, CurrentState>
 ): Either<String, LinkedList<Long>> = when (state) {
-    is Either.Left<String> -> "Error: ${state.a}".left()
+    is Either.Left<String> -> "Error: ${state.value}".left()
     is Either.Right<CurrentState> -> {
-        when (state.b.pointer) {
-            is None -> state.b.output.right()
+        when (state.value.pointer) {
+            is None -> state.value.output.right()
             is Some<Long> -> step(code, handleCodePoint(code, state))
         }
     }

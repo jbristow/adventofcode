@@ -1,4 +1,15 @@
-import arrow.core.*
+package aoc
+
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.flatMap
+import arrow.core.getOrElse
+import arrow.core.none
+import arrow.core.right
+import arrow.core.some
+import arrow.core.toOption
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -35,7 +46,7 @@ object Day07 {
     private val permutations = permute((0L until 5L).toList().some())
 
     private fun List<Long>.runPermutation(code: Array<Long>): Long {
-        return fold(Option.empty<Long>()) { result, phase ->
+        return fold(arrow.core.none<Long>()) { result, phase ->
             Day05.step(
                 code,
                 CurrentState(inputs = result.fold({ mutableListOf(phase, 0L) }, { mutableListOf(phase, it) })).right()
@@ -46,7 +57,7 @@ object Day07 {
     }
 
     fun part1() =
-        permutations.maxBy { p -> p.runPermutation(data.toTypedArray()) }
+        permutations.maxByOrNull { p -> p.runPermutation(data.toTypedArray()) }
             .toOption()
             .map { it.runPermutation(data.toTypedArray()) }
 
@@ -86,7 +97,8 @@ object Day07 {
     private fun runFeedback(list: List<Long>, input: Array<Long>): Either<String, Long> {
         var amps = list.map { ampId ->
             Amplifier(
-                code = input.copyOf(), state = CurrentState(0.some(), mutableListOf(ampId)).right()
+                code = input.copyOf(),
+                state = CurrentState(0.some(), mutableListOf(ampId)).right()
             )
         }.also { amps ->
             amps[0].state.map { it.inputs.add(0) }
@@ -94,19 +106,22 @@ object Day07 {
         while (amps.any { amp -> amp.state.fold({ false }, { s -> s.pointer is Some<Int> }) }
         ) {
             val nextAmps = amps.map { it.step() }
-            val nextOutputs = nextAmps.map { it.state.fold({ Option.empty<Long>() }, { b -> b.output }) }
+            val nextOutputs = nextAmps.map { it.state.fold({ none() }, { b -> b.output }) }
             nextOutputs.forEachIndexed { i, output ->
                 nextAmps[(i + 1) % nextAmps.size].state.map { s -> output.map { s.inputs.add(it) } }
             }
 
             amps = nextAmps.map { amp ->
-                Amplifier(code = amp.code, state =
-                amp.state.map { state ->
-                    CurrentState(
-                        pointer = state.pointer,
-                        inputs = state.inputs.toMutableList()
-                    )
-                })
+                Amplifier(
+                    code = amp.code,
+                    state =
+                    amp.state.map { state ->
+                        CurrentState(
+                            pointer = state.pointer,
+                            inputs = state.inputs.toMutableList()
+                        )
+                    }
+                )
             }
         }
         return amps.first().state.map { it.inputs.last() }
@@ -116,11 +131,9 @@ object Day07 {
         permute(listOf(5L, 6L, 7L, 8L, 9L).some())
             .map { p -> runFeedback(p, data.toTypedArray()) }
             .fold(mutableListOf<Long>()) { acc, curr ->
-                when (curr) {
-                    is Either.Right<Long> -> acc.add(curr.b)
-                }
+                curr.tap { acc.add(it) }
                 acc
-            }.max()
+            }.maxOrNull()
 }
 
 fun main() {

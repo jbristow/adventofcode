@@ -1,3 +1,5 @@
+package aoc
+
 import arrow.core.*
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -27,7 +29,7 @@ sealed class Mode {
 data class CurrentState(
     val pointer: Option<Int> = 0.some(),
     val inputs: MutableList<Long>,
-    val output: Option<Long> = Option.empty(),
+    val output: Option<Long> = none(),
     val relativeBase: Long = 0
 )
 
@@ -62,8 +64,10 @@ sealed class Instruction {
                                     '2' -> Mode.Relative
                                     else -> throw Error("Bad mode $it")
                                 }
-                            })
-            })
+                            }
+                    )
+            }
+        )
     }
 
     sealed class ThreeParameterInstruction : Instruction() {
@@ -166,7 +170,8 @@ sealed class Instruction {
             { input ->
                 code[params[0].index(state)] = input
                 CurrentState(state.pointer.map { it + 2 }, state.inputs, state.output)
-            }).right()
+            }
+        ).right()
     }
 
     class Output : Instruction() {
@@ -205,7 +210,7 @@ sealed class Instruction {
             state: CurrentState
         ): Either<String, CurrentState> =
             CurrentState(
-                Option.empty(),
+                none(),
                 state.inputs,
                 state.output
             ).right()
@@ -237,7 +242,7 @@ object Day05 {
         state: CurrentState
     ): Either<String, CurrentState> {
         return state.pointer.fold(
-            { Either.left("Problem handling codePoint: $state") },
+            { "Problem handling codePoint: $state".left() },
             { pointer ->
                 parseInstruction(code[pointer].toString(), state.inputs)
                     .flatMap { (instr, inp) ->
@@ -248,18 +253,19 @@ object Day05 {
                             CurrentState(pointer.some(), inp, state.output, state.relativeBase)
                         )
                     }
-            })
+            }
+        )
     }
 
     tailrec fun step(
         code: Array<Long>,
         state: Either<String, CurrentState>
     ): String = when (state) {
-        is Either.Left<String> -> state.a
+        is Either.Left<String> -> state.value
         is Either.Right<CurrentState> -> {
-            when (state.b.pointer) {
-                is None -> state.b.output.fold({ "No output" }, { it.toString() })
-                is Some<Int> -> step(code, handleCodePoint(code, state.b))
+            when (state.value.pointer) {
+                is None -> state.value.output.fold({ "No output" }, { it.toString() })
+                is Some<Int> -> step(code, handleCodePoint(code, state.value))
             }
         }
     }

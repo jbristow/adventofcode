@@ -1,11 +1,13 @@
+package aoc
+
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
+import arrow.core.compose
 import arrow.core.identity
+import arrow.core.partially2
 import arrow.core.right
 import arrow.optics.optics
-import arrow.syntax.function.compose
-import arrow.syntax.function.partially2
 import intcode.CurrentState
 import intcode.IntCode
 import intcode.handleCodePoint
@@ -23,7 +25,7 @@ data class DroneController(
 private tailrec fun DroneController.runCode(): DroneController {
     return when (state) {
         is Either.Left<String> -> this
-        is Either.Right<CurrentState> -> when (state.b.pointer) {
+        is Either.Right<CurrentState> -> when (state.value.pointer) {
             is None -> this
             is Some<Long> -> {
                 copy(state = handleCodePoint(code, state)).runCode()
@@ -39,7 +41,7 @@ object Day19 {
     val cache: MutableMap<PointL, Long> = mutableMapOf()
 
     fun findPowerAt(p: PointL): Long {
-        return cache.getOrPut(p, {
+        return cache.getOrPut(p) {
             DroneController(
                 code = fileData.toMutableMap(),
                 state = CurrentState(
@@ -47,8 +49,9 @@ object Day19 {
                 ).right()
             ).runCode().state.fold(
                 { error("Unknonwn Problem at $p") },
-                { state -> state.output.pop() })
-        })
+                { state -> state.output.pop() }
+            )
+        }
     }
 
     fun fourCorners(point: PointL, squareSize: Long) = listOf(
@@ -60,11 +63,13 @@ object Day19 {
 
     fun part1() {
         cache.clear()
-        println((0 until 50).flatMap { y ->
-            (0 until 50).map { x ->
-                PointL(x.toLong(), y.toLong())
-            }
-        }.map(::findPowerAt).count { it == 1L })
+        println(
+            (0 until 50).flatMap { y ->
+                (0 until 50).map { x ->
+                    PointL(x.toLong(), y.toLong())
+                }
+            }.map(::findPowerAt).count { it == 1L }
+        )
     }
 
     fun part2() {
@@ -72,7 +77,7 @@ object Day19 {
         cache.clear()
         val n = generateSequence(squareSize) { it + 1 }.map { y ->
             generateSequence(y * 0.7) { it + 1 }.takeWhile { it <= y }.map { x ->
-                PointL(x.toLong(), y.toLong())
+                PointL(x.toLong(), y)
             }.dropWhile { findPowerAt(it) == 0L }.first()
         }.dropWhile { !fourCorners(it, squareSize) }.first()
         println(n.x * 10000 + n.y - squareSize)

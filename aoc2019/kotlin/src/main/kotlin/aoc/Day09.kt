@@ -1,3 +1,5 @@
+package aoc
+
 import arrow.core.Either
 import intcode.CurrentState
 import intcode.step

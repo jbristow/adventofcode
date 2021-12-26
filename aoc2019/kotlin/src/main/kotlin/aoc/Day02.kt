@@ -1,4 +1,6 @@
-import Day02.handleOpcode
+package aoc
+
+import aoc.Day02.handleOpcode
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.left
@@ -28,7 +30,7 @@ object Day02 {
             }
         }
 
-    fun part1() = Files.readString(Paths.get(FILENAME))
+    fun part1() = String(Files.readAllBytes(Paths.get(FILENAME)))
         .trim()
         .prepInput().let {
             it[1] = 12
@@ -38,7 +40,7 @@ object Day02 {
         .toString()
 
     fun part2(): String {
-        val input = Files.readString(Paths.get(FILENAME))
+        val input = String(Files.readAllBytes(Paths.get(FILENAME)))
             .trim().prepInput()
 
         return (0..99).fold(Unit.right() as Either<Pair<Int, Int>, Unit>) { foundSoFar, noun ->

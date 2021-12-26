@@ -1,3 +1,5 @@
+package aoc
+
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -22,9 +24,11 @@ object Day03 {
                 .fold(Wire(Point(0, 0), LinkedList())) { wire, instr ->
                     val newLocs = when (instr.direction) {
                         "U" -> (wire.lastLoc.y + 1..wire.lastLoc.y + instr.count).map { Point(wire.lastLoc.x, it) }
-                        "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed().map { Point(wire.lastLoc.x, it) }
+                        "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed()
+                            .map { Point(wire.lastLoc.x, it) }
                         "R" -> (wire.lastLoc.x + 1..wire.lastLoc.x + instr.count).map { Point(it, wire.lastLoc.y) }
-                        "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed().map { Point(it, wire.lastLoc.y) }
+                        "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed()
+                            .map { Point(it, wire.lastLoc.y) }
                         else -> throw Error("bad instruction $instr")
                     }
                     wire.locations.addAll(newLocs)
@@ -45,14 +49,14 @@ object Day03 {
     private fun Set<Point>.calculateShortest(wires0: LinkedList<Point>, wires1: LinkedList<Point>): String {
         return map { match ->
             wires0.takeWhile { p -> p != match } to wires1.takeWhile { p -> p != match }
-        }.minBy { it.first.size + it.second.size }!!
+        }.minByOrNull { it.first.size + it.second.size }!!
             .let {
                 it.first.size + it.second.size + 2
             }.toString()
     }
 
     fun part1() =
-        wiresAsSet.overlaps().map { abs(it.x.toDouble()) + abs(it.y.toDouble()) }.min()!!.toInt().toString()
+        wiresAsSet.overlaps().minOf { abs(it.x.toDouble()) + abs(it.y.toDouble()) }.toInt().toString()
 
     fun part2() = wiresAsSet.overlaps()
         .calculateShortest(wires[0], wires[1])
@@ -60,10 +64,10 @@ object Day03 {
     fun draw(input: List<String>, filename: String) {
         val ws = input.toWires()
         val wsl = ws.map { it.locations }
-        val minX = wsl.map { it.map { p -> p.x }.min()!! }.min()!!
-        val maxX = wsl.map { it.map { p -> p.x }.max()!! }.max()!!
-        val minY = wsl.map { it.map { p -> p.y }.min()!! }.min()!!
-        val maxY = wsl.map { it.map { p -> p.y }.max()!! }.max()!!
+        val minX = wsl.minOf { it.minOf { p -> p.x } }
+        val maxX = wsl.maxOf { it.maxOf { p -> p.x } }
+        val minY = wsl.minOf { it.minOf { p -> p.y } }
+        val maxY = wsl.maxOf { it.maxOf { p -> p.y } }
         println("$minX,$minY - $maxX,$maxY")
 
         val field = mutableMapOf<Point, String>()
@@ -73,9 +77,11 @@ object Day03 {
             line.processLine().fold(Wire(Point(0, 0), LinkedList())) { wire, instr ->
                 val newLocs = when (instr.direction) {
                     "U" -> (wire.lastLoc.y + 1..wire.lastLoc.y + instr.count).map { Point(wire.lastLoc.x, it) }
-                    "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed().map { Point(wire.lastLoc.x, it) }
+                    "D" -> (wire.lastLoc.y - instr.count until wire.lastLoc.y).reversed()
+                        .map { Point(wire.lastLoc.x, it) }
                     "R" -> (wire.lastLoc.x + 1..wire.lastLoc.x + instr.count).map { Point(it, wire.lastLoc.y) }
-                    "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed().map { Point(it, wire.lastLoc.y) }
+                    "L" -> (wire.lastLoc.x - instr.count until wire.lastLoc.x).reversed()
+                        .map { Point(it, wire.lastLoc.y) }
                     else -> throw Error("bad instruction $instr")
                 }
                 newLocs.forEach { p ->
@@ -99,9 +105,11 @@ object Day03 {
         println(field.size)
         PrintWriter(Files.newBufferedWriter(Paths.get("output-day03-$filename.txt"))).use { out ->
             (minY..maxY).reversed().forEach { y ->
-                out.println((minX..maxX).joinToString("") { x ->
-                    field[Point(x, y)] ?: "."
-                })
+                out.println(
+                    (minX..maxX).joinToString("") { x ->
+                        field[Point(x, y)] ?: "."
+                    }
+                )
             }
         }
     }

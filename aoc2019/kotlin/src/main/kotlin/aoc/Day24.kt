@@ -1,3 +1,5 @@
+package aoc
+
 import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -62,23 +64,22 @@ object Day24 {
         rp.point == Point(3, 2) ->
             rp.aboveAndBelow() + rp.right() + (0..4).map {
                 rp.copy(level = rp.level + 1, point = Point(x = 4, y = it))
-            }            // top
+            } // top
         rp.point.y == 0 && rp.point.x > 0 && rp.point.x < 4 ->
             rp.leftAndRight() + rp.below() + RecursivePoint(rp.level - 1, Point(2, 1))
         // bottom
         rp.point.y == 4 && rp.point.x > 0 && rp.point.x < 4 ->
             rp.leftAndRight() + rp.above() + RecursivePoint(rp.level - 1, Point(2, 3))
-        //left
+        // left
         rp.point.x == 0 && rp.point.y > 0 && rp.point.y < 4 ->
             rp.aboveAndBelow() + rp.right() + RecursivePoint(rp.level - 1, Point(1, 2))
-        //right
+        // right
         rp.point.x == 4 && rp.point.y > 0 && rp.point.y < 4 ->
             rp.aboveAndBelow() + rp.left() + RecursivePoint(rp.level - 1, Point(3, 2))
         else -> rp.allDirections()
     }
 
     fun part1(input: List<String>) {
-
         val bugMap = parseMap(input)
         val neighborMap = bugMap.mapValues { (k, _) ->
             (allDirections().map(k::inDirection).filter(bugMap::containsKey))
@@ -106,14 +107,12 @@ object Day24 {
         }
         return inline.withIndex().fold(BigInteger.ZERO) { acc, curr ->
             if (curr.value) {
-                acc + BigInteger.TWO.pow(curr.index)
+                acc + BigInteger("2").pow(curr.index)
             } else {
                 acc
             }
         }
-
     }
-
 
     fun part2(input: List<String>) {
         val bugMap = (parseMap(input) - middle).mapKeys { RecursivePoint(0, it.key) }
@@ -166,7 +165,6 @@ private fun RecursivePoint.right() = copy(point = point.copy(x = point.x + 1))
 private fun RecursivePoint.leftAndRight() = listOf(left(), right())
 private fun RecursivePoint.allDirections() = aboveAndBelow() + leftAndRight()
 
-
 fun Map<Point, Boolean>.printOut(): String {
     return (0 until 5).joinToString("\n") { y ->
         (0 until 5).joinToString("") { x ->
@@ -182,4 +180,3 @@ fun main() {
     Day24.part1(Day24.fileData)
     Day24.part2(Day24.fileData)
 }
-

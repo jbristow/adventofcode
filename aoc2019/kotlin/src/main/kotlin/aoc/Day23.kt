@@ -1,3 +1,5 @@
+package aoc
+
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
@@ -91,13 +93,13 @@ object Day23 {
     private val fileData: IntCode get() = FILENAME.toIntCodeProgram()
 
     fun part1(): Long {
-        val computers: Map<Int, Either<String, NetworkedComputer>> = (0 until 50).map {
-            it to NetworkedComputer(
+        val computers: Map<Int, Either<String, NetworkedComputer>> = (0 until 50).associateWith {
+            NetworkedComputer(
                 id = it,
                 code = fileData.toMutableMap(),
                 state = CurrentState(inputs = LinkedList(listOf(it.toLong()))).right()
             ).right()
-        }.toMap()
+        }
 
         return runPart1(computers)
     }
@@ -113,13 +115,13 @@ object Day23 {
     }
 
     fun part2(): Long {
-        val computers: Map<Int, Either<String, NetworkedComputer>> = (0 until 50).map {
-            it to NetworkedComputer(
+        val computers: Map<Int, Either<String, NetworkedComputer>> = (0 until 50).associateWith {
+            NetworkedComputer(
                 id = it,
                 code = fileData.toMutableMap(),
                 state = CurrentState(inputs = LinkedList(listOf(it.toLong()))).right()
             ).right()
-        }.toMap()
+        }
 
         return runPart2(computers, NAT())
     }
@@ -145,7 +147,8 @@ object Day23 {
                 computers = nextComputers.transmitPackets(
                     nextNatPacket.fold(
                         ifEmpty = { outputs },
-                        ifSome = { outputs + (0L to listOf(it)) })
+                        ifSome = { outputs + (0L to listOf(it)) }
+                    )
                 ),
                 nat = finalNat,
                 count = count + 1
@@ -157,7 +160,7 @@ object Day23 {
         nextComputers: Map<Int, Either<String, NetworkedComputer>>,
         outputs: Map<Long, List<Packet>>
     ) =
-        outputs.isEmpty() && nextComputers.all { (k, v) ->
+        outputs.isEmpty() && nextComputers.all { (_, v) ->
             v.exists { it.packetInput.size == 0 && it.idle > 1 }
         }
 
@@ -183,11 +186,13 @@ object Day23 {
 
     private fun Map<Int, Either<String, NetworkedComputer>>.haltIfAnyError() =
         if (any { it.value.isLeft() }) {
-            error("PROBLEM: " +
+            error(
+                "PROBLEM: " +
                     asSequence()
                         .joinToString {
                             "${it.key}:${it.value.map { v -> v.state }}"
-                        })
+                        }
+            )
         } else {
             this
         }

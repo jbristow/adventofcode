@@ -1,5 +1,6 @@
+package aoc
+
 import arrow.optics.optics
-import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -52,10 +53,10 @@ object Day12 {
     private val fileData = Files.readAllLines(Paths.get(FILENAME))
 
     fun part1(): Int {
-        return moons.step(1000).sumBy(Moon::total)
+        return moons.step(1000).sumOf(Moon::total)
     }
 
-    fun part2(): BigInteger {
+    fun part2(): Long {
         return lcm(
             moons.map { pv(it.location.x) }.findLoop(),
             lcm(
@@ -91,7 +92,7 @@ tailrec fun Array<PointVel>.stepForeverX(
     } else {
         seen[blob] = mutableListOf(step)
     }
-    when {
+    return when {
         (step < max) -> {
             indices.forEach { a ->
                 indices.filterNot { b -> a == b }
@@ -102,9 +103,9 @@ tailrec fun Array<PointVel>.stepForeverX(
             indices.forEach {
                 this[it].point += this[it].velocity
             }
-            return this.stepForeverX(step + 1, seen)
+            this.stepForeverX(step + 1, seen)
         }
-        else -> return seen
+        else -> seen
     }
 }
 
@@ -144,16 +145,16 @@ private fun List<PointVel>.findLoop() =
         }.groupBy { it.first }.mapValues { it.value.map { v -> v.second }.toSortedSet() }.asSequence()
         .sortedBy { it.key }.first().key
 
-tailrec fun gcd(n1: BigInteger, n2: BigInteger): BigInteger {
-    require(n1 > BigInteger.ZERO || n2 > BigInteger.ZERO) { "a or b is less than 1 ($n1,$n2)" }
-    return when (val remainder: BigInteger = n1 % n2) {
-        BigInteger.ZERO -> n2
+tailrec fun gcd(n1: Long, n2: Long): Long {
+    require(n1 > 0 || n2 > 0) { "a or b is less than 1 ($n1,$n2)" }
+    return when (val remainder = n1 % n2) {
+        0L -> n2
         else -> gcd(n2, remainder)
     }
 }
 
-fun lcm(n1: BigInteger, n2: BigInteger) = (n1 * n2) / gcd(n1, n2)
+fun lcm(n1: Long, n2: Long) = (n1 * n2) / gcd(n1, n2)
 
-fun lcm(n1: Int, n2: Int): BigInteger = lcm(n1.toBigInteger(), n2.toBigInteger())
+fun lcm(n1: Int, n2: Int): Long = lcm(n1.toLong(), n2.toLong())
 
-fun lcm(n1: Int, n2: BigInteger): BigInteger = lcm(n1.toBigInteger(), n2)
+fun lcm(n1: Int, n2: Long): Long = lcm(n1.toLong(), n2)

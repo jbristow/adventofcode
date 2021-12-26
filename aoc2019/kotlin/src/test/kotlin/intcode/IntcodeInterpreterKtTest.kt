@@ -27,12 +27,10 @@ internal class IntcodeInterpreterKtTest {
                 fail<String>("pointer should not be null")
             }, { newPointer ->
                 assertThat(newPointer).isEqualTo(6L)
-
             })
             assertThat(code[2L]).isEqualTo(7)
         })
     }
-
 
     @Test
     fun testAddFindInputsAllRelative() {
@@ -77,7 +75,6 @@ internal class IntcodeInterpreterKtTest {
                 fail<String>("pointer should not be null")
             }, { newPointer ->
                 assertThat(newPointer).isEqualTo(6L)
-
             })
             assertThat(code[2L]).isEqualTo(1L)
         })
@@ -98,7 +95,6 @@ internal class IntcodeInterpreterKtTest {
                 fail<String>("pointer should not be null")
             }, { newPointer ->
                 assertThat(newPointer).isEqualTo(2L)
-
             })
             assertThat(code).isEqualTo(initialCode)
             println(newState)

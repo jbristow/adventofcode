@@ -1,7 +1,7 @@
 package util
 
-import Point
-import PointL
+import aoc.Point
+import aoc.PointL
 
 interface Glyphable {
     fun Glyphable?.toGlyph(): String

@@ -1,7 +1,10 @@
-import Day10.destruction
-import Day10.mostVisible
+package aoc
+
+import aoc.Day10.destruction
+import aoc.Day10.mostVisible
 import arrow.core.andThen
 import arrow.optics.optics
+import util.TwoD
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.math.PI
@@ -9,7 +12,6 @@ import kotlin.math.abs
 import kotlin.math.atan
 import kotlin.math.pow
 import kotlin.math.sqrt
-import util.TwoD
 
 @optics
 data class Point(override val x: Int, override val y: Int) : TwoD<Int> {
@@ -85,8 +87,8 @@ object Day10 {
     fun mostVisible(data: List<Point>) =
         data.map { station ->
             station to data.asSequence().filterNot(station::equals).groupBy(station::mapEuclideanGroup).asSequence()
-                .sumBy(station::countByGroup)
-        }.maxBy { it.second }
+                .sumOf(station::countByGroup)
+        }.maxOf { it.second }
 
     fun destruction(data: List<Point>): Int {
         val station = Point(20, 20)
@@ -96,7 +98,7 @@ object Day10 {
                 .flatMap(station::anglePair)
 
         val initial = emptyList<Point>() to groupedAsteroids.sortedBy { it.first }
-        return (0..(groupedAsteroids.maxBy { it.second.size }?.second?.size ?: 0))
+        return (0..(groupedAsteroids.maxByOrNull { it.second.size }?.second?.size ?: 0))
             .fold(initial) { (destroyed, remaining), _ ->
                 val nextDestroyed = destroyed + remaining.flatMap { (_, list) -> list.take(1) }
                 val nextRemaining = remaining.map { (angle, list) -> angle to list.drop(1) }

@@ -1,4 +1,7 @@
+package aoc
+
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
@@ -66,13 +69,14 @@ deal into new stack""".lines()
     }
 
     @Test
+    @Disabled
     fun testCutEquality() {
         val actual = ShuffleMethods.DealIncrement(2)((ShuffleMethods.Cut(4)((0 until 11).toList())))
         println("actual:$actual")
         repeat(99) {
             val result = ShuffleMethods.DealIncrement(it + 1)((0 until 11).toList())
             println("$it:$result")
-            println(actual.equals(result))
+            println(actual == result)
         }
         fail("Not implemented.")
     }

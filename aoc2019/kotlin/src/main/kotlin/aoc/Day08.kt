@@ -1,3 +1,5 @@
+package aoc
+
 import arrow.core.firstOrNone
 import arrow.core.getOrElse
 import java.nio.file.Files
@@ -14,7 +16,7 @@ object Day08 {
             .map { layer ->
                 layer.groupBy { it }
                     .mapValues { (_, v) -> v.size }
-            }.minBy { it.getOrDefault('0', 0) }?.let {
+            }.minByOrNull { it.getOrDefault('0', 0) }?.let {
                 it.getOrDefault('1', 0) * it.getOrDefault('2', 0)
             } ?: 0
 

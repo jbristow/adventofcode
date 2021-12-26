@@ -1,7 +1,9 @@
+package aoc
+
 import arrow.core.Option
-import arrow.core.getOption
+import arrow.core.getOrNone
 import arrow.core.some
-import arrow.optics.extensions.list.cons.cons
+import arrow.optics.cons
 import arrow.optics.optics
 import java.math.BigInteger
 import java.nio.file.Files
@@ -80,7 +82,7 @@ fun requirements(
     }
 }
 
-fun <K, V> alter(f: (Option<V>) -> Option<V>, k: K, m: Map<K, V>) = f(m.getOption(k)).fold({ m }, { m + (k to it) })
+fun <K, V> alter(f: (Option<V>) -> Option<V>, k: K, m: Map<K, V>) = f(m.getOrNone(k)).fold({ m }, { m + (k to it) })
 fun add(q: BigInteger) = { qPrime: Option<BigInteger> -> qPrime.fold({ q }, { it + q }).some() }
 
 fun quantitiesNeeded(rs: List<Reaction>, fuel: BigInteger): Map<String, BigInteger> {
@@ -111,12 +113,12 @@ tailrec fun binarySearch(
     highIndex: BigInteger,
     lowIndex: BigInteger
 ): BigInteger {
-    val currentIndex = (highIndex + lowIndex) / BigInteger.TWO
+    val currentIndex = (highIndex + lowIndex) / BigInteger("2")
     val sub = searchFn(currentIndex)
     return when {
         highIndex <= lowIndex ||
-                sub > target && highIndex == currentIndex ||
-                lowIndex == currentIndex -> listOf(highIndex, lowIndex).min()!!
+            sub > target && highIndex == currentIndex ||
+            lowIndex == currentIndex -> listOf(highIndex, lowIndex).minOrNull()!!
         sub == target -> currentIndex
         searchFn(lowIndex) == target -> lowIndex
         searchFn(highIndex) == target -> highIndex

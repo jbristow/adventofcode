@@ -1,6 +1,7 @@
+package aoc
+
 import arrow.core.None
-import arrow.core.extensions.list.functorFilter.filter
-import arrow.core.extensions.sequence.monadFilter.filterMap
+import arrow.core.filterOption
 import arrow.core.firstOrNone
 import arrow.core.getOrElse
 import arrow.core.some
@@ -20,37 +21,36 @@ object Day18 {
         data class Key(val label: Char) : DungeonTile()
     }
 
-    fun part1(fileData: List<String>): Any? {
+    fun part1(fileData: List<String>): Int {
         val dungeon = fileData.mapIndexed { y, line ->
             line.mapIndexedNotNull { x, c ->
                 when {
                     c == '#' -> null
                     c == '@' -> Point(x, y) to DungeonTile.StartLoc
                     c == '.' -> Point(x, y) to DungeonTile.Open
-                    c.isLetter() && c.isUpperCase() -> Point(x, y) to DungeonTile.Door(c.toLowerCase())
+                    c.isLetter() && c.isUpperCase() -> Point(x, y) to DungeonTile.Door(c.lowercaseChar())
                     else -> Point(x, y) to DungeonTile.Key(c)
                 }
             }
         }.flatten().toMap().toMutableMap()
         val startingLoc = dungeon.filterValues { it is DungeonTile.StartLoc }.keys.first()
-        val keylocs = dungeon.asSequence().filterMap {
+        val keylocs = dungeon.asSequence().map {
             when (it.value) {
                 is DungeonTile.Key -> (it.key to (it.value as DungeonTile.Key).some()).some()
                 else -> None
             }
-        }.toMap()
+        }.filterOption().toMap()
 
         var deadEnds = dungeon.keys.filterNot { k ->
             dungeon[k].toOption().exists { o -> o is DungeonTile.Key || o is DungeonTile.Door } ||
-                    allDirections().map { k.inDirection(it) }.count { it in dungeon } > 1
+                allDirections().map { k.inDirection(it) }.count { it in dungeon } > 1
         }
-
 
         while (deadEnds.isNotEmpty()) {
             deadEnds.forEach { dungeon.remove(it) }
             deadEnds = dungeon.keys.filterNot { k ->
                 dungeon[k].toOption().exists { o -> o is DungeonTile.Key } ||
-                        allDirections().map { k.inDirection(it) }.count { it in dungeon } > 1
+                    allDirections().map { k.inDirection(it) }.count { it in dungeon } > 1
             }
         }
 
@@ -61,9 +61,8 @@ object Day18 {
                         null -> '#'
                         is DungeonTile.StartLoc -> '@'
                         is DungeonTile.Key -> tile.label
-                        is DungeonTile.Door -> tile.label.toUpperCase()
+                        is DungeonTile.Door -> tile.label.uppercaseChar()
                         else -> '.'
-
                     }
                 )
             }
@@ -75,14 +74,13 @@ object Day18 {
                 .toSet()
         val setOfAllPoints = setOfAllTiles.map { it.first }
 
-
         val neighborFn: (
             Set<Pair<Point, List<DungeonTile.Key>>>,
             Map<Pair<Point, List<DungeonTile.Key>>, Int>,
             Pair<Point, List<DungeonTile.Key>>
         ) -> List<Pair<Point, List<DungeonTile.Key>>> =
             { q, dist, it ->
-                allDirections().map(it.first::inDirection).filter { p ->
+                allDirections().asSequence().map(it.first::inDirection).filter { p ->
                     p in setOfAllPoints
                 }.filter { p ->
                     when (val tile = dungeon[p]) {
@@ -95,15 +93,15 @@ object Day18 {
                     }
                 }.filter { v ->
                     it in q &&
-                            dist.filterKeys { k ->
-                                k.first == v
-                            }.values.firstOrNone().forall { vdist ->
-                                dist[it]!! + 1 < vdist
-                            }
+                        dist.filterKeys { k ->
+                            k.first == v
+                        }.values.firstOrNone().all { vdist ->
+                            dist[it]!! + 1 < vdist
+                        }
                 }.map { p ->
 
                     p to (it.second + if (dungeon[p] is DungeonTile.Key) listOf(dungeon[p]!! as DungeonTile.Key) else emptyList())
-                }
+                }.toList()
             }
         val minFn = { q: Set<Pair<Point, List<DungeonTile.Key>>>, dist: Map<Pair<Point, List<DungeonTile.Key>>, Int> ->
             val x = q.flatMap {
@@ -111,7 +109,7 @@ object Day18 {
                     dk.first == it.first
                 }.toList().ifEmpty { listOf(it to Int.MAX_VALUE) }
             }.asSequence()
-            x.minBy {
+            x.minByOrNull {
                 it.second
             }?.first
         }
@@ -128,9 +126,11 @@ object Day18 {
 
             val (d2, p2) =
                 djikstra18(a.key, setOfAllTiles, minFn, neighborFn)
-            println("a: " + d2.filter { d2e ->
-                d2e.key.first in keylocs && d2e.value > 0
-            })
+            println(
+                "a: " + d2.filter { d2e ->
+                    d2e.key.first in keylocs && d2e.value > 0
+                }
+            )
 
             d2.filter { it.key.first in keylocs }.forEach { b ->
                 val steps = b.value
@@ -138,12 +138,13 @@ object Day18 {
                 val nextAllTiles = (setOfAllTiles - b.key) + next
                 val (d3, p3) =
                     djikstra18(next, nextAllTiles, minFn, neighborFn)
-                println("b: " + d3.filter { d3e ->
-                    d3e.key.first in keylocs && d3e.value > 0
-                })
+                println(
+                    "b: " + d3.filter { d3e ->
+                        d3e.key.first in keylocs && d3e.value > 0
+                    }
+                )
             }
         }
-
 
         return -1
     }
@@ -153,14 +154,12 @@ fun main() {
     println(Day18.part1(Day18.fileData))
 }
 
-
 fun <P> djikstra18(
     start: P,
     q: Set<P>,
     minFn: (Set<P>, Map<P, Int>) -> P?,
     neighborFn: (Set<P>, Map<P, Int>, P) -> List<P>
 ): Pair<Map<P, Int>, Map<P, P>> {
-
     tailrec fun djikstraPrime18(
         q: Set<P>,
         dist: Map<P, Int>,

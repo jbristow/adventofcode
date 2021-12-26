@@ -1,3 +1,5 @@
+package aoc
+
 const val MIN_BOUND = 245182
 const val MAX_BOUND = 790572
 val passwordRange = (MIN_BOUND..MAX_BOUND)
@@ -8,7 +10,7 @@ object Day04 {
 
     private fun hasAllIncreasingDigits(it: Int) =
         it.toString()
-            .map { it.toInt() }
+            .map { it.code }
             .windowed(2, 1)
             .all { (a, b) -> b >= a }
 

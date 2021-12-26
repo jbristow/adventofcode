@@ -1,19 +1,22 @@
+package aoc
+
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.andThen
+import arrow.core.compose
 import arrow.core.left
+import arrow.core.none
 import arrow.core.right
 import arrow.core.some
 import arrow.optics.optics
-import arrow.syntax.function.andThen
-import arrow.syntax.function.compose
 import intcode.CurrentState
 import intcode.IntCode
 import intcode.handleCodePoint
 import intcode.toIntCodeProgram
-import java.util.*
 import util.PointGridL
+import java.util.*
 
 @optics
 sealed class ShipTile {
@@ -68,7 +71,7 @@ data class RepairRobot(
     val code: IntCode,
     val position: PointL = PointL(0, 0),
     val grid: PointGridL<ShipTile> = mutableMapOf(PointL(0, 0) to ShipTile.Empty),
-    val lastInstruction: Option<Direction> = Option.empty(),
+    val lastInstruction: Option<Direction> = none(),
     val state: Either<String, CurrentState> = CurrentState().right(),
     val instructions: LinkedList<Direction> = LinkedList()
 ) {
@@ -78,7 +81,7 @@ data class RepairRobot(
 private tailrec fun RepairRobot.move(): RepairRobot {
     return when (state) {
         is Either.Left<String> -> this
-        is Either.Right<CurrentState> -> when (state.b.pointer) {
+        is Either.Right<CurrentState> -> when (state.value.pointer) {
             is None -> this
             is Some<Long> -> {
                 val nRobot = this.processReturn().sendDirection()
@@ -107,7 +110,7 @@ object Day15 {
         seen: Set<PointL> = emptySet()
     ): Option<Int> {
         return when {
-            queue.isEmpty() -> Option.empty()
+            queue.isEmpty() -> none()
             queue.first().first == end -> queue.first().second.some()
             else -> {
                 val (p, dist) = queue.first()
@@ -197,12 +200,14 @@ private tailrec fun RepairRobot.processReturn(): RepairRobot {
             grid.filterValues(Boolean::not compose ShipTile.Wall::equals)
                 .keys.all { allDirections().all { d -> it.inDirection(d) in grid } } ->
                 this.copy(state = "All paths found.".left())
-            state.b.output.isEmpty() -> this
+            state.value.output.isEmpty() -> this
             else -> {
-                state.b.output.pop()
+                state.value.output.pop()
                     .toShipTile()
-                    .fold({ copy(state = "Bad Tile".left()) },
-                        { tile -> tile.handle(this) }).processReturn()
+                    .fold(
+                        { copy(state = "Bad Tile".left()) },
+                        { tile -> tile.handle(this) }
+                    ).processReturn()
             }
         }
     }
@@ -226,8 +231,8 @@ fun RepairRobot.printScreen() {
     val toConsider = grid + (position to ShipTile.Empty)
     val topLeft = toConsider.topLeft()
     val bottomRight = PointL(
-        toConsider.keys.map(PointL::x).max() ?: 0L,
-        toConsider.keys.map(PointL::y).max() ?: 0L
+        toConsider.keys.map(PointL::x).maxOrNull() ?: 0L,
+        toConsider.keys.map(PointL::y).maxOrNull() ?: 0L
     )
     println(
         (topLeft.y..bottomRight.y).joinToString("\n") { y ->
@@ -243,18 +248,8 @@ fun RepairRobot.printScreen() {
 }
 
 private fun <T> Map<PointL, T>.topLeft() = PointL(
-    keys.map(PointL::x).min() ?: 0L,
-    keys.map(PointL::y).min() ?: 0L
-)
-
-private fun <T> Map<Point, T>.topLeft() = Point(
-    keys.map(Point::x).min() ?: 0,
-    keys.map(Point::y).min() ?: 0
-)
-
-private fun <T> Map<Point, T>.bottomRight() = Point(
-    keys.map(Point::x).max() ?: 0,
-    keys.map(Point::y).max() ?: 0
+    keys.minOf(PointL::x),
+    keys.maxOf(PointL::y)
 )
 
 private fun ShipTile?.toGlyph(): String {

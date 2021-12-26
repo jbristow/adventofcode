@@ -1,3 +1,7 @@
+package aoc
+
+import aoc.Day01.fuelNeeded
+import aoc.Day01.totalFuelNeeded
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -15,7 +19,6 @@ class Day01KtTest {
             1969 to 654,
             100756 to 33583
         )
-
 
     @ParameterizedTest
     @MethodSource("part1Provider")
@@ -39,6 +42,4 @@ class Day01KtTest {
         val (input, expected) = data
         assertThat(totalFuelNeeded(input)).isEqualTo(expected)
     }
-
-
 }

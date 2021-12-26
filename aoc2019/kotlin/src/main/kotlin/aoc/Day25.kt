@@ -1,3 +1,5 @@
+package aoc
+
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
@@ -23,7 +25,7 @@ data class Cryostasis(
 private tailrec fun Cryostasis.runCode(): Cryostasis {
     return when (state) {
         is Either.Left<String> -> this
-        is Either.Right<CurrentState> -> when (state.b.pointer) {
+        is Either.Right<CurrentState> -> when (state.value.pointer) {
             is None -> this
             is Some<Long> -> {
                 val nCryostasis = processOutput().sendInput()
@@ -38,10 +40,10 @@ private fun Cryostasis.sendInput(): Cryostasis {
         ifLeft = { this },
         ifRight = {
             when {
-                it.waitingForInput && initalCommands.isNotEmpty() -> it.inputs.addAll(initalCommands.pop().map(Char::toLong))
+                it.waitingForInput && initalCommands.isNotEmpty() -> it.inputs.addAll(initalCommands.pop().map { ic -> ic.code.toLong() })
                 it.waitingForInput -> {
                     val enteredString = readLine()
-                    it.inputs.addAll(enteredString!!.map(Char::toLong))
+                    it.inputs.addAll(enteredString!!.map { es -> es.code.toLong() })
                     it.inputs.add(10L)
                 }
             }
@@ -54,12 +56,12 @@ private tailrec fun Cryostasis.processOutput(): Cryostasis {
     return when (state) {
         is Either.Left<String> -> this
         is Either.Right<CurrentState> -> when {
-            state.b.output.isEmpty() -> this
+            state.value.output.isEmpty() -> this
             else -> {
-                val o = state.b.output.pop()
+                val o = state.value.output.pop()
                 when {
                     o > 127 -> println("NONASCII:$o")
-                    else -> print(o.toChar())
+                    else -> print(o.toInt().toChar())
                 }
                 processOutput()
             }
@@ -105,8 +107,6 @@ object Day25 {
 
     private const val FILENAME = "src/main/resources/day25.txt"
     val fileData = FILENAME.toIntCodeProgram()
-
-
 }
 
 fun main() {

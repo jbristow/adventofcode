@@ -1,9 +1,11 @@
+package aoc
+
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
+import arrow.core.andThen
 import arrow.core.right
 import arrow.optics.optics
-import arrow.syntax.function.andThen
 import intcode.CurrentState
 import intcode.handleCodePoint
 import java.nio.file.Files
@@ -109,10 +111,10 @@ fun Robot.move(instr: Long): Robot = when (instr) {
 }.goForward()
 
 tailrec fun Robot.bodyStep(): Robot = when {
-    state is Either.Left<String> || state is Either.Right<CurrentState> && state.b.output.size < 2 -> this
+    state is Either.Left<String> || state is Either.Right<CurrentState> && state.value.output.size < 2 -> this
     state is Either.Right<CurrentState> ->
-        paint(state.b.output.pop())
-            .move(state.b.output.pop())
+        paint(state.value.output.pop())
+            .move(state.value.output.pop())
             .copy(bodyCounter = bodyCounter + 1)
             .bodyStep()
     else -> throw Error("BodyStep Problem: $this")
@@ -133,8 +135,8 @@ private fun Either<String, Robot>.fullOutput(): String {
     }, {
         val hull = it.hull.toMutableMap()
         hull[it.location] = HullColor.Black
-        val topLeft = Point(hull.keys.map { p -> p.x }.min() ?: 0, hull.keys.map { p -> p.y }.min() ?: 0)
-        val bottomRight = Point(hull.keys.map { p -> p.x }.max() ?: 0, hull.keys.map { p -> p.y }.max() ?: 0)
+        val topLeft = Point(hull.keys.map { p -> p.x }.minOrNull() ?: 0, hull.keys.map { p -> p.y }.minOrNull() ?: 0)
+        val bottomRight = Point(hull.keys.map { p -> p.x }.maxOrNull() ?: 0, hull.keys.map { p -> p.y }.maxOrNull() ?: 0)
         return (topLeft.y..bottomRight.y).joinToString("\n") { y ->
             (topLeft.x..bottomRight.x).joinToString("") { x ->
                 when {
@@ -151,14 +153,15 @@ private fun Either<String, Robot>.fullOutput(): String {
 tailrec fun Robot.brainStep(): Either<String, Robot> =
     when (state) {
         is Either.Left<String> -> state
-        is Either.Right<CurrentState> -> when (state.b.pointer) {
+        is Either.Right<CurrentState> -> when (state.value.pointer) {
             is None -> this.right()
             is Some<Long> -> {
                 copy(
                     state = handleCodePoint(
                         code,
                         state.withUpdatedInputs(hull[location])
-                    ), brainCounter = brainCounter + 1
+                    ),
+                    brainCounter = brainCounter + 1
                 ).bodyStep().brainStep()
             }
         }

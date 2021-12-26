@@ -1,3 +1,5 @@
+package aoc
+
 import arrow.core.getOrElse
 import arrow.core.toOption
 import java.math.BigInteger
@@ -29,7 +31,6 @@ sealed class ShuffleMethods : (List<Int>) -> List<Int> {
 val regexIncrement = """deal with increment (\d+)""".toRegex()
 const val dealIntoStack = "deal into new stack"
 val regexCut = """cut (-?\d+)""".toRegex()
-
 
 object Day22 {
     private const val FILENAME = "src/main/resources/day22.txt"
@@ -80,8 +81,8 @@ object Day22 {
     ): Pair<BigInteger, BigInteger> {
         return when {
             n == BigInteger.ONE -> x
-            n % BigInteger.TWO == BigInteger.ZERO -> power(applyShuffle, applyShuffle(x, x), (n / BigInteger.TWO))
-            else -> applyShuffle(x, power(applyShuffle, applyShuffle(x, x), (n / BigInteger.TWO)))
+            n % BigInteger("2") == BigInteger.ZERO -> power(applyShuffle, applyShuffle(x, x), (n / BigInteger("2")))
+            else -> applyShuffle(x, power(applyShuffle, applyShuffle(x, x), (n / BigInteger("2"))))
         }
     }
 
@@ -100,7 +101,6 @@ object Day22 {
 
         return (inverseModValue * positionToCheck + (inverseModValue.negate() * finalModOffset) % numberOfCards) % numberOfCards
     }
-
 }
 
 fun main() {

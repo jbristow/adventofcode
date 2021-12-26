@@ -1,3 +1,5 @@
+package aoc
+
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
@@ -5,6 +7,7 @@ import arrow.core.Some
 import arrow.core.firstOrNone
 import arrow.core.getOrElse
 import arrow.core.left
+import arrow.core.none
 import arrow.core.right
 import arrow.core.some
 import arrow.optics.optics
@@ -52,16 +55,16 @@ data class ArcadeGame(
     val code: MutableMap<Long, Long>,
     val screen: MutableMap<PointL, GameTile> = mutableMapOf(),
     val state: Either<String, CurrentState> = CurrentState().right(),
-    val display: Option<Long> = Option.empty(),
-    val ballPosition: Option<PointL> = Option.empty(),
-    val paddlePosition: Option<PointL> = Option.empty()
+    val display: Option<Long> = none(),
+    val ballPosition: Option<PointL> = none(),
+    val paddlePosition: Option<PointL> = none()
 )
 
 fun ArcadeGame.drawSingleTile(state: Either.Right<CurrentState>): ArcadeGame =
-    when (val p = PointL(state.b.output.pop(), state.b.output.pop())) {
-        PointL(-1, 0) -> copy(display = state.b.output.pop().some())
+    when (val p = PointL(state.value.output.pop(), state.value.output.pop())) {
+        PointL(-1, 0) -> copy(display = state.value.output.pop().some())
         else -> {
-            screen[p] = state.b.output.pop().toGameTile()
+            screen[p] = state.value.output.pop().toGameTile()
             this
         }
     }
@@ -69,7 +72,7 @@ fun ArcadeGame.drawSingleTile(state: Either.Right<CurrentState>): ArcadeGame =
 tailrec fun ArcadeGame.draw(): ArcadeGame = when (state) {
     is Either.Left<String> -> this
     is Either.Right<CurrentState> -> when {
-        state.b.output.size >= 3 -> drawSingleTile(state).draw()
+        state.value.output.size >= 3 -> drawSingleTile(state).draw()
         else -> this
     }
 }
@@ -92,7 +95,7 @@ object Day13 {
     private tailrec fun ArcadeGame.play(): Either<String, ArcadeGame> {
         return when (state) {
             is Either.Left<String> -> state
-            is Either.Right<CurrentState> -> when (state.b.pointer) {
+            is Either.Right<CurrentState> -> when (state.value.pointer) {
                 is None -> right()
                 is Some<Long> -> {
                     copy(
@@ -147,12 +150,12 @@ fun main() {
 
 fun ArcadeGame.printScreen() {
     val topLeft = PointL(
-        screen.keys.map(PointL::x).min() ?: 0L,
-        screen.keys.map(PointL::y).min() ?: 0L
+        screen.keys.minOf(PointL::x),
+        screen.keys.minOf(PointL::y)
     )
     val bottomRight = PointL(
-        screen.keys.map(PointL::x).max() ?: 0L,
-        screen.keys.map(PointL::y).max() ?: 0L
+        screen.keys.maxOf(PointL::x),
+        screen.keys.maxOf(PointL::y)
     )
     println(
         (topLeft.y..bottomRight.y).joinToString("\n") { y ->
