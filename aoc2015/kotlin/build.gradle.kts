@@ -16,4 +16,5 @@ repositories {
 
 dependencies {
     implementation("io.arrow-kt:arrow-core:1.0.1")
+    implementation("com.beust:klaxon:5.5")
 }
