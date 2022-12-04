@@ -11,8 +11,8 @@ object Day03 : AdventOfCode() {
 
     fun part2(input: Sequence<String>) =
         input.map { it.toSet() }
-            .chunked(3)
-            .flatMap { group -> group.reduce { acc, curr -> acc.intersect(curr) } }
+            .chunked(3) { it.reduce(Set<Char>::intersect) }
+            .flatten()
             .sumOf { it.priority() }
 
     @JvmStatic
