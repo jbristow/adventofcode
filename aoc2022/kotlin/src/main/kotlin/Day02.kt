@@ -46,7 +46,6 @@ object Day02 : AdventOfCode() {
             else -> throw IllegalArgumentException()
         }
 
-
     fun part1(input: List<String>) =
         input.map { line -> line.split(" ").map { it.toRpsMove() } }
             .sumOf { (theirs, mine) -> score(theirs, mine) }
@@ -54,7 +53,6 @@ object Day02 : AdventOfCode() {
     fun part2(input: List<String>) =
         input.map { it.split(" ") }
             .sumOf { (theirs, outcome) -> scoreByResult(theirs.toRpsMove(), outcome) }
-
 
     @JvmStatic
     fun main(args: Array<String>) {

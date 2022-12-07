@@ -5,7 +5,6 @@ object Day04 : AdventOfCode() {
     private fun IntRange.overlapsCompletely(b: IntRange) =
         (this.first <= b.first && this.last >= b.last) || (this.first >= b.first && this.last <= b.last)
 
-
     private fun IntRange.overlapsAtAll(b: IntRange): Boolean =
         this.first in b || this.last in b || b.first in this || b.last in this
 
@@ -18,8 +17,7 @@ object Day04 : AdventOfCode() {
         input.parse().count { (a, b) -> a.overlapsCompletely(b) }
 
     fun part2(input: Sequence<String>) =
-        input.parse().count{ (a, b) -> a.overlapsAtAll(b) }
-
+        input.parse().count { (a, b) -> a.overlapsAtAll(b) }
 
     @JvmStatic
     fun main(args: Array<String>) {

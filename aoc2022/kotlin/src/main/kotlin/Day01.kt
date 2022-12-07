@@ -6,14 +6,12 @@ object Day01 : AdventOfCode() {
         input.split("\n\n")
             .maxOfOrNull { it.lines().sumOf(String::toInt) }
 
-
     fun part2(input: String) =
         input.split("\n\n")
             .map { it.lines().sumOf(String::toInt) }
             .sorted()
             .takeLast(3)
             .sum()
-
 
     @JvmStatic
     fun main(args: Array<String>) {

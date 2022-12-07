@@ -19,7 +19,6 @@ object Day05 : AdventOfCode() {
         override fun work(stacks: Map<Int, LinkedList<Char>>, instruction: Instruction) {
             transfer(instruction.numToMove, stacks[instruction.toCol]!!, stacks[instruction.fromCol]!!)
         }
-
     }
 
     object CrateMover9001 : Crane {
@@ -28,9 +27,7 @@ object Day05 : AdventOfCode() {
             transfer(instruction.numToMove, tempStack, stacks[instruction.fromCol]!!)
             transfer(instruction.numToMove, stacks[instruction.toCol]!!, tempStack)
         }
-
     }
-
 
     data class Instruction(val numToMove: Int, val fromCol: Int, val toCol: Int) {
         constructor(n: String, f: String, t: String) : this(n.toInt(), f.toInt(), t.toInt())
@@ -70,12 +67,10 @@ object Day05 : AdventOfCode() {
         return cargoArea.topBoxLabels()
     }
 
-
     @JvmStatic
     fun main(args: Array<String>) {
         println("Day 5")
         println("\tPart 1: ${part1(inputFileString)}")
         println("\tPart 2: ${part2(inputFileString)}")
     }
-
 }

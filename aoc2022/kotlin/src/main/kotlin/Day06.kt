@@ -21,5 +21,4 @@ object Day06 : AdventOfCode() {
         println("\tPart 1: ${part1(inputFileString)}")
         println("\tPart 2: ${part2(inputFileString)}")
     }
-
 }

@@ -37,5 +37,4 @@ object Day06Alt : AdventOfCode("day06.txt") {
         println("\tPart 1: ${part1(inputFileString)}")
         println("\tPart 2: ${part2(inputFileString)}")
     }
-
 }

@@ -2,33 +2,60 @@ import util.AdventOfCode
 
 object Day07 : AdventOfCode() {
 
+    data class ValuesForRecursion(
+        val input: List<String>,
+        val path: List<String>,
+        val files: Map<String, Long>
+    )
+
     private tailrec fun processLine(
         input: List<String>,
-        path: List<String> = listOf("root"),
+        path: List<String> = listOf(),
         files: Map<String, Long> = emptyMap()
     ): Map<String, Long> {
         val head = input.firstOrNull() ?: return files
         val splitLine = head.split(" ")
-        return when (splitLine[1]) {
-            "cd" -> {
-                when (val dir = splitLine[2]) {
-                    "/" -> processLine(input.drop(1), listOf("root"), files)
-                    ".." -> processLine(input.drop(1), path.dropLast(1), files)
-                    else -> processLine(input.drop(1), path + dir, files)
-                }
-            }
-            else -> {
-                val lsLines = input.drop(1).takeWhile { !it.startsWith('$') }.toList()
-                val fileSizes = lsLines.filter { it.matches("""\d+ .*""".toRegex()) }
-                    .sumOf { it.split(" ")[0].toLong() }
 
-                val newSizes = path.drop(1).runningFold(path.first()) { acc, curr -> "$acc/$curr" }
-                    .associateWith { p -> ((files[p] ?: 0) + fileSizes) }
-
-
-                processLine(input.drop(1 + lsLines.size), path, files + newSizes)
-            }
+        val nextValues = when (splitLine[1]) {
+            "cd" -> handleCd(input, path, files, splitLine[2])
+            else -> handleLs(input, path, files)
         }
+        return processLine(nextValues.input, nextValues.path, nextValues.files)
+    }
+
+    private fun handleLs(
+        input: List<String>,
+        path: List<String>,
+        files: Map<String, Long>
+    ): ValuesForRecursion {
+        val lsLines = input.drop(1)
+            .takeWhile { !it.startsWith('$') }
+            .toList()
+
+        val fileSizes = lsLines.filter { it.matches("""\d+ .*""".toRegex()) }
+            .sumOf { it.split(" ")[0].toLong() }
+
+        val newSizes = path.drop(1)
+            .runningFold(path.first()) { acc, curr -> "$acc/$curr" }
+            .associateWith { p -> ((files[p] ?: 0) + fileSizes) }
+
+        val nextInput = input.drop(1 + lsLines.size)
+        val nextFiles = files + newSizes
+        return ValuesForRecursion(nextInput, path, nextFiles)
+    }
+
+    private fun handleCd(
+        input: List<String>,
+        path: List<String>,
+        files: Map<String, Long>,
+        dir: String
+    ): ValuesForRecursion {
+        val nextPath = when (dir) {
+            "/" -> listOf("root")
+            ".." -> path.dropLast(1)
+            else -> path + dir
+        }
+        return ValuesForRecursion(input.drop(1), nextPath, files)
     }
 
     fun part1(input: List<String>): Long {
