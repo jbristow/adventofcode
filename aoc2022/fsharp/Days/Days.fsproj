@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>AOC2022</Title>
+    <Version>2022.12.07</Version>
+    <RepositoryUrl>https://github.com/jbristow/adventofcode</RepositoryUrl>
+        <Description>
+            A collection of solutions to the advent of code for 2022. Main
+            solving done in kotlin, but reimplemented here.
+        </Description>
+    <Authors>Jon Bristow</Authors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>portable</DebugType>
+    <Optimize>true</Optimize>
+    <GenerateTailCalls>true</GenerateTailCalls>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Day01.fs" />
+    <Compile Include="Day02.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharpx.Extras" Version="3.1.0" />
+  </ItemGroup>
+
+</Project>
+
