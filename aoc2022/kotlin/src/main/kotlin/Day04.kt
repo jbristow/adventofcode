@@ -11,7 +11,11 @@ object Day04 : AdventOfCode() {
     private fun Sequence<String>.parse() = map { it.parseLine() }
 
     private fun String.parseLine() =
-        this.split(",").map { it.split('-').let { (start, end) -> start.toInt()..end.toInt() } }
+        this.split(",")
+            .map {
+                it.split('-')
+                    .let { (start, end) -> start.toInt()..end.toInt() }
+            }
 
     fun part1(input: Sequence<String>) =
         input.parse().count { (a, b) -> a.overlapsCompletely(b) }

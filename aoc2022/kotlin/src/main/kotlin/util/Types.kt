@@ -29,9 +29,10 @@ class Point2dRange(val xRange: IntRange, val yRange: IntRange) : Iterable<Point2
     }
 }
 
-data class Point2d(val x: Int, val y: Int) : Point {
+data class Point2d(val x: Int = 0, val y: Int = 0) : Point {
     companion object {
         operator fun Point2d.plus(other: Point2d) = Point2d(this.x + other.x, this.y + other.y)
+        operator fun Point2d.minus(other: Point2d) = Point2d(this.x - other.x, this.y - other.y)
 
         infix fun Point2d.modX(other: Int) = Point2d(x % other, y)
 
