@@ -47,14 +47,14 @@ let toMove (m: string) =
     | "Y" -> Paper
     | "C"
     | "Z" -> Scissors
-    | _ -> failwithf "`%s` is not a valid move." m
+    | _ -> failwith $"`{m}` is not a valid move."
 
 let toOutcome (m: string) =
     match m with
     | "X" -> Lose
     | "Y" -> Draw
     | "Z" -> Win
-    | _ -> failwithf "`%s` is not a valid outcome." m
+    | _ -> failwith $"`{m}` is not a valid outcome."
 
 let computeOutcome (theirs: Move) (mine: Move) =
     match theirs, mine with
@@ -76,7 +76,7 @@ let scoreByResult (theirs: Move) (result: Outcome) : int =
 
     mine.Points + result.Points
 
-let sumFn (txA: string -> 'A) (txB: (string -> 'B)) (transform: ('A -> 'B -> int)) (line: string list) : int =
+let sumFn (txA: string -> 'A) (txB: string -> 'B) (transform: 'A -> 'B -> int) (line: string list) : int =
     match line with
     | a :: b :: _ -> transform (txA a) (txB b)
     | _ -> failwith $"Could not process line {line}"

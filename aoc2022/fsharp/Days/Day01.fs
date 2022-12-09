@@ -7,13 +7,13 @@ let calorieSum (input: string) =
 
 let elfCarryingMost (input: string) =
     input.Split([| "\n\n" |], StringSplitOptions.RemoveEmptyEntries)
-    |> Seq.map (calorieSum)
+    |> Seq.map calorieSum
     |> Seq.max
 
 let top3Elves (input: string) =
     input.Split([| "\n\n" |], StringSplitOptions.RemoveEmptyEntries)
-    |> Seq.map (calorieSum)
+    |> Seq.map calorieSum
     |> Seq.sort
     |> Seq.rev
-    |> Seq.take (3)
+    |> Seq.take 3
     |> Seq.sum
