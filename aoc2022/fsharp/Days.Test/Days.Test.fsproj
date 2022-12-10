@@ -17,6 +17,8 @@
     <Compile Include="Day02.fs" />
     <Compile Include="Day03.fs" />
     <Compile Include="Day04.fs" />
+    <Compile Include="Day05.fs" />
+    <Compile Include="Day06.fs" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />

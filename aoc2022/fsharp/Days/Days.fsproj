@@ -22,6 +22,8 @@
     <Compile Include="Day02.fs" />
     <Compile Include="Day03.fs" />
     <Compile Include="Day04.fs" />
+    <Compile Include="Day05.fs" />
+    <Compile Include="Day06.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharpx.Extras" Version="3.1.0" />

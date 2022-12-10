@@ -1,4 +1,4 @@
-module Days.Day03
+module Day03
 
 let lowercaseMin = 'a' |> int
 let lowercaseMax = 'z' |> int

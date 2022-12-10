@@ -2,7 +2,7 @@ module Test.Day03
 
 open NUnit.Framework
 open Swensen.Unquote
-open Days.Day03
+open Day03
 
 [<TestFixture>]
 module Answers =

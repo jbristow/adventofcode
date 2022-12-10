@@ -1,4 +1,4 @@
-module Days.Day04
+module Day04
 
 let overlapsCompletely ((firstA: int, lastA: int): int * int) ((firstB: int, lastB: int): int * int) =
     (firstA <= firstB && lastA >= lastB) || (firstA >= firstB && lastA <= lastB)

@@ -2,10 +2,11 @@ module Test.Day04
 
 open NUnit.Framework
 open Swensen.Unquote
-open Days.Day04
+open Day04
 
 [<TestFixture>]
 module Answers =
+
     let data = System.IO.File.ReadAllText("day04.txt").Split('\n')
 
     [<Test>]
