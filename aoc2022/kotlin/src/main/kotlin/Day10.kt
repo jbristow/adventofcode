@@ -26,7 +26,6 @@ object Day10 : AdventOfCode() {
         data class Finished(val x: Int) : State
     }
 
-
     private fun generateCycleXValues(input: List<String>): List<Int> {
         val instrs = input.map {
             it.split(" ").let { line ->
