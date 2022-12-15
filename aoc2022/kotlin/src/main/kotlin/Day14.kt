@@ -17,12 +17,10 @@ object Day14 : AdventOfCode() {
         return split(",").let { (x, y) -> Point2d(x.toInt(), y.toInt()) }
     }
 
-
     sealed interface Disposition {
         class Settled(val location: Point2d) : Disposition
         object Void : Disposition
     }
-
 
     private tailrec fun dropSand(rocks: Set<Point2d>, maxY: Int, grains: Int = 0): Int {
         return when (val restingPoint = sandFalls(Point2d(500, 0), rocks, maxY)) {

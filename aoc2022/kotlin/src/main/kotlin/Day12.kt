@@ -29,7 +29,7 @@ object Day12 : AdventOfCode() {
             val currHeight = heightMap[it]!!
             it.orthoNeighbors.filter { neighbor ->
                 neighbor in heightMap &&
-                        heightMap[neighbor]!! <= (currHeight + 1)
+                    heightMap[neighbor]!! <= (currHeight + 1)
             }.toSet()
         }
         return output.size

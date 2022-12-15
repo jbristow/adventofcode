@@ -12,12 +12,13 @@ repositories {
 
 val arrowVersion = "1.1.2"
 val jupiterVersion = "5.9.1"
+val jacksonVersion = "2.13.4"
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-
     implementation("io.arrow-kt:arrow-core:$arrowVersion")
     implementation("io.arrow-kt:arrow-core:$arrowVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.+")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiterVersion")
