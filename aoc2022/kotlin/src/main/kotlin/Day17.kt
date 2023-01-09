@@ -146,8 +146,7 @@ object Day17 : AdventOfCode() {
             val rockDelta = snapshotValue.finishedRocks - existingSnapshot.finishedRocks
             if (rocksRemaining % rockDelta == 0L) {
                 val ydiff = snapshotValue.minY - existingSnapshot.minY
-                val quotient =
-                    rocksRemaining / rockDelta
+                val quotient = rocksRemaining / rockDelta
                 return -(quotient * ydiff + existingSnapshot.minY) - 1
             }
         }
@@ -173,7 +172,7 @@ object Day17 : AdventOfCode() {
         minY: Long,
         finishedRocks: Long
     ) = Snapshot(
-        Point2dLRange(rocks.filter { it.y in minY..minY + 5 }).joinToString { if (it in rocks) "#" else "." },
+        Point2dLRange(rocks.filter { it.y == minY + 1 }).joinToString { if (it in rocks) "#" else "." },
         minY,
         finishedRocks
     )

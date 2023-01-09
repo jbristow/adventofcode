@@ -29,6 +29,28 @@ class Point2dRange(val xRange: IntRange, val yRange: IntRange) : Iterable<Point2
     }
 }
 
+class Point2dLRange(val xRange: LongRange, val yRange: LongRange) : Iterable<Point2dL> {
+    constructor(minX: Long, maxX: Long, minY: Long, maxY: Long) : this((minX..maxX), (minY..maxY))
+
+    constructor(points: Iterable<Point2dL>) :
+        this(
+            points.minOf(Point2dL::x)..points.maxOf(Point2dL::x),
+            points.minOf(Point2dL::y)..points.maxOf(Point2dL::y)
+        )
+
+    constructor(points: Map<Point2dL, Any?>) : this(points.keys)
+
+    override fun iterator(): Iterator<Point2dL> {
+        return yRange.asSequence().flatMap { y -> xRange.asSequence().map { x -> Point2dL(x, y) } }.iterator()
+    }
+
+    fun joinToString(transform: ((Point2dL) -> CharSequence)? = null): String {
+        return yRange.joinToString("\n") { y ->
+            xRange.joinToString("") { x -> transform?.let { it(Point2dL(x, y)) } ?: "." }
+        }
+    }
+}
+
 data class Point2d(val x: Int = 0, val y: Int = 0) : Point {
     companion object {
         operator fun Point2d.plus(other: Point2d) = Point2d(this.x + other.x, this.y + other.y)
@@ -48,6 +70,26 @@ data class Point2d(val x: Int = 0, val y: Int = 0) : Point {
 
     override val neighbors: Set<Point2d>
         get() = (-1..1).flatMap { dx -> (-1..1).map { dy -> Point2d(x + dx, y + dy) } }.toSet()
+}
+data class Point2dL(val x: Long = 0, val y: Long = 0) : Point {
+    companion object {
+        operator fun Point2dL.plus(other: Point2dL) = Point2dL(this.x + other.x, this.y + other.y)
+        operator fun Point2dL.minus(other: Point2dL) = Point2dL(this.x - other.x, this.y - other.y)
+
+        infix fun Point2dL.modX(other: Long) = Point2dL(x % other, y)
+
+        fun Point2dL.manhattanDistance(from: Point2dL = Point2dL(0, 0)): Long {
+            return abs(x.toLong() - from.x) + abs(y.toLong() - from.y)
+        }
+
+        operator fun Point2dL.times(value: Long): Point2dL = Point2dL(x * value, y * value)
+    }
+
+    override val orthoNeighbors: Set<Point2dL>
+        get() = listOf(-1, 1).flatMap { listOf(Point2dL(x = x + it, y), Point2dL(x, y = y + it)) }.toSet()
+
+    override val neighbors: Set<Point2dL>
+        get() = (-1..1).flatMap { dx -> (-1..1).map { dy -> Point2dL(x + dx, y + dy) } }.toSet()
 }
 
 data class Point3d(val x: Int, val y: Int, val z: Int) : Point {

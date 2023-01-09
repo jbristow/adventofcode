@@ -1,9 +1,8 @@
 import util.AdventOfCode
 
-object Day20 : AdventOfCode() {)
+object Day20 : AdventOfCode() {
 
     private fun mix(numbers: List<Long>, startingIndices: List<Int> = numbers.indices.toList()): List<Int> {
-
         val n = numbers.size
 
         tailrec fun loop(indices: List<Int>, index: Int = 0): List<Int> {
@@ -29,7 +28,6 @@ object Day20 : AdventOfCode() {)
         return loop(startingIndices.toMutableList(), 0)
     }
 
-
     private fun part1(input: List<Long>) = coordinateSum(mix(input).map { input[it] })
 
     private fun part2(input: List<Long>): Long {
@@ -45,12 +43,10 @@ object Day20 : AdventOfCode() {)
         println("\tPart 2: ${part2(inputFileLongs)}")
     }
 
-
     private fun coordinateSum(
         numbers: List<Long>
     ): Long {
         val zero = numbers.indexOfFirst { it == 0L }
         return listOf(1000, 2000, 3000).map { (zero + it) % numbers.size }.sumOf { numbers[it] }
     }
-
 }

@@ -2,7 +2,7 @@ import util.AdventOfCode
 
 object Day06 : AdventOfCode() {
 
-    private fun <T> List<T>.isUnique() = this.toSet().size == this.size
+    fun <T> List<T>.isUnique() = this.toSet().size == this.size
 
     private fun <T> Sequence<T>.findFirstUniqueOfSize(size: Int) =
         this.windowed(size)

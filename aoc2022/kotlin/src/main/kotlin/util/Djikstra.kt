@@ -6,7 +6,8 @@ object Djikstra : PathfindingAlgorithm() {
         start: P,
         isEnd: (P?) -> Boolean,
         q: Set<P>,
-        neighborFn: (P) -> List<P>
+        neighborFn: (P) -> List<P>,
+        distanceFn: (P, P) -> Int = { _, _ -> 1 }
     ): Pair<Int, List<P>>? {
         tailrec fun djikstraPrime(
             q: Set<P>,
@@ -23,11 +24,11 @@ object Djikstra : PathfindingAlgorithm() {
                     }
                     val updates =
                         neighborFn(u).filter { v ->
-                            u in q && (dist[v] == null || dist[v]!! > ((dist[u] ?: 0) + 1))
+                            u in q && (dist[v] == null || dist[v]!! > ((dist[u] ?: 0) + distanceFn(u, v)))
                         }
                     djikstraPrime(
                         q - u,
-                        dist + updates.map { it to (dist[u] ?: 0) + 1 },
+                        dist + updates.map { it to (dist[u] ?: 0) + distanceFn(u, it) },
                         prev + updates.map { it to u }
                     )
                 }

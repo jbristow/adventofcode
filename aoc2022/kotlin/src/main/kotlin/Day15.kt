@@ -5,13 +5,14 @@ import java.util.LinkedList
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.streams.asStream
 
 object Day15 : AdventOfCode() {
     private val lineRegex = """Sensor at x=(-?\d+), y=(-?\d+): closest beacon is at x=(-?\d+), y=(-?\d+)""".toRegex()
 
     data class Sensor(val location: Point2d, val closestBeacon: Point2d) {
-        private val radius = location.manhattanDistance(closestBeacon)
-        fun noBeaconsAllowed(y: Long): LongRange? {
+        private val radius = location.manhattanDistance(closestBeacon).toInt()
+        fun noBeaconsAllowed(y: Int): IntRange? {
             val width = this.radius - abs(this.location.y - y)
             return when {
                 width > 0 -> this.location.x - width..this.location.x + width
@@ -20,19 +21,19 @@ object Day15 : AdventOfCode() {
         }
     }
 
-    private fun part1(input: List<String>): Long {
+    private fun part1(input: List<String>): Int {
         val sensors = toSensors(input)
         return candidateXRanges(sensors, 2000000).sumOf { it.last - it.first }
     }
 
     private fun part2(input: List<String>): Long? {
         val sensors = toSensors(input)
-        val range = 0..4000000L
-        return range.asSequence()
-            .map { y -> candidateXRanges(sensors, y) }
-            .withIndex()
-            .find { (_, ranges) -> ranges.size > 1 }
-            ?.let { 4000000L * (it.value.first().last + 1L) + it.index }
+        val range = 0..4000000
+        return range.asSequence().asStream().parallel()
+            .map { y -> IndexedValue(y, candidateXRanges(sensors, y)) }
+            .filter { (_, ranges) -> ranges.size > 1 }
+            .findAny()
+            .map { 4000000L * (it.value.first().last + 1L) + it.index }.orElseThrow()
     }
 
     private fun toSensors(input: List<String>) = input.map {
@@ -44,11 +45,11 @@ object Day15 : AdventOfCode() {
         }
     }
 
-    private fun candidateXRanges(sensors: List<Sensor>, y: Long): LinkedList<LongRange> {
+    private fun candidateXRanges(sensors: List<Sensor>, y: Int): LinkedList<IntRange> {
         return sensors
             .mapNotNull { it.noBeaconsAllowed(y) }
             .sortedBy { it.first }
-            .fold(LinkedList<LongRange>()) { acc, r ->
+            .fold(LinkedList<IntRange>()) { acc, r ->
                 val last = acc.lastOrNull()
                 if (last != null &&
                     (
@@ -68,8 +69,11 @@ object Day15 : AdventOfCode() {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        println("Day 15")
-        println("\tPart 1: ${part1(inputFileLines)}")
-        println("\tPart 2: ${part2(inputFileLines)}")
+        repeat(20) {
+            println("Day 15 (run $it)")
+            timed { println("\tPart 1: ${part1(inputFileLines)}") }
+            timed { println("\tPart 2: ${part2(inputFileLines)}") }
+            println()
+        }
     }
 }

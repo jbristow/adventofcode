@@ -4,13 +4,12 @@ import java.util.PriorityQueue
 
 object Day16 : AdventOfCode() {
 
-
     data class VolcanoTube(
         val currentNode: String,
         val closedValves: Map<String, Int>,
         val ppm: Int = 0,
         val minutesToArrive: Int = 0,
-        val currentPressure: Int = 0,
+        val currentPressure: Int = 0
     ) : Comparable<VolcanoTube> {
         override fun compareTo(other: VolcanoTube): Int {
             if (minutesToArrive == other.minutesToArrive) {
@@ -58,7 +57,7 @@ object Day16 : AdventOfCode() {
             current.copy(
                 ppm = current.ppm + newPpm,
                 closedValves = current.closedValves - current.currentNode,
-                currentPressure = current.currentPressure + remainingTime * newPpm,
+                currentPressure = current.currentPressure + remainingTime * newPpm
             )
         } else {
             current
@@ -69,7 +68,7 @@ object Day16 : AdventOfCode() {
             ?.filter { (node, _) -> node in modified.closedValves }
         if (validEdges == null || validEdges.isEmpty() || modified.closedValves.isEmpty()) {
             val sitInPlace = modified.copy(
-                minutesToArrive = 30,
+                minutesToArrive = 30
             )
             q.add(sitInPlace)
         } else {
@@ -77,7 +76,7 @@ object Day16 : AdventOfCode() {
                 validEdges.map { edge ->
                     modified.copy(
                         currentNode = edge.first,
-                        minutesToArrive = modified.minutesToArrive + edge.second + 1,
+                        minutesToArrive = modified.minutesToArrive + edge.second + 1
                     )
                 }
             )
@@ -92,7 +91,6 @@ object Day16 : AdventOfCode() {
         step: Int,
         seen: MutableMap<String, Int>
     ): ElephantVolcanoTube? {
-
         val current = q.remove()
         if (current.minutesToArrive == 26) {
             return current
@@ -122,31 +120,34 @@ object Day16 : AdventOfCode() {
                     path = current.path + "u=open(${current.myNode}),e=open(${current.elephantNode}),+(${minutesLeft * newPpm})"
                 )
             )
-
         } else if (current.myNode in current.closedValves) {
             val newPpm = nextValves.remove(current.myNode) ?: 0
-            newNodes.addAll(eKeys.map { elephant ->
-                current.copy(
-                    minutesToArrive = current.minutesToArrive + 1,
-                    currentPressure = current.currentPressure + minutesLeft * newPpm,
-                    ppm = current.ppm + newPpm,
-                    closedValves = nextValves,
-                    elephantNode = elephant,
-                    path = current.path + "u=open(${current.myNode}),e=$elephant,+(${minutesLeft * newPpm})"
-                )
-            })
+            newNodes.addAll(
+                eKeys.map { elephant ->
+                    current.copy(
+                        minutesToArrive = current.minutesToArrive + 1,
+                        currentPressure = current.currentPressure + minutesLeft * newPpm,
+                        ppm = current.ppm + newPpm,
+                        closedValves = nextValves,
+                        elephantNode = elephant,
+                        path = current.path + "u=open(${current.myNode}),e=$elephant,+(${minutesLeft * newPpm})"
+                    )
+                }
+            )
         } else if (current.elephantNode in current.closedValves) {
             val newPpm = nextValves.remove(current.elephantNode) ?: 0
-            newNodes.addAll(mKeys.map { my ->
-                current.copy(
-                    minutesToArrive = current.minutesToArrive + 1,
-                    currentPressure = current.currentPressure + minutesLeft * newPpm,
-                    ppm = current.ppm + newPpm,
-                    closedValves = nextValves,
-                    myNode = my,
-                    path = current.path + "u=$my,e=open(${current.elephantNode}),+(${minutesLeft * newPpm})"
-                )
-            })
+            newNodes.addAll(
+                mKeys.map { my ->
+                    current.copy(
+                        minutesToArrive = current.minutesToArrive + 1,
+                        currentPressure = current.currentPressure + minutesLeft * newPpm,
+                        ppm = current.ppm + newPpm,
+                        closedValves = nextValves,
+                        myNode = my,
+                        path = current.path + "u=$my,e=open(${current.elephantNode}),+(${minutesLeft * newPpm})"
+                    )
+                }
+            )
         }
         newNodes.addAll(
             eKeys.flatMap { elephant ->
@@ -155,7 +156,7 @@ object Day16 : AdventOfCode() {
                         minutesToArrive = current.minutesToArrive + 1,
                         myNode = my,
                         elephantNode = elephant,
-                        path = current.path + "u=${my},e=${elephant},+(0)"
+                        path = current.path + "u=$my,e=$elephant,+(0)"
                     )
                 }
             }
@@ -163,12 +164,10 @@ object Day16 : AdventOfCode() {
 
         q.addAll(newNodes.filter { (seen[seenKey(it)] ?: Int.MAX_VALUE) > it.ppm })
 
-
         return pqElephantSearch(graph, q, step + 1, seen)
     }
 
     private fun seenKey(it: ElephantVolcanoTube) = "${it.myNode}-${it.elephantNode}-${it.minutesToArrive}"
-
 
     private fun toEdgeMap(lines: List<Pair<Pair<String, Int>, List<String>>>) =
         lines.flatMap { (node, edges) -> edges.sorted().map { edge -> node.first to edge } }.groupBy { it.first }
