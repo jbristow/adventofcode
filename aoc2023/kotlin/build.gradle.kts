@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.21"
+    id("com.google.devtools.ksp") version "1.9.21-1.0.15"
 }
 
 version = "1.0-SNAPSHOT"
@@ -8,7 +9,7 @@ repositories {
     mavenCentral()
 }
 
-val arrowVersion = "1.2.0"
+val arrowVersion = "1.2.1"
 val jupiterVersion = "5.10.1"
 val jacksonVersion = "2.13.4"
 dependencies {
@@ -16,7 +17,8 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
     implementation("io.arrow-kt:arrow-core:$arrowVersion")
-    implementation("io.arrow-kt:arrow-core:$arrowVersion")
+    implementation("io.arrow-kt:arrow-optics:$arrowVersion")
+    ksp("io.arrow-kt:arrow-optics-ksp-plugin:$arrowVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
@@ -28,7 +30,7 @@ dependencies {
 
 kotlin {
     jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(20)
     }
 }
 
