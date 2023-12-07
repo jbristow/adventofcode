@@ -24,7 +24,7 @@ object Day06 : AdventOfCode() {
         val time = lines[0].toLongIgnoreSpace()
         val record = lines[1].toLongIgnoreSpace()
 
-        val first = (1 until time).dropWhile { ((time - it) * it) < record }.first()
+        val first = (1 until time).dropWhile { ((time - it) * it) <= record }.first()
         val last = (1 until time).reversed().dropWhile { ((time - it) * it) <= record }.first()
 
         return last - first + 1
@@ -35,7 +35,7 @@ object Day06 : AdventOfCode() {
         val records = lines[1].toLongList()
 
         return times.zip(records)
-            .map { (time, record) -> numberOfWaysToWin(time, record) }
+            .map { (t, r) -> numberOfWaysToWin(t, r) }
             .fold(1) { prod, curr -> prod * curr }
     }
 
@@ -46,6 +46,7 @@ object Day06 : AdventOfCode() {
     }
 
     private fun numberOfWaysToWin(time: Long, record: Long): Long {
+
         val a = 0.5 * (time - sqrt(-4.0 * record + time * time))
         val b = 0.5 * (time + sqrt(-4.0 * record + time * time))
         return ((ceil(b) - 1).toLong() - (floor(a)).toLong())
