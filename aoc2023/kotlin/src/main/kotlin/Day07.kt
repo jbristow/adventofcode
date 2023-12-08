@@ -98,8 +98,6 @@ object Day07 : AdventOfCode() {
                     HandType.identify(freq)
                 }
             }
-
-
         }
     }
 
