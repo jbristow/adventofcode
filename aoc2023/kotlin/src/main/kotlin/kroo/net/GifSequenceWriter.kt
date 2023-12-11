@@ -40,7 +40,7 @@ class GifSequenceWriter(
     outputStream: ImageOutputStream,
     imageType: Int,
     msBtwnFrames: Int,
-    loopContinuously: Boolean
+    loopContinuously: Boolean,
 ) : AutoCloseable {
     private var gifWriter: ImageWriter
     private var imageWriteParam: ImageWriteParam
@@ -51,10 +51,11 @@ class GifSequenceWriter(
         gifWriter = writer
         imageWriteParam = gifWriter.defaultWriteParam
 
-        imageMetaData = gifWriter.getDefaultImageMetadata(
-            ImageTypeSpecifier.createFromBufferedImageType(imageType),
-            imageWriteParam
-        )
+        imageMetaData =
+            gifWriter.getDefaultImageMetadata(
+                ImageTypeSpecifier.createFromBufferedImageType(imageType),
+                imageWriteParam,
+            )
 
         val metaFormatName = imageMetaData.nativeMetadataFormatName
 
@@ -79,9 +80,9 @@ class GifSequenceWriter(
                     byteArrayOf(
                         0x1,
                         (loop and 0xFF).toByte(),
-                        (loop shr 8 and 0xFF).toByte()
-                    )
-                )
+                        (loop shr 8 and 0xFF).toByte(),
+                    ),
+                ),
         )
 
         imageMetaData.setFromTree(metaFormatName, root)
@@ -95,7 +96,7 @@ class GifSequenceWriter(
     fun writeToSequence(img: RenderedImage) {
         gifWriter.writeToSequence(
             IIOImage(img, null, imageMetaData),
-            imageWriteParam
+            imageWriteParam,
         )
     }
 
@@ -117,10 +118,11 @@ class GifSequenceWriter(
      */
     private val writer: ImageWriter
         @Throws(IIOException::class)
-        get() = ImageIO.getImageWritersBySuffix("gif").let { iter ->
-            require(iter.hasNext()) { "No GIF Image Writers Exist" }
-            iter.next()
-        }
+        get() =
+            ImageIO.getImageWritersBySuffix("gif").let { iter ->
+                require(iter.hasNext()) { "No GIF Image Writers Exist" }
+                iter.next()
+            }
 
     /**
      * Returns an existing child node, or creates and returns a new child node (if
@@ -131,15 +133,17 @@ class GifSequenceWriter(
      *
      * @return the child node, if found or a new node created with the given name.
      */
-    private fun getNode(root: IIOMetadataNode, nodeName: String) =
-        generateSequence(root.firstChild) { it.nextSibling }
-            .find { it.nodeName.equals(nodeName, ignoreCase = true) }
-            .let { matching ->
-                when (matching) {
-                    null -> root.appendChild(IIOMetadataNode(nodeName))
-                    else -> matching
-                } as IIOMetadataNode
-            }
+    private fun getNode(
+        root: IIOMetadataNode,
+        nodeName: String,
+    ) = generateSequence(root.firstChild) { it.nextSibling }
+        .find { it.nodeName.equals(nodeName, ignoreCase = true) }
+        .let { matching ->
+            when (matching) {
+                null -> root.appendChild(IIOMetadataNode(nodeName))
+                else -> matching
+            } as IIOMetadataNode
+        }
 }
 
 /**
@@ -175,7 +179,7 @@ fun main(args: Array<String>) {
         output.close()
     } else {
         println(
-            "Usage: java GifSequenceWriter [list of gif files] [output file]"
+            "Usage: java GifSequenceWriter [list of gif files] [output file]",
         )
     }
 }
@@ -187,7 +191,7 @@ private fun IIOMetadataNode.withUserObject(userObjectBA: ByteArray): IIOMetadata
 
 private fun IIOMetadataNode.withAttribute(
     name: String,
-    value: String
+    value: String,
 ): IIOMetadataNode {
     setAttribute(name, value)
     return this

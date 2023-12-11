@@ -4,12 +4,9 @@ import kotlin.math.floor
 import kotlin.math.sqrt
 
 object Day06 : AdventOfCode() {
-    private fun String.toLongList() =
-        split(""":\s+""".toRegex())[1].split("""\s+""".toRegex()).map { it.toLong() }
+    private fun String.toLongList() = split(""":\s+""".toRegex())[1].split("""\s+""".toRegex()).map { it.toLong() }
 
-    private fun String.toLongIgnoreSpace() =
-        split(""":\s+""".toRegex())[1].replace("""\s+""".toRegex(), "").toLong()
-
+    private fun String.toLongIgnoreSpace() = split(""":\s+""".toRegex())[1].replace("""\s+""".toRegex(), "").toLong()
 
     private fun part1(lines: List<String>): Long {
         val times = lines[0].toLongList()
@@ -45,8 +42,10 @@ object Day06 : AdventOfCode() {
         return numberOfWaysToWin(time, record)
     }
 
-    private fun numberOfWaysToWin(time: Long, record: Long): Long {
-
+    private fun numberOfWaysToWin(
+        time: Long,
+        record: Long,
+    ): Long {
         val a = 0.5 * (time - sqrt(-4.0 * record + time * time))
         val b = 0.5 * (time + sqrt(-4.0 * record + time * time))
         return ((ceil(b) - 1).toLong() - (floor(a)).toLong())

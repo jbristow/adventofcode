@@ -1,9 +1,8 @@
 import arrow.optics.optics
 import util.AdventOfCode
-import java.util.*
+import java.util.LinkedList
 
 object Day05 : AdventOfCode() {
-
     @optics
     data class Farm(
         val seedToSoil: List<AlmanacMap> = emptyList(),
@@ -15,21 +14,22 @@ object Day05 : AdventOfCode() {
         val humidityToLocation: List<AlmanacMap> = emptyList(),
     ) {
         companion object {
-            val almanacSections = listOf(
-                Farm.seedToSoil,
-                Farm.soilToFertilizer,
-                Farm.fertilizerToWater,
-                Farm.waterToLight,
-                Farm.lightToTemperature,
-                Farm.temperatureToHumidity,
-                Farm.humidityToLocation
-            )
+            val almanacSections =
+                listOf(
+                    Farm.seedToSoil,
+                    Farm.soilToFertilizer,
+                    Farm.fertilizerToWater,
+                    Farm.waterToLight,
+                    Farm.lightToTemperature,
+                    Farm.temperatureToHumidity,
+                    Farm.humidityToLocation,
+                )
         }
     }
 
     private fun LinkedList<LongRange>.consumeRanges(
         mappings: List<AlmanacMap>,
-        dests: LinkedList<LongRange> = LinkedList()
+        dests: LinkedList<LongRange> = LinkedList(),
     ): LinkedList<LongRange> {
         if (this.isEmpty()) {
             return LinkedList(dests.sortedBy { it.first })
@@ -37,9 +37,10 @@ object Day05 : AdventOfCode() {
 
         val current = this.removeFirst()
 
-        val overlap = mappings.firstOrNull {
-            current.first in it.sourceRange || current.last in it.sourceRange
-        }
+        val overlap =
+            mappings.firstOrNull {
+                current.first in it.sourceRange || current.last in it.sourceRange
+            }
 
         return when {
             overlap == null -> {
@@ -73,7 +74,6 @@ object Day05 : AdventOfCode() {
         }
     }
 
-
     private fun Long.applyAlmanac(almanacRange: List<AlmanacMap>): Long {
         return when (val range = almanacRange.find { it.canConvert(this) }) {
             null -> this
@@ -83,7 +83,7 @@ object Day05 : AdventOfCode() {
 
     private tailrec fun List<String>.parse(
         seeds: List<Long> = emptyList(),
-        farm: Farm = Farm()
+        farm: Farm = Farm(),
     ): Pair<List<Long>, Farm> {
         if (this.isEmpty()) {
             return seeds to farm
@@ -106,7 +106,8 @@ object Day05 : AdventOfCode() {
     }
 
     private tailrec fun List<String>.parseRange(
-        seeds: List<LongRange> = emptyList(), farm: Farm = Farm()
+        seeds: List<LongRange> = emptyList(),
+        farm: Farm = Farm(),
     ): Pair<List<LongRange>, Farm> {
         if (this.isEmpty()) {
             return seeds to farm
@@ -120,7 +121,8 @@ object Day05 : AdventOfCode() {
         } else if (current.startsWith("seeds:")) {
             remaining.parseRange(
                 current.split(" ").drop(1).map { it.trim().toLong() }.chunked(2)
-                    .map { (a, b) -> (a until a + b) }, farm
+                    .map { (a, b) -> (a until a + b) },
+                farm,
             )
         } else {
             val (nextRemaining, nextFarm) = almanacMaps(current, remaining, farm)
@@ -128,7 +130,11 @@ object Day05 : AdventOfCode() {
         }
     }
 
-    private fun almanacMaps(current: String, remaining: List<String>, farm: Farm): Pair<List<String>, Farm> {
+    private fun almanacMaps(
+        current: String,
+        remaining: List<String>,
+        farm: Farm,
+    ): Pair<List<String>, Farm> {
         when (current) {
             "seed-to-soil map:" -> {
                 val (nextRemaining, soilToSeed) = remaining.parseMap()
@@ -166,7 +172,6 @@ object Day05 : AdventOfCode() {
             }
 
             else -> throw Exception("Unknown section: $current")
-
         }
     }
 
@@ -186,18 +191,17 @@ object Day05 : AdventOfCode() {
         val sourceRange = sourceRangeStart until (sourceRangeStart + size)
 
         fun canConvert(item: Long) = item in sourceRange
+
         fun convert(item: Long): Long {
             return (item - sourceRangeStart) + destRangeStart
         }
     }
-
 
     private fun part1(input: List<String>): Long {
         val (seeds, farm) = input.parse()
         return seeds.minOf { seed ->
             Farm.almanacSections.fold(seed) { item, prop -> item.applyAlmanac(prop.get(farm)) }
         }
-
     }
 
     private fun part2(input: List<String>): Long {

@@ -1,7 +1,6 @@
 import util.AdventOfCode
 
 object Day09 : AdventOfCode() {
-
     private fun Sequence<String>.toLongLists(): Sequence<List<Long>> {
         return this.map { line -> line.split("""\s+""".toRegex()).map { it.toLong() } }
     }
@@ -18,8 +17,7 @@ object Day09 : AdventOfCode() {
 
     private fun computeNext(histories: Sequence<List<Long>>) = histories.sumOf { it.last() }
 
-    private fun computePreceding(histories: Sequence<List<Long>>) =
-        histories.map { it.first() }.toList().reduceRight { a, b -> a - b }
+    private fun computePreceding(histories: Sequence<List<Long>>) = histories.map { it.first() }.toList().reduceRight { a, b -> a - b }
 
     private fun part1(input: Sequence<String>) =
         input.toLongLists()

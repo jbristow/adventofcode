@@ -36,6 +36,3 @@ object Day01 : AdventOfCode() {
         }
     }
 }
-
-
-

@@ -2,19 +2,27 @@ package util
 
 import kotlin.math.abs
 
-interface Point {
-    val neighbors: Set<Point>
-    val orthoNeighbors: Set<Point>
+interface Point<F : Number, M : Number, T : Point<F, M, T>> {
+    val neighbors: Set<Point<F, M, T>>
+    val orthoNeighbors: Set<Point<F, M, T>>
+
+    fun manhattanDistance(other: T): M
+
+    operator fun plus(other: T): T
+
+    operator fun minus(other: T): T
+
+    operator fun times(value: F): T
 }
 
-class Point2dRange(val xRange: IntRange, val yRange: IntRange) : Iterable<Point2d> {
+data class Point2dRange(val xRange: IntRange, val yRange: IntRange) : Iterable<Point2d> {
     constructor(minX: Int, maxX: Int, minY: Int, maxY: Int) : this((minX..maxX), (minY..maxY))
+    constructor(topLeft: Point2d, bottomRight: Point2d) : this((topLeft.x..bottomRight.x), (topLeft.y..bottomRight.y))
 
-    constructor(points: Iterable<Point2d>) :
-        this(
-            points.minOf(Point2d::x)..points.maxOf(Point2d::x),
-            points.minOf(Point2d::y)..points.maxOf(Point2d::y)
-        )
+    constructor(points: Iterable<Point2d>) : this(
+        points.minOf(Point2d::x)..points.maxOf(Point2d::x),
+        points.minOf(Point2d::y)..points.maxOf(Point2d::y),
+    )
 
     constructor(points: Map<Point2d, Any?>) : this(points.keys)
 
@@ -32,13 +40,13 @@ class Point2dRange(val xRange: IntRange, val yRange: IntRange) : Iterable<Point2
 class Point2dLRange(val xRange: LongRange, val yRange: LongRange) : Iterable<Point2dL> {
     constructor(minX: Long, maxX: Long, minY: Long, maxY: Long) : this((minX..maxX), (minY..maxY))
 
-    constructor(points: Iterable<Point2dL>) :
-        this(
-            points.minOf(Point2dL::x)..points.maxOf(Point2dL::x),
-            points.minOf(Point2dL::y)..points.maxOf(Point2dL::y)
-        )
+    constructor(points: Iterable<Point2dL>) : this(
+        points.minOf(Point2dL::x)..points.maxOf(Point2dL::x),
+        points.minOf(Point2dL::y)..points.maxOf(Point2dL::y),
+    )
 
     constructor(points: Map<Point2dL, Any?>) : this(points.keys)
+    constructor(topLeft: Point2dL, bottomRight: Point2dL) : this((topLeft.x..bottomRight.x), (topLeft.y..bottomRight.y))
 
     override fun iterator(): Iterator<Point2dL> {
         return yRange.asSequence().flatMap { y -> xRange.asSequence().map { x -> Point2dL(x, y) } }.iterator()
@@ -51,107 +59,89 @@ class Point2dLRange(val xRange: LongRange, val yRange: LongRange) : Iterable<Poi
     }
 }
 
-data class Point2d(val x: Int = 0, val y: Int = 0) : Point {
-    companion object {
-        operator fun Point2d.plus(other: Point2d) = Point2d(this.x + other.x, this.y + other.y)
-        operator fun Point2d.minus(other: Point2d) = Point2d(this.x - other.x, this.y - other.y)
-
-        infix fun Point2d.modX(other: Int) = Point2d(x % other, y)
-
-        fun Point2d.manhattanDistance(from: Point2d = Point2d(0, 0)): Long {
-            return abs(x.toLong() - from.x) + abs(y.toLong() - from.y)
-        }
-
-        operator fun Point2d.times(value: Int): Point2d = Point2d(x * value, y * value)
-    }
-
+data class Point2d(val x: Int = 0, val y: Int = 0) : Point<Int, Long, Point2d> {
     override val orthoNeighbors: Set<Point2d>
         get() = listOf(-1, 1).flatMap { listOf(Point2d(x = x + it, y), Point2d(x, y = y + it)) }.toSet()
 
     override val neighbors: Set<Point2d>
         get() = (-1..1).flatMap { dx -> (-1..1).map { dy -> Point2d(x + dx, y + dy) } }.toSet()
+
+    override fun manhattanDistance(other: Point2d): Long = abs(x.toLong() - other.x) + abs(y.toLong() - other.y)
+
+    override operator fun plus(other: Point2d): Point2d = Point2d(this.x + other.x, this.y + other.y)
+
+    override operator fun minus(other: Point2d): Point2d = Point2d(this.x - other.x, this.y - other.y)
+
+    override operator fun times(value: Int): Point2d = Point2d(x * value, y * value)
 }
-data class Point2dL(val x: Long = 0, val y: Long = 0) : Point {
-    companion object {
-        operator fun Point2dL.plus(other: Point2dL) = Point2dL(this.x + other.x, this.y + other.y)
-        operator fun Point2dL.minus(other: Point2dL) = Point2dL(this.x - other.x, this.y - other.y)
 
-        infix fun Point2dL.modX(other: Long) = Point2dL(x % other, y)
-
-        fun Point2dL.manhattanDistance(from: Point2dL = Point2dL(0, 0)): Long {
-            return abs(x - from.x) + abs(y - from.y)
-        }
-
-        operator fun Point2dL.times(value: Long): Point2dL = Point2dL(x * value, y * value)
-    }
-
+data class Point2dL(val x: Long = 0, val y: Long = 0) : Point<Long, Long, Point2dL> {
     override val orthoNeighbors: Set<Point2dL>
         get() = listOf(-1, 1).flatMap { listOf(Point2dL(x = x + it, y), Point2dL(x, y = y + it)) }.toSet()
 
     override val neighbors: Set<Point2dL>
         get() = (-1..1).flatMap { dx -> (-1..1).map { dy -> Point2dL(x + dx, y + dy) } }.toSet()
+
+    override fun manhattanDistance(other: Point2dL): Long = abs(x.toLong() - other.x) + abs(y.toLong() - other.y)
+
+    override operator fun plus(other: Point2dL): Point2dL = Point2dL(this.x + other.x, this.y + other.y)
+
+    override operator fun minus(other: Point2dL): Point2dL = Point2dL(this.x - other.x, this.y - other.y)
+
+    override operator fun times(value: Long): Point2dL = Point2dL(x * value, y * value)
 }
 
-data class Point3d(val x: Int, val y: Int, val z: Int) : Point {
+data class Point3d(val x: Int, val y: Int, val z: Int) : Point<Int, Long, Point3d> {
     override val neighbors: Set<Point3d>
-        get() = (-1..1).flatMap { dx ->
-            (-1..1).flatMap { dy ->
-                (-1..1).mapNotNull { dz -> Point3d(x + dx, y + dy, z + dz) }
-            }
-        }.toSet()
+        get() =
+            (-1..1).flatMap { dx ->
+                (-1..1).flatMap { dy ->
+                    (-1..1).mapNotNull { dz -> Point3d(x + dx, y + dy, z + dz) }
+                }
+            }.toSet()
 
     override val orthoNeighbors: Set<Point3d>
         get() = listOf(-1, 1).flatMap { listOf(copy(x = x + it), copy(y = y + it), copy(z = z + it)) }.toSet()
 
-    companion object {
-        operator fun Point3d.plus(other: Point3d) = Point3d(this.x + other.x, this.y + other.y, this.z + other.z)
-        operator fun Point3d.minus(other: Point3d) = Point3d(this.x - other.x, this.y - other.y, this.z - other.z)
+    override operator fun plus(other: Point3d) = Point3d(this.x + other.x, this.y + other.y, this.z + other.z)
 
-        infix fun Point3d.modX(other: Int) = copy(x = x % other)
+    override operator fun minus(other: Point3d) = Point3d(this.x - other.x, this.y - other.y, this.z - other.z)
 
-        fun Point3d.manhattanDistance(from: Point3d = Point3d(0, 0, 0)): Long {
-            return abs(x.toLong() - from.x) +
-                abs(y.toLong() - from.y) +
-                abs(z.toLong() - from.z)
-        }
-
-        operator fun Point3d.times(value: Int): Point3d = Point3d(x * value, y * value, z * value)
+    override fun manhattanDistance(other: Point3d): Long {
+        return abs(x.toLong() - other.x) + abs(y.toLong() - other.y) + abs(z.toLong() - other.z)
     }
+
+    override operator fun times(value: Int): Point3d = Point3d(x * value, y * value, z * value)
 }
 
-data class Point4d(val x: Int, val y: Int, val z: Int, val w: Int) : Point {
+data class Point4d(val x: Int, val y: Int, val z: Int, val w: Int) : Point<Int, Long, Point4d> {
     override val neighbors: Set<Point4d>
-        get() = (-1..1).flatMap { dx ->
-            (-1..1).flatMap { dy ->
-                (-1..1).flatMap { dz ->
-                    (-1..1).map { dw -> Point4d(x + dx, y + dy, z + dz, w + dw) }
+        get() =
+            (-1..1).flatMap { dx ->
+                (-1..1).flatMap { dy ->
+                    (-1..1).flatMap { dz ->
+                        (-1..1).map { dw -> Point4d(x + dx, y + dy, z + dz, w + dw) }
+                    }
                 }
-            }
-        }.toSet()
+            }.toSet()
 
     override val orthoNeighbors: Set<Point4d>
-        get() = listOf(-1, 1).flatMap {
-            listOf(
-                copy(x = x + it),
-                copy(y = y + it),
-                copy(z = z + it),
-                copy(w = w + it)
-            )
-        }.toSet()
+        get() =
+            listOf(-1, 1).flatMap {
+                listOf(
+                    copy(x = x + it),
+                    copy(y = y + it),
+                    copy(z = z + it),
+                    copy(w = w + it),
+                )
+            }.toSet()
 
-    companion object {
-        operator fun Point4d.plus(other: Point4d) =
-            Point4d(this.x + other.x, this.y + other.y, this.z + other.z, this.w + other.w)
+    override operator fun plus(other: Point4d) = Point4d(this.x + other.x, this.y + other.y, this.z + other.z, this.w + other.w)
 
-        infix fun Point4d.modX(other: Int) = copy(x = x % other)
+    override operator fun times(value: Int): Point4d = Point4d(x * value, y * value, z * value, w * value)
 
-        fun Point4d.manhattanDistance(from: Point4d = Point4d(0, 0, 0, 0)): Long {
-            return abs(x.toLong() - from.x) +
-                abs(y.toLong() - from.y) +
-                abs(z.toLong() - from.z) +
-                abs(w.toLong() - from.w)
-        }
+    override operator fun minus(other: Point4d): Point4d = this + (other * -1)
 
-        operator fun Point4d.times(value: Int): Point4d = Point4d(x * value, y * value, z * value, w * value)
-    }
+    override fun manhattanDistance(other: Point4d): Long =
+        abs(x.toLong() - other.x) + abs(y.toLong() - other.y) + abs(z.toLong() - other.z) + abs(w.toLong() - other.w)
 }

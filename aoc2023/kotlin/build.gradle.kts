@@ -36,15 +36,15 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    systemProperties = mapOf(
-        "junit.jupiter.extensions.autodetection.enabled" to true,
-        "junit.jupiter.testinstance.lifecycle.default" to "per_class",
-        "junit.jupiter.execution.parallel.enabled" to true,
-        "junit.jupiter.execution.parallel.mode.default" to "concurrent",
-        "junit.jupiter.execution.parallel.mode.classes.default" to "concurrent"
-    )
+    systemProperties =
+        mapOf(
+            "junit.jupiter.extensions.autodetection.enabled" to true,
+            "junit.jupiter.testinstance.lifecycle.default" to "per_class",
+            "junit.jupiter.execution.parallel.enabled" to true,
+            "junit.jupiter.execution.parallel.mode.default" to "concurrent",
+            "junit.jupiter.execution.parallel.mode.classes.default" to "concurrent",
+        )
     testLogging {
         events("passed", "skipped", "failed")
     }
 }
-

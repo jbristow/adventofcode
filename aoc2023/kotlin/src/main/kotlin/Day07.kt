@@ -4,7 +4,6 @@ import java.util.Comparator.comparing
 import java.util.Comparator.comparingInt
 
 object Day07 : AdventOfCode() {
-
     fun Char.toRank(): Int {
         return when (this) {
             '2', '3', '4', '5', '6', '7', '8', '9' -> this.digitToInt()
@@ -31,6 +30,7 @@ object Day07 : AdventOfCode() {
 
     data class Card(val label: Char, val rank: Int = label.toRank()) : Comparable<Card> {
         override fun compareTo(other: Card): Int = this.rank.compareTo(other.rank)
+
         override fun toString() = "$label"
     }
 
@@ -50,11 +50,17 @@ object Day07 : AdventOfCode() {
         }
 
         data object FiveOfAKind : HandType(6, { it.size == 1 })
+
         data object FourOfAKind : HandType(5, { it.size == 2 && it.containsValue(4) && it.containsValue(1) })
+
         data object FullHouse : HandType(4, { it.size == 2 && it.containsValue(3) && it.containsValue(2) })
+
         data object ThreeOfAKind : HandType(3, { it.size in 2..3 && it.containsValue(3) })
+
         data object TwoPair : HandType(2, { it.size == 3 })
+
         data object OnePair : HandType(1, { it.size == 4 })
+
         data object HighCard : HandType(0, { it.size == 5 })
     }
 
@@ -79,8 +85,9 @@ object Day07 : AdventOfCode() {
             override val cards: List<Card>,
             override val bid: Long,
             override val type: HandType = HandType.identify(cards.frequency()),
-            val cardGroup: List<Pair<Card, Int>> = cards.frequency().toList().sortedByDescending { it.first }
-                .sortedByDescending { it.second }
+            val cardGroup: List<Pair<Card, Int>> =
+                cards.frequency().toList().sortedByDescending { it.first }
+                    .sortedByDescending { it.second },
         ) : Hand()
 
         class JokerHand(override val cards: List<Card>, override val bid: Long) : Hand() {
@@ -90,13 +97,14 @@ object Day07 : AdventOfCode() {
             private val bestGroup = freqNoJokers.toList().sortedWith(kvComparator).firstOrNull()?.first
 
             init {
-                type = if (bestGroup == null) {
-                    HandType.FiveOfAKind
-                } else {
-                    val freq = freqNoJokers.toMutableMap()
-                    freq[bestGroup] = freqNoJokers.getValue(bestGroup) + jokerCount
-                    HandType.identify(freq)
-                }
+                type =
+                    if (bestGroup == null) {
+                        HandType.FiveOfAKind
+                    } else {
+                        val freq = freqNoJokers.toMutableMap()
+                        freq[bestGroup] = freqNoJokers.getValue(bestGroup) + jokerCount
+                        HandType.identify(freq)
+                    }
             }
         }
     }
@@ -119,11 +127,9 @@ object Day07 : AdventOfCode() {
         return map { it.toJokerHand() }
     }
 
-    private fun part1(input: List<String>) =
-        input.toHands().sorted().withIndex().sumOf { (i, it) -> (i + 1) * it.bid }
+    private fun part1(input: List<String>) = input.toHands().sorted().withIndex().sumOf { (i, it) -> (i + 1) * it.bid }
 
-    private fun part2(input: List<String>) =
-        input.toJokerHands().sorted().withIndex().sumOf { (i, it) -> (i + 1) * it.bid }
+    private fun part2(input: List<String>) = input.toJokerHands().sorted().withIndex().sumOf { (i, it) -> (i + 1) * it.bid }
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -132,5 +138,3 @@ object Day07 : AdventOfCode() {
         println("\tPart 2: ${part2(inputFileLines)}")
     }
 }
-
-

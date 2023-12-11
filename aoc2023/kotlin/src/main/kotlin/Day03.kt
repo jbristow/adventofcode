@@ -2,7 +2,6 @@ import util.AdventOfCode
 import util.Point2d
 
 object Day03 : AdventOfCode() {
-
     data class Part(val n: Long, val points: List<Point2d>) {
         val neighbors = points.flatMap { it.neighbors }.toSet()
     }
@@ -29,7 +28,7 @@ object Day03 : AdventOfCode() {
         y: Int,
         x: Int = 0,
         seen: MutableList<Part> = mutableListOf(),
-        soFar: MutableList<Pair<Char, Point2d>> = mutableListOf()
+        soFar: MutableList<Pair<Char, Point2d>> = mutableListOf(),
     ): List<Part> {
         if (this.isEmpty()) {
             if (soFar.isNotEmpty()) {
@@ -65,7 +64,6 @@ object Day03 : AdventOfCode() {
         return parts.filter { part -> part.neighbors.any { it in symbols } }
             .sumOf { part -> part.n }
     }
-
 
     private fun part2(input: List<String>): Long {
         val symbols = input.toSymbolPoints()

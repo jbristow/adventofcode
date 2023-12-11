@@ -7,7 +7,6 @@ import kotlin.io.path.readLines
 import kotlin.streams.asSequence
 
 abstract class AdventOfCode {
-
     private val fileName: String
     private val file: Path
 
@@ -45,16 +44,18 @@ abstract class AdventOfCode {
         val sec = (el / 1000) % 60
         val minutes = (el / 1000 / 60)
         val msStr = "${ms}ms"
-        val secStr = if (el > 1000) {
-            "${sec}s"
-        } else {
-            ""
-        }
-        val minStr = if (el > 1000 * 60) {
-            "${minutes}m"
-        } else {
-            ""
-        }
+        val secStr =
+            if (el > 1000) {
+                "${sec}s"
+            } else {
+                ""
+            }
+        val minStr =
+            if (el > 1000 * 60) {
+                "${minutes}m"
+            } else {
+                ""
+            }
         return listOf(minStr, secStr, msStr).filter { it.isNotBlank() }.joinToString(" ")
     }
 }

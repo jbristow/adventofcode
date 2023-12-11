@@ -27,7 +27,7 @@ class RangesKtTest {
             .containsExactly(
                 50..100,
                 a,
-                106..150
+                106..150,
             )
             .isEqualTo(b.splitOnIntersect(a))
     }
@@ -41,7 +41,7 @@ class RangesKtTest {
         assertThat(actual)
             .containsExactly(
                 a,
-                106..150
+                106..150,
             )
             .isEqualTo(b.splitOnIntersect(a))
     }
@@ -55,14 +55,13 @@ class RangesKtTest {
         assertThat(actual)
             .containsExactly(
                 50..99,
-                a
+                a,
             )
             .isEqualTo(b.splitOnIntersect(a))
     }
 
     @Test
     fun `a overlaps b - a_start lt b_start`() {
-
         val a = 27..35
         val b = 30..77
         val actual = a.splitOnIntersect(b)
@@ -70,20 +69,21 @@ class RangesKtTest {
             .containsExactly(
                 27..29,
                 30..35,
-                36..77
+                36..77,
             )
             .isEqualTo(b.splitOnIntersect(a))
     }
 
     @Test
     fun `a overlaps b - a_end gt b_end keep a`() {
-
         val a = 35..81
         val b = 30..77
         val actual = a.splitOnIntersect(b)
         assertThat(actual)
             .containsExactly(
-                30..34, 35..77, 78..81
+                30..34,
+                35..77,
+                78..81,
             )
             .isEqualTo(b.splitOnIntersect(a))
     }
@@ -136,7 +136,6 @@ class RangesKtTest {
         val b = 200..450
         assertThat(a.merge(b)).containsExactly(200..450)
     }
-
 
     @Test
     fun `merge b inside a`() {

@@ -2,14 +2,14 @@ package util
 
 @Suppress("DuplicatedCode")
 fun IntRange.splitOnIntersect(other: IntRange): List<IntRange> {
-
-    val (a, b) = if (this.first < other.first) {
-        this to other
-    } else if (this.first == other.first && this.last > other.last) {
-        this to other
-    } else {
-        other to this
-    }
+    val (a, b) =
+        if (this.first < other.first) {
+            this to other
+        } else if (this.first == other.first && this.last > other.last) {
+            this to other
+        } else {
+            other to this
+        }
 
     return when {
         a == b -> listOf(a)
@@ -24,14 +24,14 @@ fun IntRange.splitOnIntersect(other: IntRange): List<IntRange> {
 
 @Suppress("DuplicatedCode")
 fun LongRange.splitOnIntersect(other: LongRange): List<LongRange> {
-
-    val (a, b) = if (this.first < other.first) {
-        this to other
-    } else if (this.first == other.first && this.last > other.last) {
-        this to other
-    } else {
-        other to this
-    }
+    val (a, b) =
+        if (this.first < other.first) {
+            this to other
+        } else if (this.first == other.first && this.last > other.last) {
+            this to other
+        } else {
+            other to this
+        }
 
     return when {
         a == b -> listOf(a)
@@ -45,21 +45,23 @@ fun LongRange.splitOnIntersect(other: LongRange): List<LongRange> {
 }
 
 @Suppress("DuplicatedCode")
-fun IntRange.merge(other: IntRange) = when {
-    this == other -> listOf(this)
-    this.first in other && this.last in other -> listOf(other)
-    other.first in this && other.last in this -> listOf(this)
-    this.first < other.first && this.last in other -> listOf(this.first..other.last)
-    this.first in other && this.last > other.last -> listOf(other.first..this.last)
-    else -> listOf(this, other)
-}
+fun IntRange.merge(other: IntRange) =
+    when {
+        this == other -> listOf(this)
+        this.first in other && this.last in other -> listOf(other)
+        other.first in this && other.last in this -> listOf(this)
+        this.first < other.first && this.last in other -> listOf(this.first..other.last)
+        this.first in other && this.last > other.last -> listOf(other.first..this.last)
+        else -> listOf(this, other)
+    }
 
 @Suppress("DuplicatedCode")
-fun LongRange.merge(other: LongRange) = when {
-    this == other -> listOf(this)
-    this.first in other && this.last in other -> listOf(other)
-    other.first in this && other.last in this -> listOf(this)
-    this.first < other.first && this.last in other -> listOf(this.first..other.last)
-    this.first in other && this.last > other.last -> listOf(other.first..this.last)
-    else -> listOf(this, other)
-}
+fun LongRange.merge(other: LongRange) =
+    when {
+        this == other -> listOf(this)
+        this.first in other && this.last in other -> listOf(other)
+        other.first in this && other.last in this -> listOf(this)
+        this.first < other.first && this.last in other -> listOf(this.first..other.last)
+        this.first in other && this.last > other.last -> listOf(other.first..this.last)
+        else -> listOf(this, other)
+    }

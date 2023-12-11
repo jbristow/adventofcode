@@ -22,7 +22,7 @@ fun BufferedImage.floodFill(color: Color): BufferedImage {
 
 fun BufferedImage.colorPixels(
     pixels: Iterable<Point2d>,
-    rgb: Int
+    rgb: Int,
 ): BufferedImage {
     pixels.forEach {
         setRGB(it.x, it.y, rgb)
@@ -42,7 +42,7 @@ fun BufferedImage.drawImage(img: Image): BufferedImage {
         img.getScaledInstance(width, height, Image.SCALE_FAST),
         0,
         0,
-        null
+        null,
     )
     return this
 }
@@ -51,7 +51,7 @@ fun BufferedImage.resizeToWidth(newWidth: Int) =
     BufferedImage(
         newWidth,
         (height * (newWidth.toDouble() / width)).toInt(),
-        BufferedImage.TYPE_INT_RGB
+        BufferedImage.TYPE_INT_RGB,
     ).drawImage(this)
 
 fun BufferedImage.writePng(filename: String): BufferedImage {

@@ -7,7 +7,7 @@ object AStarSearch : PathfindingAlgorithm() {
         start: Point2d,
         end: Point2d,
         spaces: Set<Point2d>,
-        neighbors: (Point2d) -> Set<Point2d> = Point2d::orthoNeighbors
+        neighbors: (Point2d) -> Set<Point2d> = Point2d::orthoNeighbors,
     ): List<Point2d> {
         return shortestPath(start, spaces, { it == end }, { it.manhattanDistance(end) }, neighbors)
     }
@@ -17,7 +17,7 @@ object AStarSearch : PathfindingAlgorithm() {
         spaces: Set<T>,
         isGoal: (T) -> Boolean,
         heuristicCostEstimate: (T) -> Long,
-        neighbors: (T) -> Set<T>
+        neighbors: (T) -> Set<T>,
     ): List<T> {
         val openSet = mutableSetOf(start)
         val closedSet = mutableSetOf<T>()

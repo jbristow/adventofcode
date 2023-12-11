@@ -1,29 +1,31 @@
 import util.AdventOfCode
 
 object Day02 : AdventOfCode() {
-
     data class GameResult(val id: Long, val blue: Long, val red: Long, val green: Long) {
-        fun isValidFor(blue: Long, red: Long, green: Long): Boolean =
-            this.blue <= blue && this.red <= red && this.green <= green
+        fun isValidFor(
+            blue: Long,
+            red: Long,
+            green: Long,
+        ): Boolean = this.blue <= blue && this.red <= red && this.green <= green
 
         val power: Long
             get() = blue * red * green
-
     }
 
     private fun String.toGameResult(): GameResult {
         val (label, results) = this.split(": ")
         val (_, id) = label.split(" ")
-        val pulls = results.split("[;,] ".toRegex())
-            .map { it.toCubePull() }
-            .groupBy({ (k, _) -> k }, { (_, v) -> v })
-            .mapValues { (_, v) -> v.max() }
+        val pulls =
+            results.split("[;,] ".toRegex())
+                .map { it.toCubePull() }
+                .groupBy({ (k, _) -> k }, { (_, v) -> v })
+                .mapValues { (_, v) -> v.max() }
 
         return GameResult(
             id = id.toLong(),
             blue = pulls.getValue("blue"),
             red = pulls.getValue("red"),
-            green = pulls.getValue("green")
+            green = pulls.getValue("green"),
         )
     }
 
