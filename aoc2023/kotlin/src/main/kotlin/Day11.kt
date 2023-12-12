@@ -1,6 +1,5 @@
 import util.AdventOfCode
 import util.Point2dL
-import util.Point2dL.Companion.manhattanDistance
 
 object Day11 : AdventOfCode() {
     fun List<String>.toGalaxies(distance: Long = 2): List<Point2dL> {

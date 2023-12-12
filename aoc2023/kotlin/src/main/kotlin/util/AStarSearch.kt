@@ -1,7 +1,5 @@
 package util
 
-import util.Point2d.Companion.manhattanDistance
-
 object AStarSearch : PathfindingAlgorithm() {
     fun orthogonalShortestPath(
         start: Point2d,
