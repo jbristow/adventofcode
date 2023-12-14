@@ -90,7 +90,7 @@ object Day13 : AdventOfCode() {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        println("Day 1")
+        println("Day 13")
         println("\tPart 1: ${part1(inputFileString)}")
         println("\tPart 2: ${part2(inputFileString)}")
     }
