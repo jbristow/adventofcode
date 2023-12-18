@@ -1,36 +1,47 @@
 import util.AdventOfCode
-import util.Point2d
-import util.Point2dRange
+import util.Point2dL
+import util.Point2dLRange
 import util.frequency
 import kotlin.math.abs
 
 object Day10 : AdventOfCode() {
-    sealed class Direction(val offset: Point2d) {
-        data object North : Direction(Point2d(0, -1))
+    sealed class Direction(val offset: Point2dL) {
+        data object North : Direction(Point2dL(0, -1))
 
-        data object South : Direction(Point2d(0, 1))
+        data object South : Direction(Point2dL(0, 1))
 
-        data object East : Direction(Point2d(1, 0))
+        data object East : Direction(Point2dL(1, 0))
 
-        data object West : Direction(Point2d(-1, 0))
+        data object West : Direction(Point2dL(-1, 0))
     }
 
     sealed class PipeTile(vararg directions: Direction) {
         val directions = directions.toList()
 
-        data object Vertical : PipeTile(Direction.North, Direction.South)
+        object Vertical : PipeTile(Direction.North, Direction.South)
 
-        data object Horizontal : PipeTile(Direction.East, Direction.West)
+        object Horizontal : PipeTile(Direction.East, Direction.West)
 
-        data object BendNE : PipeTile(Direction.North, Direction.East)
+        object BendNE : PipeTile(Direction.North, Direction.East)
 
-        data object BendNW : PipeTile(Direction.North, Direction.West)
+        object BendNW : PipeTile(Direction.North, Direction.West)
 
-        data object BendSE : PipeTile(Direction.South, Direction.East)
+        object BendSE : PipeTile(Direction.South, Direction.East)
 
-        data object BendSW : PipeTile(Direction.South, Direction.West)
+        object BendSW : PipeTile(Direction.South, Direction.West)
 
-        data object Start : PipeTile(Direction.North, Direction.South, Direction.East, Direction.West)
+        object Start : PipeTile(Direction.North, Direction.South, Direction.East, Direction.West)
+
+        override fun toString() =
+            when (this) {
+                Vertical -> "|"
+                Horizontal -> "-"
+                BendNE -> "L"
+                BendNW -> "J"
+                BendSE -> "F"
+                BendSW -> "7"
+                Start -> "S"
+            }
     }
 
     private fun Char.toPipeTile(): PipeTile? {
@@ -46,13 +57,13 @@ object Day10 : AdventOfCode() {
         }
     }
 
-    private fun List<String>.toPipeMap(): Map<Point2d, PipeTile> {
+    private fun List<String>.toPipeMap(): Map<Point2dL, PipeTile> {
         val map =
             flatMapIndexed { y, line ->
                 line.mapIndexedNotNull { x, c ->
                     when (val pt = c.toPipeTile()) {
                         null -> null
-                        else -> Point2d(x, y) to pt
+                        else -> Point2dL(x, y) to pt
                     }
                 }
             }.toMap()
@@ -61,10 +72,10 @@ object Day10 : AdventOfCode() {
     }
 
     private tailrec fun navigate(
-        map: Map<Point2d, PipeTile>,
-        queue: MutableList<Point2d>,
-        distances: MutableMap<Point2d, Long> = queue.associateWith { 1L }.toMutableMap(),
-    ): Map<Point2d, Long> {
+        map: Map<Point2dL, PipeTile>,
+        queue: MutableList<Point2dL>,
+        distances: MutableMap<Point2dL, Long> = queue.associateWith { 1L }.toMutableMap(),
+    ): Map<Point2dL, Long> {
         if (queue.isEmpty()) {
             return distances
         }
@@ -100,12 +111,15 @@ object Day10 : AdventOfCode() {
         return navigate(map - start, firstSteps).maxBy { it.value }.value
     }
 
-    private fun Point2d.inside(boundary: Map<Point2d, PipeTile>): Boolean {
+    fun Point2dL.inside(
+        boundary: Map<Point2dL, PipeTile>,
+        minY: Long = 0,
+    ): Boolean {
         val freq =
-            if (y == 0) {
+            if (y == minY) {
                 emptyList()
             } else {
-                Point2dRange(x..x, 0..<y)
+                Point2dLRange(x..x, minY..<y)
             }.mapNotNull { boundary[it] }.frequency()
 
         val hCount = freq[PipeTile.Horizontal] ?: 0
@@ -115,9 +129,9 @@ object Day10 : AdventOfCode() {
         return (hCount + westWalls) % 2 == 1 && (hCount + eastWalls) % 2 == 1
     }
 
-    private fun determineStartTileType(
-        map: Map<Point2d, PipeTile>,
-        start: Point2d,
+    fun determineStartTileType(
+        map: Map<Point2dL, PipeTile>,
+        start: Point2dL,
     ): PipeTile {
         val n = map[start + Direction.North.offset]?.directions?.contains(Direction.South) ?: false
         val s = map[start + Direction.South.offset]?.directions?.contains(Direction.North) ?: false
@@ -143,7 +157,7 @@ object Day10 : AdventOfCode() {
 
         val loop = navigate(map, mutableListOf(start)).mapValues { (k, _) -> map.getValue(k) }
 
-        return Point2dRange(loop).filter { it !in loop && it.inside(loop) }.size.toLong()
+        return Point2dLRange(loop).filter { it !in loop && it.inside(loop) }.size.toLong()
     }
 
     @JvmStatic

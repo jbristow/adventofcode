@@ -37,7 +37,7 @@ data class Point2dRange(val xRange: IntRange, val yRange: IntRange) : Iterable<P
     }
 }
 
-class Point2dLRange(val xRange: LongRange, val yRange: LongRange) : Iterable<Point2dL> {
+data class Point2dLRange(val xRange: LongRange, val yRange: LongRange) : Iterable<Point2dL> {
     constructor(minX: Long, maxX: Long, minY: Long, maxY: Long) : this((minX..maxX), (minY..maxY))
 
     constructor(points: Iterable<Point2dL>) : this(
@@ -73,9 +73,13 @@ data class Point2d(val x: Int = 0, val y: Int = 0) : Point<Int, Long, Point2d> {
     override operator fun minus(other: Point2d): Point2d = Point2d(this.x - other.x, this.y - other.y)
 
     override operator fun times(value: Int): Point2d = Point2d(x * value, y * value)
+
+    operator fun times(value: Long): Point2dL = Point2dL(x * value, y * value)
 }
 
 data class Point2dL(val x: Long = 0, val y: Long = 0) : Point<Long, Long, Point2dL> {
+    constructor(x: Int, y: Int) : this(x.toLong(), y.toLong())
+
     override val orthoNeighbors: Set<Point2dL>
         get() = listOf(-1, 1).flatMap { listOf(Point2dL(x = x + it, y), Point2dL(x, y = y + it)) }.toSet()
 
@@ -145,3 +149,23 @@ data class Point4d(val x: Int, val y: Int, val z: Int, val w: Int) : Point<Int, 
     override fun manhattanDistance(other: Point4d): Long =
         abs(x.toLong() - other.x) + abs(y.toLong() - other.y) + abs(z.toLong() - other.z) + abs(w.toLong() - other.w)
 }
+
+sealed class Direction(val offset: Point2d) {
+    data object North : Direction(Point2d(0, -1))
+
+    data object East : Direction(Point2d(1, 0))
+
+    data object South : Direction(Point2d(0, 1))
+
+    data object West : Direction(Point2d(-1, 0))
+
+    companion object {
+        val all: Sequence<Direction>
+            get() = sequenceOf(North, East, South, West)
+    }
+}
+
+typealias Up = Direction.North
+typealias Down = Direction.South
+typealias Left = Direction.West
+typealias Right = Direction.East
