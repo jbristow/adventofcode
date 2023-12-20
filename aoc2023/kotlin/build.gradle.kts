@@ -26,6 +26,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:$jupiterVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jupiterVersion")
     testImplementation("org.assertj:assertj-core:3.24.2")
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
 }
 
 kotlin {
