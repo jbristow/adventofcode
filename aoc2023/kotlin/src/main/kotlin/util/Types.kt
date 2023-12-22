@@ -37,6 +37,28 @@ data class Point2dRange(val xRange: IntRange, val yRange: IntRange) : Iterable<P
     }
 }
 
+data class Point3dRange(val xRange: IntRange, val yRange: IntRange, val zRange: IntRange) : Iterable<Point3d> {
+    constructor(
+        topLeft: Point3d,
+        bottomRight: Point3d,
+    ) : this((topLeft.x..bottomRight.x), (topLeft.y..bottomRight.y), (topLeft.z..bottomRight.z))
+
+    constructor(points: Iterable<Point3d>) : this(
+        points.minOf(Point3d::x)..points.maxOf(Point3d::x),
+        points.minOf(Point3d::y)..points.maxOf(Point3d::y),
+        points.minOf(Point3d::z)..points.maxOf(Point3d::z),
+    )
+
+    constructor(points: Map<Point3d, Any?>) : this(points.keys)
+
+    override fun iterator(): Iterator<Point3d> {
+        return zRange.asSequence().flatMap {
+                z ->
+            yRange.asSequence().flatMap { y -> xRange.asSequence().map { x -> Point3d(x, y, z) } }
+        }.iterator()
+    }
+}
+
 data class Point2dLRange(val xRange: LongRange, val yRange: LongRange) : Iterable<Point2dL> {
     constructor(minX: Long, maxX: Long, minY: Long, maxY: Long) : this((minX..maxX), (minY..maxY))
 
@@ -62,6 +84,14 @@ data class Point2dLRange(val xRange: LongRange, val yRange: LongRange) : Iterabl
 data class Point2d(val x: Int = 0, val y: Int = 0) : Point<Int, Long, Point2d> {
     override val orthoNeighbors: Set<Point2d>
         get() = listOf(-1, 1).flatMap { listOf(Point2d(x = x + it, y), Point2d(x, y = y + it)) }.toSet()
+    val diagonalNeighbors: Set<Point2d>
+        get() =
+            setOf(
+                Point2d(x + 1, y + 1),
+                Point2d(x - 1, y + 1),
+                Point2d(x - 1, y - 1),
+                Point2d(x + 1, y - 1),
+            )
 
     override val neighbors: Set<Point2d>
         get() = (-1..1).flatMap { dx -> (-1..1).map { dy -> Point2d(x + dx, y + dy) } }.toSet()
@@ -116,6 +146,10 @@ data class Point3d(val x: Int, val y: Int, val z: Int) : Point<Int, Long, Point3
     }
 
     override operator fun times(value: Int): Point3d = Point3d(x * value, y * value, z * value)
+
+    override fun toString(): String {
+        return "($x,$y,$z)"
+    }
 }
 
 data class Point4d(val x: Int, val y: Int, val z: Int, val w: Int) : Point<Int, Long, Point4d> {

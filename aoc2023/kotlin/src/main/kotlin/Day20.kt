@@ -4,16 +4,19 @@ import util.Maths.lcm
 object Day20 : AdventOfCode() {
     sealed interface Pulse {
         data object High : Pulse
+
         data object Low : Pulse
     }
 
     sealed interface Module {
         var sent: Long
         val dests: List<String>
+
         fun receive(impulse: Impulse): Map<String, Pulse>
 
         data class Broadcaster(override val dests: List<String>) : Module {
             override var sent = 0L
+
             override fun receive(impulse: Impulse): Map<String, Pulse> {
                 sent += 1
                 return dests.associateWith { impulse.pulse }
@@ -22,14 +25,16 @@ object Day20 : AdventOfCode() {
 
         data class FlipFlop(override val dests: List<String>, var state: Boolean = false) : Module {
             override var sent = 0L
+
             override fun receive(impulse: Impulse): Map<String, Pulse> {
                 sent += 1
-                val newState = if (impulse.pulse==Pulse.Low) {
-                    !this.state
-                } else {
-                    this.state
-                }
-                if (newState==this.state) {
+                val newState =
+                    if (impulse.pulse == Pulse.Low) {
+                        !this.state
+                    } else {
+                        this.state
+                    }
+                if (newState == this.state) {
                     return mapOf()
                 } else {
                     this.state = newState
@@ -38,7 +43,6 @@ object Day20 : AdventOfCode() {
                         else -> Pulse.Low
                     }.let { p -> dests.associateWith { p } }
                 }
-
             }
         }
 
@@ -47,6 +51,7 @@ object Day20 : AdventOfCode() {
             var reported = false
             var canReport = false
             override var sent = 0L
+
             override fun receive(impulse: Impulse): Map<String, Pulse> {
                 history[impulse.from] = impulse.pulse
                 sent += 1
@@ -57,32 +62,29 @@ object Day20 : AdventOfCode() {
                     canReport = false
                     Pulse.High
                 }.let { p -> dests.associateWith { p } }
-
             }
         }
-
-
     }
 
     fun List<String>.toModules(): Map<String, Module> {
-        val sourceToDest = this.associate { line ->
-            val (source, dests) = line.dropWhile { c -> !c.isLetter() }.split(" -> ")
-            source to dests.split(""",\s+""".toRegex())
-        }
+        val sourceToDest =
+            this.associate { line ->
+                val (source, dests) = line.dropWhile { c -> !c.isLetter() }.split(" -> ")
+                source to dests.split(""",\s+""".toRegex())
+            }
         val destToSource = sourceToDest.flatMap { (k, v) -> v.map { it to k } }.groupBy({ it.first }, { it.second })
 
         return this.associate { line ->
             val source = line.split(" -> ").first()
             val name = source.drop(1)
             when {
-                '&'==source.first() -> name to Module.Conjunction(sourceToDest.getValue(name), destToSource.getValue(name))
-                '%'==source.first() -> name to Module.FlipFlop(sourceToDest.getValue(name))
-                "broadcaster"==source -> source to Module.Broadcaster(sourceToDest.getValue(source))
+                '&' == source.first() -> name to Module.Conjunction(sourceToDest.getValue(name), destToSource.getValue(name))
+                '%' == source.first() -> name to Module.FlipFlop(sourceToDest.getValue(name))
+                "broadcaster" == source -> source to Module.Broadcaster(sourceToDest.getValue(source))
                 else -> throw Exception("Could not parse $source")
             }
         }
     }
-
 
     private fun part1(input: List<String>): Long {
         val modules = input.toModules()
@@ -104,8 +106,7 @@ object Day20 : AdventOfCode() {
         pulseList: List<Impulse> = listOf(Impulse("button", "broadcaster", Pulse.Low)),
         lowPulses: Long = 0,
         highPulses: Long = 0,
-
-        ): Pair<Long, Long> {
+    ): Pair<Long, Long> {
         if (pulseList.isEmpty()) {
             return lowPulses to highPulses
         }
@@ -113,10 +114,11 @@ object Day20 : AdventOfCode() {
         val currModule = modules[currImpulse.to]
         val result = currModule?.receive(currImpulse)?.map { (k, v) -> Impulse(currImpulse.to, k, v) } ?: listOf()
 
-        val (low, high) = when (currImpulse.pulse) {
-            Pulse.High -> 0 to 1
-            Pulse.Low -> 1 to 0
-        }
+        val (low, high) =
+            when (currImpulse.pulse) {
+                Pulse.High -> 0 to 1
+                Pulse.Low -> 1 to 0
+            }
 
         return simulate(modules, pulseList.drop(1) + result, lowPulses + low, highPulses + high)
     }
@@ -132,7 +134,7 @@ object Day20 : AdventOfCode() {
             return false to found
         }
         val currImpulse = pulseList.first()
-        if (currImpulse.pulse==Pulse.Low && currImpulse.to==target) {
+        if (currImpulse.pulse == Pulse.Low && currImpulse.to == target) {
             return true to found
         }
         val currModule = modules[currImpulse.to]
@@ -144,7 +146,6 @@ object Day20 : AdventOfCode() {
             found.add(buttonPresses)
         }
 
-
         return simulateEscape(modules, target, buttonPresses, found, pulseList.drop(1) + result)
     }
 
@@ -155,7 +156,6 @@ object Day20 : AdventOfCode() {
         found: MutableList<Long> = mutableListOf(),
         buttonPresses: Long = 0,
     ): Long {
-
         val nextButtonPresses = buttonPresses + 1
 
         val (done, nextFound) = simulateEscape(modules, target, nextButtonPresses, found)

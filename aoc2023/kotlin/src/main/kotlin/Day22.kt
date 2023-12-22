@@ -16,9 +16,10 @@ object Day22 : AdventOfCode() {
 
     private fun List<String>.toBricks(): List<Brick> {
         return this.mapIndexed { i, line ->
-            val (a, b) = line.split("~")
-                .map { range -> range.split(",") }
-                .map { (x, y, z) -> Point3d(x.toInt(), y.toInt(), z.toInt()) }
+            val (a, b) =
+                line.split("~")
+                    .map { range -> range.split(",") }
+                    .map { (x, y, z) -> Point3d(x.toInt(), y.toInt(), z.toInt()) }
             Brick("$i", Point3dRange(a, b).toSet())
         }
     }
@@ -28,7 +29,7 @@ object Day22 : AdventOfCode() {
             it.label to
                 it.cubes.map { c ->
                     c + Point3d(0, 0, 1)
-                }.mapNotNull { c -> this.find { b -> b.label!=it.label && c in b } }.map { b -> b.label }
+                }.mapNotNull { c -> this.find { b -> b.label != it.label && c in b } }.map { b -> b.label }
         }
     }
 
@@ -37,7 +38,7 @@ object Day22 : AdventOfCode() {
             it.label to
                 it.cubes
                     .map { cube -> cube + Point3d(0, 0, -1) }
-                    .mapNotNull { c -> this.find { b -> b.label!=it.label && c in b } }.map { b -> b.label }
+                    .mapNotNull { c -> this.find { b -> b.label != it.label && c in b } }.map { b -> b.label }
         }
     }
 
@@ -63,7 +64,7 @@ object Day22 : AdventOfCode() {
         }
 
         return bricks.sumOf {
-            chainReaction(setOf(it.label)).filter { label -> label!=it.label }.size
+            chainReaction(setOf(it.label)).filter { label -> label != it.label }.size
         }
     }
 
@@ -87,11 +88,11 @@ object Day22 : AdventOfCode() {
 
     private tailrec fun settle(bricks: MutableList<Brick>): List<Brick> {
         val filtered =
-            bricks.filter { brick -> brick.cubes.none { it.z==0 } }
+            bricks.filter { brick -> brick.cubes.none { it.z == 0 } }
                 .filter { brick ->
                     brick.cubes.map { it + Point3d(0, 0, -1) }.all {
                         bricks.none { other ->
-                            other.label!=brick.label && it in other
+                            other.label != brick.label && it in other
                         }
                     } // no bricks underneath
                 }
@@ -113,8 +114,8 @@ object Day22 : AdventOfCode() {
         return supports.filter { (supportBrick, supportedBricks) ->
             supportedBricks.isEmpty() ||
                 supportedBricks.all {
-                    supportedBy.getValue(it).any { label -> supportBrick!=label }
+                    supportedBy.getValue(it).any { label -> supportBrick != label }
                 }
-        }.keys.mapNotNull { bricks.find { b -> b.label==it } }
+        }.keys.mapNotNull { bricks.find { b -> b.label == it } }
     }
 }
