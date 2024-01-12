@@ -27,6 +27,9 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jupiterVersion")
     testImplementation("org.assertj:assertj-core:3.24.2")
     implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
+    implementation(files("/Users/jbristow/git/z3/build/com.microsoft.z3.jar"))
+    implementation(files("/Users/jbristow/git/z3/build/libz3.dylib"))
+    implementation(files("/Users/jbristow/git/z3/build/libz3java.dylib"))
 }
 
 kotlin {

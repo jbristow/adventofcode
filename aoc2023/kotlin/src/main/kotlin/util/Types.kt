@@ -1,10 +1,11 @@
 package util
 
+import java.math.BigDecimal
 import kotlin.math.abs
 
 interface Point<F : Number, M : Number, T : Point<F, M, T>> {
     val neighbors: Set<Point<F, M, T>>
-    val orthoNeighbors: Set<Point<F, M, T>>
+    val orthoNeighbors: Set<T>
 
     fun manhattanDistance(other: T): M
 
@@ -52,9 +53,29 @@ data class Point3dRange(val xRange: IntRange, val yRange: IntRange, val zRange: 
     constructor(points: Map<Point3d, Any?>) : this(points.keys)
 
     override fun iterator(): Iterator<Point3d> {
-        return zRange.asSequence().flatMap {
-                z ->
+        return zRange.asSequence().flatMap { z ->
             yRange.asSequence().flatMap { y -> xRange.asSequence().map { x -> Point3d(x, y, z) } }
+        }.iterator()
+    }
+}
+
+data class Point3dLRange(val xRange: LongRange, val yRange: LongRange, val zRange: LongRange) : Iterable<Point3dL> {
+    constructor(
+        topLeft: Point3dL,
+        bottomRight: Point3dL,
+    ) : this((topLeft.x..bottomRight.x), (topLeft.y..bottomRight.y), (topLeft.z..bottomRight.z))
+
+    constructor(points: Iterable<Point3dL>) : this(
+        points.minOf(Point3dL::x)..points.maxOf(Point3dL::x),
+        points.minOf(Point3dL::y)..points.maxOf(Point3dL::y),
+        points.minOf(Point3dL::z)..points.maxOf(Point3dL::z),
+    )
+
+    constructor(points: Map<Point3dL, Any?>) : this(points.keys)
+
+    override fun iterator(): Iterator<Point3dL> {
+        return zRange.asSequence().flatMap { z ->
+            yRange.asSequence().flatMap { y -> xRange.asSequence().map { x -> Point3dL(x, y, z) } }
         }.iterator()
     }
 }
@@ -105,6 +126,10 @@ data class Point2d(val x: Int = 0, val y: Int = 0) : Point<Int, Long, Point2d> {
     override operator fun times(value: Int): Point2d = Point2d(x * value, y * value)
 
     operator fun times(value: Long): Point2dL = Point2dL(x * value, y * value)
+
+    override fun toString(): String {
+        return "($x,$y)"
+    }
 }
 
 data class Point2dL(val x: Long = 0, val y: Long = 0) : Point<Long, Long, Point2dL> {
@@ -116,7 +141,7 @@ data class Point2dL(val x: Long = 0, val y: Long = 0) : Point<Long, Long, Point2
     override val neighbors: Set<Point2dL>
         get() = (-1..1).flatMap { dx -> (-1..1).map { dy -> Point2dL(x + dx, y + dy) } }.toSet()
 
-    override fun manhattanDistance(other: Point2dL): Long = abs(x.toLong() - other.x) + abs(y.toLong() - other.y)
+    override fun manhattanDistance(other: Point2dL): Long = abs(x - other.x) + abs(y - other.y)
 
     override operator fun plus(other: Point2dL): Point2dL = Point2dL(this.x + other.x, this.y + other.y)
 
@@ -152,36 +177,91 @@ data class Point3d(val x: Int, val y: Int, val z: Int) : Point<Int, Long, Point3
     }
 }
 
-data class Point4d(val x: Int, val y: Int, val z: Int, val w: Int) : Point<Int, Long, Point4d> {
-    override val neighbors: Set<Point4d>
+data class Point3dL(val x: Long, val y: Long, val z: Long) : Point<Long, Long, Point3dL> {
+    override val neighbors: Set<Point3dL>
         get() =
             (-1..1).flatMap { dx ->
                 (-1..1).flatMap { dy ->
-                    (-1..1).flatMap { dz ->
-                        (-1..1).map { dw -> Point4d(x + dx, y + dy, z + dz, w + dw) }
-                    }
+                    (-1..1).mapNotNull { dz -> Point3dL(x + dx, y + dy, z + dz) }
                 }
             }.toSet()
 
-    override val orthoNeighbors: Set<Point4d>
-        get() =
-            listOf(-1, 1).flatMap {
-                listOf(
-                    copy(x = x + it),
-                    copy(y = y + it),
-                    copy(z = z + it),
-                    copy(w = w + it),
-                )
-            }.toSet()
+    override val orthoNeighbors: Set<Point3dL>
+        get() = listOf(-1, 1).flatMap { listOf(copy(x = x + it), copy(y = y + it), copy(z = z + it)) }.toSet()
 
-    override operator fun plus(other: Point4d) = Point4d(this.x + other.x, this.y + other.y, this.z + other.z, this.w + other.w)
+    override operator fun plus(other: Point3dL) = Point3dL(this.x + other.x, this.y + other.y, this.z + other.z)
 
-    override operator fun times(value: Int): Point4d = Point4d(x * value, y * value, z * value, w * value)
+    override operator fun minus(other: Point3dL) = Point3dL(this.x - other.x, this.y - other.y, this.z - other.z)
 
-    override operator fun minus(other: Point4d): Point4d = this + (other * -1)
+    override fun manhattanDistance(other: Point3dL): Long {
+        return abs(x - other.x) + abs(y - other.y) + abs(z - other.z)
+    }
 
-    override fun manhattanDistance(other: Point4d): Long =
-        abs(x.toLong() - other.x) + abs(y.toLong() - other.y) + abs(z.toLong() - other.z) + abs(w.toLong() - other.w)
+    override operator fun times(value: Long): Point3dL = Point3dL(x * value, y * value, z * value)
+
+    override fun toString(): String {
+        return "($x,$y,$z)"
+    }
+
+    fun toArray(): LongArray {
+        return longArrayOf(x, y, z)
+    }
+
+    operator fun get(i: Int): Long {
+        return when (i) {
+            0 -> x
+            1 -> y
+            2 -> z
+            else -> throw Exception("Illegal access, index $i")
+        }
+    }
+}
+
+data class Point3dBigDecimal(val x: BigDecimal, val y: BigDecimal, val z: BigDecimal) : Point<BigDecimal, BigDecimal, Point3dBigDecimal> {
+    constructor(x: Int, y: Int, z: Int) : this(x.toBigDecimal(), y.toBigDecimal(), z.toBigDecimal())
+
+    override val neighbors: Set<Point3dBigDecimal>
+        get() = TODO("Non integer points cannot easily define what neighbors are")
+
+    override val orthoNeighbors: Set<Point3dBigDecimal>
+        get() = TODO("Non integer points cannot easily define what neighbors are")
+
+    override operator fun plus(other: Point3dBigDecimal) =
+        Point3dBigDecimal(
+            this.x.add(other.x),
+            this.y.add(other.y),
+            this.z.add(other.z),
+        )
+
+    override operator fun minus(other: Point3dBigDecimal) =
+        Point3dBigDecimal(
+            this.x.subtract(other.x),
+            this.y.subtract(other.y),
+            this.z.subtract(other.z),
+        )
+
+    override fun manhattanDistance(other: Point3dBigDecimal): BigDecimal {
+        return (x - other.x).abs() + (y - other.y).abs() + (z - other.z).abs()
+    }
+
+    fun manhattanDistance(): BigDecimal {
+        return this.manhattanDistance(Point3dBigDecimal(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO))
+    }
+
+    override operator fun times(value: BigDecimal): Point3dBigDecimal = Point3dBigDecimal(x * value, y * value, z * value)
+
+    override fun toString(): String {
+        return "($x,$y,$z)"
+    }
+
+    operator fun get(i: Int): BigDecimal {
+        return when (i) {
+            0 -> x
+            1 -> y
+            2 -> z
+            else -> throw Exception("Illegal access, index $i")
+        }
+    }
 }
 
 sealed class Direction(val offset: Point2d) {
