@@ -3,7 +3,6 @@ import util.frequency
 import kotlin.math.absoluteValue
 
 object Day01 : AdventOfCode() {
-
     private fun splitLine(line: String) =
         line
             .split("""\s+""".toRegex())
