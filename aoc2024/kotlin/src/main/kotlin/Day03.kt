@@ -1,23 +1,19 @@
 import util.AdventOfCode
 
 object Day03 : AdventOfCode() {
-
     val mul_re = """mul\((\d+),\s*(\d+)\)""".toRegex()
 
     val all_re = """(mul|do|don't)\((?:\d+,\s*\d+)?\)""".toRegex()
 
-    fun part1(input: String): Long {
-        val ops = mul_re.findAll(input)
-        return ops.sumOf { multiply(it) }
-    }
+    fun part1(input: String) = mul_re.findAll(input).sumOf { multiply(it) }
 
-    private fun multiply(it: MatchResult): Long {
-        return it.groupValues[1].toLong() * it.groupValues[2].toLong()
-    }
+    private fun multiply(it: MatchResult) = it.groupValues[1].toLong() * it.groupValues[2].toLong()
 
-    fun part2(input: String): Long {
-        val ops = all_re.findAll(input)
-        return ops.map { it.groupValues }.fold(0L to true) { (sum, shouldI), match ->
+    fun part2(input: String) =
+        all_re
+            .findAll(input)
+            .map { it.groupValues }
+            .fold(0L to true) { (sum, shouldI), match ->
                 when (match[1]) {
                     "do" -> sum to true
                     "don't" -> sum to false
@@ -32,13 +28,10 @@ object Day03 : AdventOfCode() {
                 }
             }.first
 
-    }
-
     @JvmStatic
     fun main(args: Array<String>) {
         println("Day 3")
         println("\tPart 1: ${part1(inputFileString)}")
         println("\tPart 2: ${part2(inputFileString)}")
     }
-
 }
