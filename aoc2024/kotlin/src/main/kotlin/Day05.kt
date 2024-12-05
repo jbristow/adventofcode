@@ -1,7 +1,10 @@
 import util.*
 
 object Day05 : AdventOfCode() {
-    private fun parse(input: String): Pair<Map<Int, List<Int>>, List<List<Int>>> {
+    internal val <T> List<T>.middle
+        get() = this[this.size / 2]
+
+    fun parse(input: String): Pair<Map<Int, List<Int>>, List<List<Int>>> {
         val split = input.split("\n\n")
         val before =
             split[0]
@@ -31,7 +34,7 @@ object Day05 : AdventOfCode() {
         val (before, updates) = parse(input)
         return updates
             .filter { isOrdered(before, it) }
-            .sumOf { it[it.size / 2] }
+            .sumOf { it.middle }
     }
 
     private fun part2(input: String): Int {
@@ -39,7 +42,7 @@ object Day05 : AdventOfCode() {
         return updates
             .filterNot { isOrdered(before, it) }
             .map { correct(before, it) }
-            .sumOf { it[it.size / 2] }
+            .sumOf { it.middle }
     }
 
     private tailrec fun correct(
