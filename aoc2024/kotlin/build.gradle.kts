@@ -11,9 +11,11 @@ repositories {
 val arrowVersion = "1.2.4"
 val jupiterVersion = "5.10.1"
 val assertjVersion = "3.24.2"
+val coroutinesVersion = "1.9.0"
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("io.arrow-kt:arrow-core:$arrowVersion")
     implementation("io.arrow-kt:arrow-optics:$arrowVersion")
     testImplementation(kotlin("test"))

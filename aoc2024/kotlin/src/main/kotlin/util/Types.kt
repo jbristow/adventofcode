@@ -279,6 +279,14 @@ data class Point3dBigDecimal(
 sealed class Direction(
     val offset: Point2d,
 ) {
+    fun turnRight(): Direction =
+        when (this) {
+            is North -> East
+            is East -> South
+            is South -> West
+            is West -> North
+        }
+
     data object North : Direction(Point2d(0, -1))
 
     data object East : Direction(Point2d(1, 0))
