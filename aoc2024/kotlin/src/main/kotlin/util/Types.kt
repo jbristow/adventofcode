@@ -37,6 +37,8 @@ data class Point2dRange(
         yRange.joinToString("\n") { y ->
             xRange.joinToString("") { x -> transform?.let { it(Point2d(x, y)) } ?: "." }
         }
+
+    operator fun contains(p: Point2d): Boolean = p.x in xRange && p.y in yRange
 }
 
 data class Point3dRange(
