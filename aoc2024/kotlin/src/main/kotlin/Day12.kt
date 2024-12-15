@@ -1,8 +1,11 @@
 import util.AdventOfCode
+import util.Direction
 import util.Left
+import util.Point
 import util.Point2d
 import util.Point2dRange
 import util.Up
+import java.util.LinkedList
 import kotlin.math.min
 
 object Day12 : AdventOfCode() {
@@ -88,7 +91,7 @@ MMMISSJEEE""".lines()
                             val a = equivalence.getOrDefault(l, setOf())
                             val b = equivalence.getOrDefault(u, setOf())
 
-                            val eq = a + b + setOf(l,u)
+                            val eq = a + b + setOf(l, u)
                             eq.forEach { e -> equivalence[e] = eq }
                         }
 
@@ -98,7 +101,7 @@ MMMISSJEEE""".lines()
                             val a = equivalence.getOrDefault(l, setOf())
                             val b = equivalence.getOrDefault(u, setOf())
 
-                            val eq = a + b + setOf(l,u)
+                            val eq = a + b + setOf(l, u)
                             eq.forEach { e -> equivalence[e] = eq }
 
                         }
@@ -161,8 +164,115 @@ MMMISSJEEE""".lines()
         return -1
     }
 
+    fun formRegion(grid: Map<Point2d, String>, point: Point2d, seen: MutableSet<Point2d>): Int {
+        if (point in seen) {
+            return 0
+        }
+
+        val label = grid.getValue(point)
+        val queue = LinkedList<Point2d>(listOf(point))
+
+        var area = 1
+        var perimiter = 4
+        var corners = countCorners(grid, point)
+        seen.add(point)
+        while (queue.isNotEmpty()) {
+            val curr = queue.remove()
+            println("${queue.size} ${curr}")
+            curr.orthoNeighbors.filter { it in grid && grid.getValue(it) == label }
+                .forEach { it ->
+                    perimiter -= 1
+                    if (it !in seen) {
+                        area += 1
+                        perimiter += 4
+                        corners += countCorners(grid, it)
+                        queue.add(it)
+                        seen.add(it)
+                    }
+                }
+        }
+        return area * corners
+    }
+
+    fun countCorners(grid: Map<Point2d, String>, point: Point2d): Int {
+        val label = grid.getValue(point)
+        return listOf(
+            Direction.North to Direction.East,
+            Direction.East to Direction.South,
+            Direction.South to Direction.West,
+            Direction.West to Direction.North,
+        ).map { (a, b) ->
+            listOf(
+                grid[point + a.offset],
+                grid[point + b.offset],
+                grid[point + a.offset + b.offset],
+            )
+        }.count { (left, right, mid) ->
+            (left != label && right != label) || (left == label && right == label && mid != label)
+        }
+
+    }
+    /*
+const countCorners = (x: number, y: number) =>
+  [0, 1, 2, 3]
+    .map(d => [directions2D[d], directions2D[(d + 1) % 4]])
+    .map(([[dx1, dy1], [dx2, dy2]]) => [
+      gardenMap[y][x],
+      gardenMap[y + dy1]?.[x + dx1],
+      gardenMap[y + dy2]?.[x + dx2],
+      gardenMap[y + dy1 + dy2]?.[x + dx1 + dx2],
+    ])
+    .filter(([plant, left, right, mid]) => (left !== plant && right !== plant) || (left === plant && right === plant && mid !== plant))
+    .length;
+
+const formRegion = (x: number, y: number) => {
+  if (plotted.has([x, y])) return 0;
+
+  const plant = gardenMap[y][x];
+  const plotQueue = new Queue([[x, y]]);
+  let [area, perimeter, corners] = [1, 4, countCorners(x, y)];
+  plotted.add([x, y]);
+  while (plotQueue.size) {
+    [x, y] = plotQueue.remove();
+    directions2D
+      .map(([dx, dy]) => [x + dx, y + dy])
+      .filter(([x, y]) => gardenMap[y]?.[x] === plant)
+      .forEach(([x, y]) => {
+        perimeter--;
+        if (!plotted.has([x, y])) {
+          area += 1;
+          perimeter += 4;
+          corners += countCorners(x, y);
+          plotQueue.add([x, y]);
+          plotted.add([x, y]);
+        }
+      });
+  }
+  return area * [perimeter, corners][part - 1];
+};
+
+const countCorners = (x: number, y: number) =>
+  [0, 1, 2, 3]
+    .map(d => [directions2D[d], directions2D[(d + 1) % 4]])
+    .map(([[dx1, dy1], [dx2, dy2]]) => [
+      gardenMap[y][x],
+      gardenMap[y + dy1]?.[x + dx1],
+      gardenMap[y + dy2]?.[x + dx2],
+      gardenMap[y + dy1 + dy2]?.[x + dx1 + dx2],
+    ])
+    .filter(([plant, left, right, mid]) => (left !== plant && right !== plant) || (left === plant && right === plant && mid !== plant))
+    .length;
+
+output(gardenMap.flatMap((row, y) => row.map((_, x) => formRegion(x, y))).reduce((a, b) => a + b));
+
+     */
+
     fun part2(input: List<String>): Int {
-        return -1
+        val grid = parse(input)
+        val range = Point2dRange(grid)
+        val seen = mutableSetOf<Point2d>()
+        println(range.fold(0) { acc, curr -> acc + formRegion(grid, curr, seen) })
+ return -1
     }
 
 
