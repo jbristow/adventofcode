@@ -1,36 +1,12 @@
 import util.AdventOfCode
 import util.Direction
 import util.Left
-import util.Point
 import util.Point2d
 import util.Point2dRange
 import util.Up
 import java.util.LinkedList
-import kotlin.math.min
 
 object Day12 : AdventOfCode() {
-
-    val sample = """AAAA
-BBCD
-BBCC
-EEEC""".lines()
-
-    val sample2 = """OOOOO
-OXOXO
-OOOOO
-OXOXO
-OOOOO""".lines()
-
-    val sample3 = """RRRRIICCFF
-RRRRIICCCF
-VVRRRCCFFF
-VVRCCCJFFF
-VVVVCJJCFE
-VVIVCCJJEE
-VVIIICJJEE
-MIIIIIJJEE
-MIIISIJEEE
-MMMISSJEEE""".lines()
 
     fun parse(input: List<String>): Map<Point2d, String> {
         return input.flatMapIndexed { y, line -> line.mapIndexed { x, c -> Point2d(x, y) to c.toString() } }.toMap()
@@ -65,10 +41,9 @@ MMMISSJEEE""".lines()
                     labelMap[p] = labelMap[p + Left.offset]!!
                 }
                 if ((grid[p + Up.offset] == v && grid[p + Left.offset] == v) && (
-                        labelMap[p + Up.offset] != labelMap[p] || labelMap[p + Left.offset] != labelMap[p]
-                        )
+                            labelMap[p + Up.offset] != labelMap[p] || labelMap[p + Left.offset] != labelMap[p]
+                            )
                 ) {
-                    println("$p ${v} (2) ${labelMap[p + Left.offset]} ${labelMap[p + Up.offset]}")
                     val u = labelMap[p + Up.offset]
                     val l = labelMap[p + Left.offset]
                     when {
@@ -76,18 +51,16 @@ MMMISSJEEE""".lines()
                             throw Error("oops")
                         }
 
-                        l == null && u != null -> {
-                            labelMap[p] = u
+                        l == null -> {
+                            labelMap[p] = u!!
                         }
 
-                        u == null && l != null -> {
+                        u == null -> {
                             labelMap[p] = l
                         }
 
-                        u != null && l != null && u < l -> {
-
+                        u < l -> {
                             labelMap[p] = u
-                            println("=>$l - $u")
                             val a = equivalence.getOrDefault(l, setOf())
                             val b = equivalence.getOrDefault(u, setOf())
 
@@ -95,9 +68,8 @@ MMMISSJEEE""".lines()
                             eq.forEach { e -> equivalence[e] = eq }
                         }
 
-                        u != null && l != null && u >= l -> {
+                        u >= l -> {
                             labelMap[p] = l
-                            println("=>$u - $l")
                             val a = equivalence.getOrDefault(l, setOf())
                             val b = equivalence.getOrDefault(u, setOf())
 
@@ -119,14 +91,10 @@ MMMISSJEEE""".lines()
                 }
             }
         }
-
-        println(equivalence)
-        var after = labelMap.mapValues { (_, v) -> equivalence[v]?.min() ?: v }
-
-        return after
+        return labelMap.mapValues { (_, v) -> equivalence[v]?.min() ?: v }
     }
 
-    fun part1(input: List<String>): Int {
+    fun part1(input: List<String>): Long {
         val grid = parse(input)
 
         val fences = grid.keys.flatMap {
@@ -136,32 +104,12 @@ MMMISSJEEE""".lines()
         val cgrid = connectivity(grid)
         val chunks = cgrid.toList().groupBy({ it.second }, { it.first })
 
-        println(
-            Point2dRange(grid).joinToString { p ->
-                if (cgrid.getValue(p) < 26) {
-                    ('a'.code + cgrid.getValue(p)).toChar().toString()
-                } else if (cgrid.getValue(p) - 26 < 26) {
-                    ('A'.code + cgrid.getValue(p) - 26).toChar().toString()
-                } else if (cgrid.getValue(p) - 26 - 26 < 10) {
-                    ('0'.code + cgrid.getValue(p) - 26 - 26).toChar().toString()
-                } else {
 
-                    (cgrid.getValue(p)).toChar().toString()
-                }
-            },
-        )
-        println(
-            chunks.toList().map { (_, v) ->
-                v.size.toString() + "x" + v.flatMap { p -> p.orthoNeighbors.map { neighbor -> Fence(p, neighbor) } }.count { it in fences }
-            },
-        )
-        println(
-            chunks.toList().sumOf { (_, v) ->
-                v.size.toLong() * v.flatMap { p -> p.orthoNeighbors.map { neighbor -> Fence(p, neighbor) } }.count { it in fences }
-            },
-        )
+        return chunks.toList().sumOf { (_, v) ->
+            v.size.toLong() * v.flatMap { p -> p.orthoNeighbors.map { neighbor -> Fence(p, neighbor) } }
+                .count { it in fences }
+        }
 
-        return -1
     }
 
     fun formRegion(grid: Map<Point2d, String>, point: Point2d, seen: MutableSet<Point2d>): Int {
@@ -178,9 +126,8 @@ MMMISSJEEE""".lines()
         seen.add(point)
         while (queue.isNotEmpty()) {
             val curr = queue.remove()
-            println("${queue.size} ${curr}")
             curr.orthoNeighbors.filter { it in grid && grid.getValue(it) == label }
-                .forEach { it ->
+                .forEach {
                     perimiter -= 1
                     if (it !in seen) {
                         area += 1
@@ -212,67 +159,11 @@ MMMISSJEEE""".lines()
         }
 
     }
-    /*
-const countCorners = (x: number, y: number) =>
-  [0, 1, 2, 3]
-    .map(d => [directions2D[d], directions2D[(d + 1) % 4]])
-    .map(([[dx1, dy1], [dx2, dy2]]) => [
-      gardenMap[y][x],
-      gardenMap[y + dy1]?.[x + dx1],
-      gardenMap[y + dy2]?.[x + dx2],
-      gardenMap[y + dy1 + dy2]?.[x + dx1 + dx2],
-    ])
-    .filter(([plant, left, right, mid]) => (left !== plant && right !== plant) || (left === plant && right === plant && mid !== plant))
-    .length;
-
-const formRegion = (x: number, y: number) => {
-  if (plotted.has([x, y])) return 0;
-
-  const plant = gardenMap[y][x];
-  const plotQueue = new Queue([[x, y]]);
-  let [area, perimeter, corners] = [1, 4, countCorners(x, y)];
-  plotted.add([x, y]);
-  while (plotQueue.size) {
-    [x, y] = plotQueue.remove();
-    directions2D
-      .map(([dx, dy]) => [x + dx, y + dy])
-      .filter(([x, y]) => gardenMap[y]?.[x] === plant)
-      .forEach(([x, y]) => {
-        perimeter--;
-        if (!plotted.has([x, y])) {
-          area += 1;
-          perimeter += 4;
-          corners += countCorners(x, y);
-          plotQueue.add([x, y]);
-          plotted.add([x, y]);
-        }
-      });
-  }
-  return area * [perimeter, corners][part - 1];
-};
-
-const countCorners = (x: number, y: number) =>
-  [0, 1, 2, 3]
-    .map(d => [directions2D[d], directions2D[(d + 1) % 4]])
-    .map(([[dx1, dy1], [dx2, dy2]]) => [
-      gardenMap[y][x],
-      gardenMap[y + dy1]?.[x + dx1],
-      gardenMap[y + dy2]?.[x + dx2],
-      gardenMap[y + dy1 + dy2]?.[x + dx1 + dx2],
-    ])
-    .filter(([plant, left, right, mid]) => (left !== plant && right !== plant) || (left === plant && right === plant && mid !== plant))
-    .length;
-
-output(gardenMap.flatMap((row, y) => row.map((_, x) => formRegion(x, y))).reduce((a, b) => a + b));
-
-     */
 
     fun part2(input: List<String>): Int {
         val grid = parse(input)
-        val range = Point2dRange(grid)
         val seen = mutableSetOf<Point2d>()
-        println(range.fold(0) { acc, curr -> acc + formRegion(grid, curr, seen) })
- return -1
+        return Point2dRange(grid).fold(0) { acc, curr -> acc + formRegion(grid, curr, seen) }
     }
 
 
