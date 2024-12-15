@@ -8,11 +8,15 @@ import java.util.LinkedList
 
 object Day12 : AdventOfCode() {
 
-    fun parse(input: List<String>): Map<Point2d, String> {
-        return input.flatMapIndexed { y, line -> line.mapIndexed { x, c -> Point2d(x, y) to c.toString() } }.toMap()
-    }
+    fun parse(input: List<String>): Map<Point2d, String> =
+        input.flatMapIndexed { y, line ->
+            line.mapIndexed { x, c -> Point2d(x, y) to c.toString() }
+        }.toMap()
 
-    data class Fence(val a: Point2d, val b: Point2d) {
+    data class Fence(
+        val a: Point2d,
+        val b: Point2d,
+    ) {
         override fun equals(other: Any?): Boolean {
             if (other !is Fence) {
                 return false
@@ -27,8 +31,10 @@ object Day12 : AdventOfCode() {
         }
     }
 
-    fun connectivity(grid: Map<Point2d, String>, initial: Map<Point2d, Int>? = null): Map<Point2d, Int> {
-
+    fun connectivity(
+        grid: Map<Point2d, String>,
+        initial: Map<Point2d, Int>? = null,
+    ): Map<Point2d, Int> {
         val labelMap = initial?.toMutableMap() ?: mutableMapOf<Point2d, Int>()
         var labelMax = 0
         val range = Point2dRange(grid)
@@ -40,9 +46,10 @@ object Day12 : AdventOfCode() {
                 if (grid[p + Left.offset] == v) {
                     labelMap[p] = labelMap[p + Left.offset]!!
                 }
-                if ((grid[p + Up.offset] == v && grid[p + Left.offset] == v) && (
-                            labelMap[p + Up.offset] != labelMap[p] || labelMap[p + Left.offset] != labelMap[p]
-                            )
+                if ((grid[p + Up.offset] == v && grid[p + Left.offset] == v) &&
+                    (
+                        labelMap[p + Up.offset] != labelMap[p] || labelMap[p + Left.offset] != labelMap[p]
+                        )
                 ) {
                     val u = labelMap[p + Up.offset]
                     val l = labelMap[p + Left.offset]
@@ -75,7 +82,6 @@ object Day12 : AdventOfCode() {
 
                             val eq = a + b + setOf(l, u)
                             eq.forEach { e -> equivalence[e] = eq }
-
                         }
                     }
                 }
@@ -104,15 +110,17 @@ object Day12 : AdventOfCode() {
         val cgrid = connectivity(grid)
         val chunks = cgrid.toList().groupBy({ it.second }, { it.first })
 
-
         return chunks.toList().sumOf { (_, v) ->
             v.size.toLong() * v.flatMap { p -> p.orthoNeighbors.map { neighbor -> Fence(p, neighbor) } }
                 .count { it in fences }
         }
-
     }
 
-    fun formRegion(grid: Map<Point2d, String>, point: Point2d, seen: MutableSet<Point2d>): Int {
+    fun formRegion(
+        grid: Map<Point2d, String>,
+        point: Point2d,
+        seen: MutableSet<Point2d>,
+    ): Int {
         if (point in seen) {
             return 0
         }
@@ -141,7 +149,10 @@ object Day12 : AdventOfCode() {
         return area * corners
     }
 
-    fun countCorners(grid: Map<Point2d, String>, point: Point2d): Int {
+    fun countCorners(
+        grid: Map<Point2d, String>,
+        point: Point2d,
+    ): Int {
         val label = grid.getValue(point)
         return listOf(
             Direction.North to Direction.East,
@@ -157,7 +168,6 @@ object Day12 : AdventOfCode() {
         }.count { (left, right, mid) ->
             (left != label && right != label) || (left == label && right == label && mid != label)
         }
-
     }
 
     fun part2(input: List<String>): Int {
@@ -165,7 +175,6 @@ object Day12 : AdventOfCode() {
         val seen = mutableSetOf<Point2d>()
         return Point2dRange(grid).fold(0) { acc, curr -> acc + formRegion(grid, curr, seen) }
     }
-
 
     @JvmStatic
     fun main(args: Array<String>) {
