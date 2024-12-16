@@ -288,6 +288,13 @@ sealed class Direction(
             is South -> West
             is West -> North
         }
+    fun turnLeft(): Direction =
+        when (this) {
+            is North -> West
+            is East -> North
+            is South -> East
+            is West -> South
+        }
 
     data object North : Direction(Point2d(0, -1))
 
