@@ -20,28 +20,37 @@ object Day18 : AdventOfCode() {
     }
 
     private fun part2(input: List<String>): String {
-        val totalCorruption = input.map { it.split(",").let { (x, y) -> Point2d(x.toInt(), y.toInt()) } }
+        val corruption = input.map { it.split(",").let { (x, y) -> Point2d(x.toInt(), y.toInt()) } }
         val start = Point2d(0, 0)
         val end = Point2d(70, 70)
 
-        val output = totalCorruption.indices.drop(1024).stream().parallel()
-            .map { n ->
-                val corruption = totalCorruption.take(n)
-                val corruptionSet = corruption.toSet()
-                val grid = Point2dRange(start, end).filter { p -> p !in corruptionSet }.toSet()
-                val d = djikstra(
-                    start,
-                    { it == end },
-                    grid,
-                    { it.orthoNeighbors.filter { it in grid } },
-                )
-                if (d == null) {
-                    corruption.last()
-                } else {
-                    null
-                }
-            }.filter { it != null }
-            .findFirst()
-        return output.orElseThrow().let { p -> "${p?.x},${p?.y}" }
+        return BinarySearch(start, end, corruption).search().let { "${it.x},${it.y}" }
+    }
+
+    class BinarySearch(
+        val start: Point2d,
+        val end: Point2d,
+        val corruption: List<Point2d>,
+    ) {
+        val grid = Point2dRange(start, end)
+        tailrec fun search(
+            lowerBound: Int = 1025,
+            upperBound: Int = corruption.size,
+        ): Point2d {
+            val currentCorruption = corruption.take(lowerBound)
+            val corruptedGrid = grid - currentCorruption
+            val d = djikstra(
+                start,
+                { it == end },
+                corruptedGrid.toSet(),
+                { it.orthoNeighbors.filter { it in grid } },
+            )
+            return when {
+                d == null && lowerBound == upperBound -> currentCorruption.last()
+                d == null -> search(lowerBound / 2, lowerBound)
+                lowerBound + 1 == upperBound -> search(upperBound, upperBound)
+                else -> search((lowerBound + upperBound) / 2, upperBound)
+            }
+        }
     }
 }
