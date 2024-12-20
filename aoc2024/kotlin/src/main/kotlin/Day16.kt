@@ -115,7 +115,7 @@ object Day16 : AdventOfCode() {
             }
         }.toMap()
 
-    private fun <P> distMap(
+    fun <P> distMap(
         start: P,
         q: Set<P>,
         neighborFn: (P) -> List<P>,
