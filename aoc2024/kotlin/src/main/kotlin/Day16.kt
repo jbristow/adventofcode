@@ -117,15 +117,14 @@ object Day16 : AdventOfCode() {
 
     fun <P> distMap(
         start: P,
-        q: Set<P>,
+        inQ: Set<P>,
         neighborFn: (P) -> List<P>,
         distanceFn: (P, P) -> Int = { _, _ -> 1 },
     ): Pair<Map<P, Int>, Map<P, P>> {
-        tailrec fun djikstraPrime(
-            q: Set<P>,
-            dist: Map<P, Int>,
-            prev: Map<P, P> = emptyMap(),
-        ): Pair<Map<P, Int>, Map<P, P>> {
+        val q = inQ.toMutableSet()
+        val dist: MutableMap<P, Int> = mutableMapOf(start to 0)
+        val prev: MutableMap<P, P> = mutableMapOf()
+        tailrec fun djikstraPrime(): Pair<Map<P, Int>, Map<P, P>> {
             return when (val u = q.filter { it in dist }.minByOrNull { dist.getValue(it) }) {
                 null -> {
                     return dist to prev
@@ -136,14 +135,14 @@ object Day16 : AdventOfCode() {
                         neighborFn(u).filter { v ->
                             u in q && (dist[v] == null || dist[v]!! > ((dist[u] ?: 0) + distanceFn(u, v)))
                         }
-                    djikstraPrime(
-                        q - u,
-                        dist + updates.map { it to (dist[u] ?: 0) + distanceFn(u, it) },
-                        prev + updates.map { it to u },
-                    )
+
+                    q.remove(u)
+                    dist.putAll(updates.map { it to (dist[u] ?: 0) + distanceFn(u, it) })
+                    prev.putAll(updates.map { it to u })
+                    djikstraPrime()
                 }
             }
         }
-        return djikstraPrime(q, mapOf(start to 0), emptyMap())
+        return djikstraPrime()
     }
 }

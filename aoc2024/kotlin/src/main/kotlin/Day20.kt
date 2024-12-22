@@ -1,6 +1,5 @@
 import util.AdventOfCode
 import util.Point2d
-import kotlin.compareTo
 
 object Day20 : AdventOfCode() {
 
@@ -16,15 +15,15 @@ object Day20 : AdventOfCode() {
         input: List<String>,
     ) {
         val track = parse(input)
-        val start = track.asSequence().filter { it.value is Track.Start }.first().key
-        val end = track.asSequence().filter { it.value is Track.End }.first().key
-        val outbound = Day16.distMap(start, track.keys, { it -> it.orthoNeighbors.filter { n -> n in track } }).first
-        val inbound = Day16.distMap(end, track.keys, { it -> it.orthoNeighbors.filter { n -> n in track } }).first
+        val start = track.asSequence().find { it.value is Track.Start }!!.key
+        val end = track.asSequence().find { it.value is Track.End }!!.key
+        val outbound = Day16.distMap(start, track.keys, { it.orthoNeighbors.filter { n -> n in track } }).first
+        val inbound = Day16.distMap(end, track.keys, { it.orthoNeighbors.filter { n -> n in track } }).first
         val noCheat = outbound.getValue(end)
 
         fun cheat(noclipPicoseconds: Int): Int =
-            track.keys.flatMap { p1 ->
-                track.keys.filter { p2 -> p1.manhattanDistance(p2) <= noclipPicoseconds }
+            track.keys.asSequence().flatMap { p1 ->
+                track.keys.asSequence().filter { p2 -> p1.manhattanDistance(p2) <= noclipPicoseconds }
                     .map { p2 -> outbound.getValue(p1) + inbound.getValue(p2) + p1.manhattanDistance(p2) }
             }.map { noCheat - it }.count { it >= 100 }
     }
