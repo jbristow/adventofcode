@@ -18,6 +18,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("io.arrow-kt:arrow-core:$arrowVersion")
     implementation("io.arrow-kt:arrow-optics:$arrowVersion")
+
+    implementation("org.neo4j.driver:neo4j-java-driver:5.27.0")
+
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiterVersion")

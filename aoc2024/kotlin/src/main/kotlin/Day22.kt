@@ -7,8 +7,10 @@ object Day22 : AdventOfCode() {
     @JvmStatic
     fun main(args: Array<String>) {
         println("Day 22")
-        println("\tPart 1: ${part1(inputFileLongs)}")
-        println("\tPart 2: ${part2(inputFileLongs)}")
+//        println("\tPart 1: ${part1(inputFileLongs)}")
+//        println("\tPart 2: ${part2(inputFileLongs)}")
+
+        part1(listOf(1, 2, 3))
     }
 
     private fun part1(numbers: List<Long>): Long =
@@ -17,9 +19,10 @@ object Day22 : AdventOfCode() {
         }
 
     private fun nextSecret(acc: Long): Long {
-        val step1 = acc.shl(6).xor(acc).and(CHOP)
-        val step2 = step1.shr(5).xor(step1).and(CHOP)
-        val step3 = step2.shl(11).xor(step2).and(CHOP)
+        val step1 = ((acc shl 6) xor acc) and CHOP
+        val step2 = ((step1 shr 5) xor step1) and CHOP
+        val step3 = ((step2 shl 11) xor step2) and CHOP
+        println("%06x %8d".format(step3, step3))
         return step3
     }
 
