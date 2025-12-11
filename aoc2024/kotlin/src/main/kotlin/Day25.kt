@@ -1,0 +1,2 @@
+object Day25 {
+}
