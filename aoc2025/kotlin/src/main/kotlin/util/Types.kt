@@ -101,6 +101,13 @@ data class Point2dLRange(
     val xRange: LongRange,
     val yRange: LongRange,
 ) : Iterable<Point2dL> {
+    val corners = listOf(
+        Point2dL(xRange.first, yRange.first),
+        Point2dL(xRange.last, yRange.first),
+        Point2dL(xRange.last, yRange.last),
+        Point2dL(xRange.first, yRange.last),
+    )
+
     val size = ((xRange.last - xRange.first).absoluteValue + 1) * ((yRange.last - yRange.first).absoluteValue + 1)
 
     constructor(minX: Long, maxX: Long, minY: Long, maxY: Long) : this((minX..maxX), (minY..maxY))

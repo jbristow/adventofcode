@@ -1,14 +1,13 @@
 import util.AdventOfCode
 
 object Day11 : AdventOfCode() {
-    private fun List<String>.toReversePathMap(): Map<String, List<String>> {
-        return flatMap { line ->
+    private fun List<String>.toReversePathMap(): Map<String, List<String>> =
+        flatMap { line ->
             line.split(": ")
                 .let { splitLine ->
                     splitLine[1].split(" ").map { it to splitLine[0] }
                 }
         }.groupBy({ it.first }, { it.second })
-    }
 
     tailrec fun countBackwards(
         current: Map<String, Long>,
